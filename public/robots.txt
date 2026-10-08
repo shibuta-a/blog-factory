@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://blog-factory-cf7.pages.dev/sitemap.xml
