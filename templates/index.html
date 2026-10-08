@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{site_name}}</title>
+<meta name="description" content="{{site_description}}">
+<link rel="stylesheet" href="{{root}}assets/style.css">
+<!-- HEAD_SLOT -->
+{{slot_head}}
+</head>
+<body>
+<header class="site-header">
+  <a class="site-name" href="{{root}}{{lang_path}}">{{site_name}}</a>
+  {{lang_switch}}
+</header>
+
+<main class="container">
+  <p class="site-description">{{site_description}}</p>
+
+  <!-- AD_SLOT_TOP -->
+  {{slot_ad_top}}
+
+  <h2 class="list-heading">{{list_label}}</h2>
+  <ul class="post-list">
+    {{posts}}
+  </ul>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; {{year}} {{site_name}}</p>
+</footer>
+</body>
+</html>

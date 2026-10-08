@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="{{lang}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} | {{site_name}}</title>
+<meta name="description" content="{{description}}">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:type" content="article">
+<link rel="stylesheet" href="{{root}}assets/style.css">
+<!-- HEAD_SLOT: 広告ネットワークの<head>用スクリプト（AdSense等）はここに入れる -->
+{{slot_head}}
+</head>
+<body>
+<header class="site-header">
+  <a class="site-name" href="{{root}}{{lang_path}}">{{site_name}}</a>
+</header>
+
+<main class="container">
+  <article>
+    <h1 class="article-title">{{title}}</h1>
+    <p class="meta"><time datetime="{{date}}">{{date_label}} {{date}}</time></p>
+
+    <!-- AD_SLOT_TOP -->
+    {{slot_ad_top}}
+
+    <nav class="toc" aria-label="{{toc_label}}">
+      <p class="toc-title">{{toc_label}}</p>
+      {{toc}}
+    </nav>
+
+    <div class="article-body">
+      {{body}}
+    </div>
+
+    <!-- AFFILIATE_SLOT -->
+    {{slot_affiliate}}
+  </article>
+
+  <p class="back"><a href="{{root}}{{lang_path}}">← {{back_label}}</a></p>
+</main>
+
+<footer class="site-footer">
+  <p>&copy; {{year}} {{site_name}}</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "default_lang": "ja",
+  "languages": {
+    "ja": {
+      "site_name": "MAF ブログ",
+      "site_description": "役立つ情報を毎日お届けするブログです。",
+      "list_label": "新着記事",
+      "toc_label": "目次",
+      "date_label": "公開日",
+      "back_label": "記事一覧へ戻る",
+      "switch_label": "日本語"
+    },
+    "en": {
+      "site_name": "MAF Blog",
+      "site_description": "Useful articles, published every day.",
+      "list_label": "Latest posts",
+      "toc_label": "Contents",
+      "date_label": "Published",
+      "back_label": "Back to all posts",
+      "switch_label": "English"
+    },
+    "zh": {
+      "site_name": "MAF 博客",
+      "site_description": "每天为您带来实用信息。",
+      "list_label": "最新文章",
+      "toc_label": "目录",
+      "date_label": "发布日期",
+      "back_label": "返回文章列表",
+      "switch_label": "中文"
+    }
+  }
+}
