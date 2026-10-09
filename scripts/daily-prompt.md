@@ -8,7 +8,7 @@
 1. `python scripts/autopilot.py sync` … 審査待ちだった広告が承認されていれば台帳に取り込まれる（A8 のログインが切れていれば自動でスキップされる）
 2. `python scripts/autopilot.py review` … 「整えてください」と出た案件があれば、`data/affiliates.json` のその案件を編集する
    - `label`（短いサービス名）、`catch`（30字前後の特徴。ad_copies に書いてあることだけ）、`keywords`（記事に出てきそうな語を5個前後）、
-     `table`（`price` / `storage` / `days` / `feature`。ad_copies に書いてある事実だけ。分からなければ空文字）を書き、`needs_review` を消す
+     `table`（`price` / `storage` / `days` / `feature`。各項目がそのジャンルで何を表すかは review の表示どおり。ad_copies に書いてある事実だけ。分からなければ空文字）を書き、`needs_review` を消す
    - 誇張（No.1、最安など）は ad_copies にあっても書かない
 
 ## 2. 記事を書く（{N} 回くり返す）

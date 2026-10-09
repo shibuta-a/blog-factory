@@ -292,7 +292,8 @@ def cmd_review():
     log("次の案件は label / catch / keywords / table を整えて、needs_review を消してください。"
         "根拠は ad_copies と案件名だけ（書いていない数字は書かない。分からない table の項目は空欄のまま）:")
     for k, v in todo.items():
-        log(f"\n## {k}（genre: {v.get('genre')}）")
+        cols = GENRES.get(v.get("genre"), {}).get("table_columns", {})
+        log(f"\n## {k}（genre: {v.get('genre')}）  table の意味: " + " / ".join(f"{c}={n}" for c, n in cols.items()))
         for c in list(dict.fromkeys(v.get("ad_copies", [])))[:8]:
             log(f"   {c}")
     return 0

@@ -562,7 +562,7 @@
   "priority": 0,
   "table": {
    "price": "",
-   "storage": "",
+   "storage": "冷凍弁当",
    "days": "",
    "feature": "70種類以上のメニュー・カロリー調整食"
   },
@@ -652,7 +652,7 @@
   "priority": 0,
   "table": {
    "price": "",
-   "storage": "",
+   "storage": "冷凍弁当",
    "days": "",
    "feature": "最短翌日着の冷凍弁当"
   },
@@ -701,7 +701,7 @@
   "priority": 0,
   "table": {
    "price": "",
-   "storage": "",
+   "storage": "ミールキット",
    "days": "",
    "feature": "栄養士の献立・7コースから選べるミールキット"
   },

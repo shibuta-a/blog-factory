@@ -314,6 +314,9 @@ def wrap_sections(body):
         # 末尾に付いた広告・比較表は箱の外に出す
         split = re.search(r'\n?(<!-- AD_SLOT_MIDDLE -->|<section class="aff-|<aside class="aff-)', inner)
         core, after = (inner[:split.start()], inner[split.start():]) if split else (inner, "")
+        nested = core.find('<div class="box')  # 記事側で書いたボックスは入れ子にせず、自動の箱の後ろに出す
+        if nested >= 0:
+            core, after = core[:nested], core[nested:] + after
         if "まとめ" in text and core.strip():
             out.append(head + box("box-summary", "この記事のポイント", core) + after)
         elif "注意" in text and core.strip():

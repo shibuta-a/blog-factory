@@ -149,13 +149,23 @@ def render_cta(p, button=BTN_END, kicker="この記事のイチオシ", icon=ICO
     )
 
 
-TABLE_COLS = [("price", "料金の目安"), ("storage", "保管"), ("days", "仕上がり日数")]
+TABLE_COLS = [("price", "料金の目安"), ("storage", "保管"), ("days", "仕上がり日数")]  # 既定（cleaning）
+
+
+def table_cols(genre):
+    """比較表の列名。data/genres.json の table_columns でジャンルごとに変えられる。"""
+    try:
+        conf = json.loads((ROOT / "data" / "genres.json").read_text(encoding="utf-8")).get(genre or "", {})
+    except (OSError, ValueError):
+        conf = {}
+    names = conf.get("table_columns") or {}
+    return [(k, names.get(k, label)) for k, label in TABLE_COLS]
 
 
 def render_table(progs):
     """比較表：各行の右端に申込みボタン。1位に「イチオシ」バッジ。スマホでは縦積みのカードになる。"""
     tables = [p.get("table") or {} for p in progs]
-    cols = [(k, label) for k, label in TABLE_COLS if any(t.get(k) for t in tables)]
+    cols = [(k, label) for k, label in table_cols(progs[0].get("genre")) if any(t.get(k) for t in tables)]
     head = "<th scope=\"col\">サービス</th>" + "".join(f'<th scope="col">{l}</th>' for _, l in cols) \
         + '<th scope="col">特徴</th><th scope="col"><span class="sr-only">申込み</span></th>'
     rows = []

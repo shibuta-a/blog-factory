@@ -198,7 +198,10 @@ def contact_sheet(slug, role, query=None):
     """候補を番号付きで1枚に並べる（目で選ぶとき用）。"""
     md = next(p for p in CONTENT.rglob("*.md") if slug_of(p, front_matter(p)) == slug)
     query = query or queries_for(front_matter(md))[role]
-    cands = search(query, 20, sources=None)[:12]
+    cands = search(query, 20)  # まずは選別済みのストック写真サイトから
+    if len(cands) < 4:
+        cands += search(query, 20, sources=None)
+    cands = cands[:12]
     sheet = Image.new("RGB", (4 * 320, 3 * 200), "white")
     for i, x in enumerate(cands):
         try:
