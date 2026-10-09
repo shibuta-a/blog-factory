@@ -24,6 +24,13 @@ build.py から呼ばれる（Python標準ライブラリのみ）。
   どの列も全社空欄なら、その列ごと出さない。
 
 ■ ボタンの文言は台帳の cta で個別に変えられる。ボックスの一言は cta_note（なければ catch）。
+
+■ 自社サービスの紹介記事（A8 ではない）: 本文に次の形の行を書く（続けて書けば1つの箱にボタンが並ぶ）
+    <!-- CTA: 無料でLINE相談・資料請求する → https://lin.ee/xxxx -->
+    <!-- CTA: 公式サイトで詳しく見る → https://example.com/ -->
+  → その位置（ふつうは「まとめ」の後）・目次の下・「よくある質問」の直前の3か所に申込みボックスが入る。
+    A8 の広告は自動では入らない。PR表記は「運営元による自社サービスの紹介です」になる
+    （フロントマター pr_notice: で文言を変えられる。cta_note: でボックスの一言、cta_name: で見出しを変えられる）。
 """
 import html
 import json
@@ -219,3 +226,49 @@ def apply(body_html, meta, title, programs):
         body_html = body_html.replace("<!-- AFFILIATE_CTA -->", cta_end, 1).replace("<!-- AFFILIATE_CTA -->", "")
         cta_end = ""
     return body_html, cta_top, cta_end, PR_NOTICE
+
+
+# ---------------------------------------------------------------------------
+# 自社サービス（A8 以外）の申込みボックス
+# ---------------------------------------------------------------------------
+OWN_CTA_RE = re.compile(r"<!--\s*CTA:\s*(.+?)\s*(?:→|->)\s*(https?://\S+?)\s*-->")
+OWN_PR_NOTICE = "※本記事は運営元による自社サービスの紹介です。"
+
+
+def render_own_cta(buttons, kicker, name, note, variant="", icon=ICON_CHECK):
+    btns = "".join(
+        f'<a class="aff-btn{" aff-btn-alt" if i else ""}" href="{html.escape(url, quote=True)}" '
+        f'target="_blank" rel="noopener">{html.escape(text)}</a>'
+        for i, (text, url) in enumerate(buttons))
+    return (
+        f'<aside class="aff-box aff-cta aff-own{(" " + variant) if variant else ""}" aria-label="お問い合わせ">'
+        f'<p class="aff-kicker">{icon}<span>{html.escape(kicker)}</span></p>'
+        + (f'<p class="aff-name">{html.escape(name)}</p>' if name else "")
+        + (f'<p class="aff-catch">{html.escape(note)}</p>' if note else "")
+        + f'<div class="aff-btns">{btns}</div>'
+        + '<p class="aff-micro">※相談・資料請求は無料です</p>'
+        + "</aside>"
+    )
+
+
+def apply_own(body_html, meta):
+    """
+    <!-- CTA: 文言 → URL --> を自社サービスの申込みボックスに変える。
+    戻り値: (本文HTML, 目次下のボックス, PR表記HTML)。CTA 行がなければ (そのまま, "", "")
+    """
+    groups = list(re.finditer(r"(?:<!--\s*CTA:.*?-->\s*)+", body_html))
+    if not groups:
+        return body_html, "", ""
+    buttons = OWN_CTA_RE.findall(groups[0].group(0))
+    name = meta.get("cta_name", "")
+    note = meta.get("cta_note", "")
+    end_box = render_own_cta(buttons, "まずは気軽に聞いてみる", name, note)
+    for g in reversed(groups):
+        body_html = body_html[:g.start()] + end_box + "\n" + body_html[g.end():]
+    mid_box = render_own_cta(buttons, "気になったら", name, note, "aff-cta-sub")
+    m = re.search(r"<h2[^>]*>[^<]*よくある質問", body_html)
+    if m:
+        body_html = body_html[:m.start()] + mid_box + "\n" + body_html[m.start():]
+    top_box = render_own_cta(buttons, "無料で相談できます", name, note, "aff-cta-top", ICON_HEART)
+    notice = f'<p class="pr-notice">{html.escape(meta.get("pr_notice") or OWN_PR_NOTICE)}</p>'
+    return body_html, top_box, notice

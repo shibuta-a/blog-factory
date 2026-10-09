@@ -182,5 +182,40 @@
    "openverse_id": "a558706e-e4f3-47d7-a03b-ae94de86edf1",
    "alt": "コーヒーと本"
   }
+ },
+ "orishan-fukugyou": {
+  "eyecatch": {
+   "file": "img/orishan-fukugyou/eyecatch.jpg",
+   "query": "champagne",
+   "title": "Champagne Party",
+   "creator": "Piotr Lohunko",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/champagne-party-OS989CI8D6",
+   "openverse_id": "0b811a88-801c-46f9-9b68-8c4e8c55981a",
+   "alt": "シャンパングラスで乾杯する様子"
+  },
+  "body-1": {
+   "file": "img/orishan-fukugyou/body-1.jpg",
+   "query": "champagne celebration",
+   "title": "Champagne Bottle",
+   "creator": "Kristin Hardwick",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/champagne-bottle-ZLASC4UKIX",
+   "openverse_id": "167e0031-89fd-4ed4-b057-dcac4b9a3d36",
+   "alt": "お祝い用のスパークリングワインとグラス"
+  },
+  "body-2": {
+   "file": "img/orishan-fukugyou/body-2.jpg",
+   "query": "wine bottles",
+   "title": "Wine Bottle",
+   "creator": "Daria Nepriakhina",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/wine-bottle-K5ZDFKB57D",
+   "openverse_id": "793877c5-39e0-4757-995a-e99918c19b75",
+   "alt": "かごに入ったワインボトル"
+  }
  }
 }

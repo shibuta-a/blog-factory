@@ -16,7 +16,7 @@
   **太字**                              … 太字
   > [!POINT] / > [!NOTE] / > [!WARN]   … 「ポイント」「メモ」「注意」のアイコン付きボックス（次の行から中身）
   - ラベル：説明                         … 箇条書きの「：」の前を自動で太字に
-  Q. 質問 / A. 答え（2行続けて書く）      … Q&A の見た目になる
+  Q. 質問 / A. 答え（2行続けて書く）      … Q&A の見た目になる（「**質問？**」の次の行に答え、でも可）
   「まとめ」の見出しの中身は「ポイント」ボックス、「注意」を含む見出しの中身は「注意」ボックスに自動で入る
 
 使い方:  python scripts/build.py
@@ -248,8 +248,9 @@ def markdown(text, headings=None):
         while i < n and not is_block_start(lines[i]):
             buf.append(lines[i].strip())
             i += 1
-        if re.match(r"^Q[.．:：\s]", buf[0]) and len(buf) >= 2 and re.match(r"^A[.．:：\s]", buf[1]):
-            q = re.sub(r"^Q[.．:：\s]\s*", "", buf[0])
+        bold_q = re.match(r"^\*\*(.+?[?？])\*\*$", buf[0]) if len(buf) >= 2 else None
+        if bold_q or (re.match(r"^Q[.．:：\s]", buf[0]) and len(buf) >= 2 and re.match(r"^A[.．:：\s]", buf[1])):
+            q = bold_q.group(1) if bold_q else re.sub(r"^Q[.．:：\s]\s*", "", buf[0])
             a = " ".join(re.sub(r"^A[.．:：\s]\s*", "", b) for b in buf[1:])
             out.append(f'<div class="faq"><p class="faq-q">{inline(q)}</p><p class="faq-a">{inline(a)}</p></div>')
             continue
@@ -458,7 +459,11 @@ def main():
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
             description = meta.get("description") or excerpt_of(body, 120)
-            body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
+            body, cta_top, pr_notice = affiliate.apply_own(body, meta)  # 自社サービスの紹介記事
+            if cta_top:
+                aff_tail = ""
+            else:
+                body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
             body = insert_middle_ad(body, slots["slot_ad_middle"])
             body = wrap_sections(body)
             imgs = images.get(slug, {})

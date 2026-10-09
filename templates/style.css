@@ -184,6 +184,9 @@ img { max-width: 100%; height: auto; }
 .aff-cta-top { padding: 16px 14px 12px; margin: 20px 0 28px; }
 .aff-cta-top .aff-name { font-size: 1.08rem; }
 .aff-cta-sub { margin-top: 18px; }
+.aff-btns { display: flex; flex-direction: column; align-items: center; }
+.aff-btn-alt { background: var(--bg); color: var(--cta-dark) !important; border: 2px solid var(--cta); box-shadow: 0 4px 0 var(--cta-line); }
+.aff-btn-alt:hover { box-shadow: 0 2px 0 var(--cta-line); }
 .aff-px { position: absolute; width: 1px; height: 1px; border: 0; opacity: 0; }
 
 /* 比較表（スマホでは縦積みのカード） */
