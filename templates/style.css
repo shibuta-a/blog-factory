@@ -52,3 +52,28 @@ a { color: var(--accent); }
 .back { margin-top: 40px; }
 .site-footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 24px 16px; border-top: 1px solid var(--line); }
 .ad-slot, .affiliate-slot { margin: 24px 0; }
+
+/* ---------- 広告（A8.net 提携案件）: scripts/affiliate.py が自動で差し込む ---------- */
+.pr-notice { font-size: 0.8rem; color: var(--muted); margin: -12px 0 20px; }
+.aff-box { position: relative; margin: 32px 0; padding: 20px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.aff-kicker { margin: 0 0 10px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); }
+.aff-name { margin: 0; font-size: 1.12rem; font-weight: 700; line-height: 1.5; }
+.aff-catch { margin: 4px 0 0; font-size: 0.93rem; color: var(--muted); }
+.aff-points { margin: 10px 0 0; padding-left: 1.3em; font-size: 0.92rem; }
+.aff-points li { margin: 2px 0; }
+.aff-btn {
+  display: block; margin: 16px auto 0; max-width: 360px; padding: 13px 18px; border-radius: 999px;
+  background: #e8590c; color: #fff; font-weight: 700; text-align: center; text-decoration: none;
+  box-shadow: 0 6px 16px -8px rgba(232, 89, 12, 0.7); transition: transform 0.15s, box-shadow 0.15s;
+}
+.aff-btn::after { content: " \203A"; }
+.aff-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -8px rgba(232, 89, 12, 0.8); color: #fff; }
+.aff-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.aff-card { position: relative; display: flex; flex-direction: column; padding: 18px 14px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.aff-card .aff-btn { margin-top: auto; padding: 10px 12px; font-size: 0.92rem; }
+.aff-card .aff-points { margin-bottom: 14px; }
+.aff-rank {
+  position: absolute; top: -10px; left: 12px; margin: 0; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 700; line-height: 26px; text-align: center;
+}
+.aff-px { position: absolute; width: 1px; height: 1px; border: 0; opacity: 0; }

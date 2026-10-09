@@ -2,3 +2,8 @@
 logs/
 __pycache__/
 *.pyc
+
+# ログイン情報・ブラウザのログイン状態（GitHubに絶対に上げない）
+.secrets/
+*.secret
+data/a8-candidates.json

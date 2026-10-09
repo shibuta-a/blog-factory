@@ -7,6 +7,7 @@
 - 既定言語(ja)は public/ 直下、それ以外の言語は public/<言語>/ に出力
 - slots/*.html の中身（広告・アフィリタグ）を全ページに自動差し込み
 - static/ の中身（画像など）は public/ にそのままコピー
+- data/affiliates.json（A8.net の提携台帳）から、記事の内容に合う広告を自動で差し込む
 
 使い方:  python scripts/build.py
 """
@@ -17,6 +18,9 @@ import re
 import shutil
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import affiliate  # noqa: E402  記事の内容に合わせた広告の自動差し込み
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
@@ -288,6 +292,9 @@ def main():
     tpl_article = (TEMPLATES / "article.html").read_text(encoding="utf-8")
     tpl_index = (TEMPLATES / "index.html").read_text(encoding="utf-8")
 
+    programs = affiliate.load_ledger()
+    print(f"広告台帳: 提携中 {len(programs)} 件")
+
     slots = {
         "slot_head": load_slot("head", None),
         "slot_ad_top": load_slot("ad_top", "ad-slot"),
@@ -336,10 +343,17 @@ def main():
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
             description = meta.get("description") or excerpt_of(body, 120)
+            body, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
             body = insert_middle_ad(body, slots["slot_ad_middle"])
+            slot_affiliate = slots["slot_affiliate"]
+            if aff_tail:
+                slot_affiliate = f'<div class="affiliate-slot">{aff_tail}</div>' + slot_affiliate
+            if pr_notice:
+                names = re.findall(r'class="aff-name">([^<]+)<', body + aff_tail)
+                print(f"  広告 {slug}: {' / '.join(dict.fromkeys(names))}")
 
             page = render(tpl_article, {
-                **L, **slots,
+                **L, **slots, "slot_affiliate": slot_affiliate, "pr_notice": pr_notice,
                 "lang": lang, "root": root, "lang_path": lang_path, "year": year,
                 "title": html.escape(title), "description": html.escape(description),
                 "date": html.escape(date), "toc": build_toc(headings), "body": body,
