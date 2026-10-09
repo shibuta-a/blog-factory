@@ -27,7 +27,9 @@ content/ja/記事.md  →  scripts/build.py  →  public/*.html
 | `public/` | 自動生成された公開用HTML（手で触らない） |
 | `scripts/build.py` | ビルド（Markdown → HTML） |
 | `scripts/publish.py` | 公開（保存 → ビルド → git push） |
-| `scripts/auto-generate.py` | Claude APIで記事を自動生成→広告挿入→公開（「自動投稿オン」まで動かさない） |
+| `scripts/auto-generate.py` | 毎日の自動運転：Claude Code を起動して記事執筆→広告確保→公開（下の「全自動運転」参照） |
+| `scripts/autopilot.py` | 自動運転の道具（ネタ選び・1日の上限・A8 提携・承認取り込み・STATUS.md） |
+| `scripts/images.py` | 著作権フリー写真の自動取得（Openverse） |
 | `scripts/affiliate.py` | 記事の内容に合う広告を台帳から選んで差し込む（build.py が使う） |
 | `scripts/fetch-affiliates.py` | A8.net の提携申請・広告リンク取得をブラウザ自動操作で行い、台帳を更新 |
 | `scripts/a8-login.py` | A8.net にログインした Chrome を用意する |
@@ -146,35 +148,67 @@ python scripts/publish.py                      # 台帳の変更をサイトに�
 
 同じ記事を翻訳するときは、翻訳版も **同じ slug** にしておくと URL が `/slug` と `/en/slug` で揃う。
 
-## 毎日自動投稿をオンにする方法（Windows タスクスケジューラ）
+## 全自動運転（記事・写真・広告・提携を毎日まわす）
 
-※ 現在は**オフ**。渋田さんが「自動投稿オンにして」と言ったら Claude Code が設定する。
+※ 毎日の自動実行は現在**オフ**。渋田さんが「毎日の自動投稿をオンにして」と言ったときだけ Claude Code がオンにする。
+現状は `STATUS.md`（公開のたびに自動更新）で一目で分かる。
 
-前提：`.secrets/anthropic.env`（または従来の `.env`）に `ANTHROPIC_API_KEY=…` を書き、`topics.txt` にネタを並べておく（`scripts/auto-generate.py` 冒頭参照）。
+### 仕組み
 
-- ネタにクリーニング・布団・家事代行などの言葉があれば、**クリーニング比較の型**で書かせ、広告の差し込み口を必ず入れる。
-  生成 → 保存 → ビルド（広告を自動挿入）→ 公開 まで止まらずに回る
-- 生成だけ試す（公開しない）：`python scripts/auto-generate.py --dry-run`
-- APIを呼ばずにプロンプトだけ確認：`python scripts/auto-generate.py --show-prompt "布団クリーニング おすすめ 比較"`
-- 渋田さんが「自動投稿オンにして」と言ったら、Claude Code が APIキーの用意を確認し、下のコマンドで毎日の実行を登録する
-
-### Claude Code が実行するコマンド（毎日朝7時に1本）
-```powershell
-$action  = New-ScheduledTaskAction -Execute "C:\blog-factory\auto-generate.bat" -Argument "-n 1" -WorkingDirectory "C:\blog-factory"
-$trigger = New-ScheduledTaskTrigger -Daily -At 7:00
-$setting = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun
-Register-ScheduledTask -TaskName "BlogFactory-AutoPost" -Action $action -Trigger $trigger -Settings $setting -Description "ブログ工場 毎日自動投稿"
+```
+タスクスケジューラ（毎日 9:00）→ auto-generate.bat → scripts/auto-generate.py
+  → Claude Code をヘッドレス起動（claude -p。外部APIの従量課金は使わない）
+  → scripts/daily-prompt.md の手順で Claude Code 自身が動く:
+      ① autopilot.py sync     審査待ちの承認を取り込む → 新しい広告の説明文・比較表データを整える
+      ② autopilot.py next     次のネタ（topics.txt）・ジャンル・型・既存記事を確認（1日の上限もここで判定）
+      ③ autopilot.py ads      そのジャンルの広告が足りなければ A8 で検索 → 提携申請 → 即時提携分を台帳へ（エンジン②）
+      ④ 型に沿って記事を書く → content/ja/ に保存 → autopilot.py done でネタに印
+      ⑤ publish.py            写真（Openverse）→ ビルド（比較表・申込みボックス・PR表記）→ 公開 → STATUS.md
+      ⑥ autopilot.py topics-check  残りネタが少ないジャンルは Claude Code が10個補充
 ```
 
-- 確認：`Get-ScheduledTask -TaskName BlogFactory-AutoPost`
-- 今すぐ1回試す：`Start-ScheduledTask -TaskName BlogFactory-AutoPost`
-- オフにする：`Unregister-ScheduledTask -TaskName BlogFactory-AutoPost -Confirm:$false`
-- ログ：`logs/auto-generate.log`
-- PCの電源が切れている時刻は実行されない（`StartWhenAvailable` で次回起動時に実行）
+| ファイル | 役割 |
+|---|---|
+| `topics.txt` | ネタの台帳。`## genre: id` の下に `- [ ] キーワード`。使うと `- [x] … → slug（日付）` になる |
+| `data/genres.json` | ジャンルの設定（A8 の検索語・対象/対象外・広告の自動選択キーワード・使う型） |
+| `templates/kata/compare.md` | 全ジャンル共通の記事の型（導入→選び方→比較→注意点→Q&A→まとめ） |
+| `scripts/daily-prompt.md` | 自動運転の Claude Code への手順書（記事のルール・スパム対策・禁止事項） |
+| `scripts/autopilot.py` | 司令塔の道具（next / done / ads / sync / a8-check / topics-check / review / status） |
+| `scripts/auto-generate.py` | Claude Code を起動する（許可するコマンドは autopilot・publish・images だけ） |
+| `scripts/schedule.ps1` | 毎日の自動実行のオン／オフ |
+| `STATUS.md` | 記事数・ジャンル別内訳・提携中/審査待ち・残りネタ・自動投稿オン/オフ・要対応 |
+| `logs/autopilot.log` | 自動実行の記録 |
 
-### 手で設定する場合（参考）
-タスクスケジューラ → 基本タスクの作成 → 名前「BlogFactory-AutoPost」→ 毎日 → 7:00 → プログラムの開始 →
-プログラム `C:\blog-factory\auto-generate.bat`、引数 `-n 1`、開始 `C:\blog-factory` → 完了。
+### スパム対策・安全
+
+- 自動生成の記事（`generated_by: autopilot`）は **1日3本まで**（`autopilot.py` の `MAX_PER_DAY`）。何度起動しても超えない
+- ジャンルを順番に回し、公開済みの記事一覧を見せて同じ切り口を避けさせる。各記事に選び方・注意点・Q&A を必須
+- 各社の数字は本文に書かせない（比較表は台帳の事実だけ。分からない項目は「公式サイトで確認」）
+- A8 のログインが切れていたら提携作業だけ飛ばして記事は公開し、STATUS.md の「要対応」に出す
+
+### コマンド
+
+- 今すぐ1回まわす（2本）：`python scripts/auto-generate.py`（1本だけ：`-n 1`）
+- 毎日の自動実行をオン：`powershell -ExecutionPolicy Bypass -File scripts\schedule.ps1 on`（時刻と本数を変える：`… on 10:30 3`）
+- オフ：`… schedule.ps1 off`　状態：`… schedule.ps1 status`
+- 前提：PC が起動していて渋田さんがログオン中であること（実行時刻に止まっていたら、次の起動時に1回実行）
+
+## Google Search Console（検索に載せる）
+
+サイトマップ `https://blog-factory-cf7.pages.dev/sitemap.xml` は公開のたびに自動で作り直される（各記事の更新日 `lastmod` 付き）。
+`robots.txt` にもサイトマップの場所を書いてある。
+
+### 渋田さんの作業（最初の1回だけ・約3分）
+
+1. https://search.google.com/search-console を開き、Google アカウントでログイン
+2. 「プロパティを追加」→ 右側の **「URL プレフィックス」** に `https://blog-factory-cf7.pages.dev/` を入れて「続行」
+3. 確認方法の一覧から **「HTML タグ」** を開き、表示された `<meta name="google-site-verification" content="……">` を**コピーして Claude Code に貼る**
+   （→ Claude Code が `site.json` の `google_site_verification` に書いて公開する。1〜2分で反映）
+4. Claude Code が「反映しました」と言ったら、Search Console の画面で **「確認」** を押す
+5. 左メニュー「サイトマップ」→ `sitemap.xml` と入力して **「送信」**
+
+※ 「ドメイン」プロパティは DNS の設定が必要で、pages.dev では使えないので「URL プレフィックス」を選ぶ。
+※ Google から「HTML ファイル」（google…….html）を渡された場合は、そのファイルを Claude Code に渡せば `static/` に置いて公開する（どちらの方法でもよい）。
 
 ## Cloudflare Pages の設定値（記録）
 
@@ -194,7 +228,6 @@ Register-ScheduledTask -TaskName "BlogFactory-AutoPost" -Action $action -Trigger
 | もの | 場所 |
 |---|---|
 | A8.net のログイン状態（ブラウザのデータ） | `.secrets/a8-browser-profile/` ※ID・パスワードそのものは保存していない |
-| Claude API キー（自動投稿用） | `.secrets/anthropic.env`（従来の `.env` も可） |
 | 作業時のスクリーンショット | `.secrets/shots/` |
 
 `.secrets/`・`.env`・`data/a8-candidates.json` は `.gitignore` で除外済み。公開リポジトリに出るのは台帳 `data/affiliates.json`（公開前提のアフィリエイトリンクのみ）。

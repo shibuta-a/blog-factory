@@ -217,5 +217,37 @@
    "openverse_id": "793877c5-39e0-4757-995a-e99918c19b75",
    "alt": "かごに入ったワインボトル"
   }
+ },
+ "takuhai-bento-hitorigurashi": {
+  "eyecatch": {
+   "file": "img/takuhai-bento-hitorigurashi/eyecatch.jpg",
+   "query": "healthy meal",
+   "title": "Healthy Meal",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/5970447/healthy-meal",
+   "openverse_id": "c7452d87-a914-4ab8-add8-400fad63f856"
+  },
+  "body-1": {
+   "file": "img/takuhai-bento-hitorigurashi/body-1.jpg",
+   "query": "microwave kitchen",
+   "title": "Microwave Food",
+   "creator": "Lisa Fotios",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/microwave-food-21CWIC8UCJ",
+   "openverse_id": "5533e95d-7d60-46c0-bf45-2e488e84c23f"
+  },
+  "body-2": {
+   "file": "img/takuhai-bento-hitorigurashi/body-2.jpg",
+   "query": "refrigerator freezer",
+   "title": "Refrigerators in supermarket",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/6082105/refrigerators-supermarket",
+   "openverse_id": "49f72c0a-9e70-4404-babe-d6a7f7ae3fe3"
+  }
  }
 }
