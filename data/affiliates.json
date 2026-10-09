@@ -49,7 +49,8 @@
    "storage": "",
    "days": "",
    "feature": "布団丸洗い専門。全国送料無料・決済手数料無料"
-  }
+  },
+  "genre": "cleaning"
  },
  "しももとクリーニング": {
   "program_id": "s00000017843001",
@@ -93,7 +94,8 @@
    "storage": "",
    "days": "",
    "feature": "他の人の布団と一緒に洗わない「完全個別洗い」"
-  }
+  },
+  "genre": "cleaning"
  },
  "モクリン": {
   "program_id": "s00000023611001",
@@ -137,7 +139,8 @@
    "storage": "",
    "days": "",
    "feature": "品質重視の宅配クリーニング"
-  }
+  },
+  "genre": "cleaning"
  },
  "ポニークリーニング": {
   "program_id": "s00000021644001",
@@ -178,7 +181,8 @@
    "storage": "最大9か月",
    "days": "",
    "feature": "創業60年の老舗。保管付き"
-  }
+  },
+  "genre": "cleaning"
  },
  "フラットクリーニング": {
   "program_id": "s00000022166001",
@@ -221,7 +225,8 @@
    "storage": "保管20点パックあり",
    "days": "",
    "feature": "富士山の伏流水で洗う。ダウン・コートOK"
-  }
+  },
+  "genre": "cleaning"
  },
  "プラスキューブ": {
   "program_id": "s00000018478001",
@@ -264,7 +269,8 @@
    "storage": "",
    "days": "",
    "feature": "職人が1枚ずつ洗う個別洗い。送料無料"
-  }
+  },
+  "genre": "cleaning"
  },
  "Loop Laundry": {
   "program_id": "s00000026065001",
@@ -301,7 +307,8 @@
    "storage": "",
    "days": "",
    "feature": "定額制（サブスク）の宅配クリーニング"
-  }
+  },
+  "genre": "cleaning"
  },
  "クリーニングモンスター": {
   "program_id": "s00000021792001",
@@ -341,7 +348,8 @@
    "storage": "",
    "days": "",
    "feature": "シミ抜きが得意。無料オプションあり"
-  }
+  },
+  "genre": "cleaning"
  },
  "ハイクリア": {
   "program_id": "s00000027173001",
@@ -374,6 +382,7 @@
    "storage": "",
    "days": "",
    "feature": "人にも環境にもやさしい洗い"
-  }
+  },
+  "genre": "cleaning"
  }
 }

@@ -392,6 +392,12 @@ def load_slot(name, css_class):
     return f'<div class="{css_class}">{content}</div>' if css_class else content
 
 
+def verification_tag(config):
+    """Google Search Console の所有権確認タグ（site.json の google_site_verification に content の値を書く）。"""
+    code = (config.get("google_site_verification") or "").strip()
+    return f'<meta name="google-site-verification" content="{html.escape(code, quote=True)}">\n' if code else ""
+
+
 def excerpt_of(body_html, length=90):
     text = re.sub(r"<[^>]+>", "", body_html)
     text = re.sub(r"\s+", " ", text).strip()
@@ -412,7 +418,7 @@ def main():
     print(f"広告台帳: 提携中 {len(programs)} 件")
 
     slots = {
-        "slot_head": load_slot("head", None),
+        "slot_head": verification_tag(config) + load_slot("head", None),
         "slot_ad_top": load_slot("ad_top", "ad-slot"),
         "slot_ad_middle": load_slot("ad_middle", "ad-slot"),
         "slot_affiliate": load_slot("affiliate", "affiliate-slot"),
@@ -493,7 +499,7 @@ def main():
             plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)
             posts.append({"slug": slug, "title": title, "date": date, "excerpt": excerpt_of(plain_body),
                           "thumb": f"img/{slug}/thumb.jpg" if imgs.get("eyecatch") else ""})
-            sitemap_urls.append(f"{url_prefix}{slug}")
+            sitemap_urls.append((f"{url_prefix}{slug}", meta.get("updated") or date))
             total += 1
 
         posts.sort(key=lambda p: (p["date"], p["slug"]), reverse=True)
@@ -523,13 +529,14 @@ def main():
             "posts": items, "lang_switch": switch,
         })
         (out_dir / "index.html").write_text(index, encoding="utf-8")
-        sitemap_urls.append(url_prefix)
+        sitemap_urls.append((url_prefix, max([p["date"] for p in posts] or [today])))
         print(f"[{lang}] {len(posts)} 記事")
 
     if base_url:
         xml = ['<?xml version="1.0" encoding="UTF-8"?>',
                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
-        xml += [f"  <url><loc>{html.escape(base_url)}/{u}</loc></url>" for u in sitemap_urls]
+        xml += [f"  <url><loc>{html.escape(base_url)}/{u}</loc><lastmod>{html.escape(d)}</lastmod></url>"
+                for u, d in sitemap_urls]
         xml.append("</urlset>")
         (PUBLIC / "sitemap.xml").write_text("\n".join(xml) + "\n", encoding="utf-8")
         (PUBLIC / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n", encoding="utf-8")

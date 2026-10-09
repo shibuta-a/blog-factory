@@ -6,12 +6,13 @@ A8.net の提携作業をブラウザ自動操作でまとめて行い、広告�
       （起動とログインは `python scripts/a8-login.py`。A8.net はブラウザを閉じるとログインが消えるため、
         ログインした Chrome を開いたまま、このスクリプトを実行する）
 
-  python scripts/fetch-affiliates.py search          … 候補を検索して data/a8-candidates.json に保存（提携はしない）
-  python scripts/fetch-affiliates.py apply [-n 20]   … 候補のうち未提携のものに提携申請（即時提携を優先）
-  python scripts/fetch-affiliates.py links           … 提携中のプログラムの広告リンクを取得して data/affiliates.json を更新
-  python scripts/fetch-affiliates.py all             … search → apply → links を続けて実行
+  python scripts/fetch-affiliates.py search [--genre food]   … 候補を検索して data/a8-candidates.json に追記（提携はしない）
+  python scripts/fetch-affiliates.py apply [--genre food] [-n 20] … 候補のうち未申請のものに提携申請（即時提携を優先）
+  python scripts/fetch-affiliates.py links                   … 提携中のプログラムの広告リンクを取得して data/affiliates.json を更新
+  python scripts/fetch-affiliates.py all [--genre food]      … search → apply → links を続けて実行
 
-検索ワードやジャンルの判定は下の KEYWORDS / RELEVANT を変えれば、別ジャンル（宅配食・通信講座など）にも使える。
+ジャンル（検索ワード・対象/対象外の判定・台帳に入れるときのキーワード）は data/genres.json で決める。
+--genre を省くと全ジャンル。ジャンルを増やすときは genres.json に1つ足すだけ。
 """
 import argparse
 import datetime
@@ -35,13 +36,17 @@ SHOTS = ROOT / ".secrets" / "shots"
 
 BASE = "https://media-console.a8.net"
 
-# 検索するキーワード（ジャンルを広げるときはここに足す）
-KEYWORDS = ["宅配クリーニング", "布団クリーニング", "ふとんクリーニング", "クリーニング 保管",
-            "家事代行", "ホワイト急便", "Nexcy", "しももと", "リナビス", "リネット", "カジタク"]
-# 候補に残す条件（名前・関連キーワードにどれかを含むもの）
-RELEVANT = ["クリーニング", "家事代行", "家事", "布団", "ふとん"]
-# 対象外（クリーニングでも今回のジャンルと違うもの）
-EXCLUDE = ["エアコン", "ハウスクリーニング", "靴", "くつ", "スニーカー"]
+GENRES = {k: v for k, v in json.loads((DATA / "genres.json").read_text(encoding="utf-8")).items()
+          if not k.startswith("_")}
+
+
+def genre_of(name):
+    """案件名からジャンルを判定する（家事代行を先に見る：「家事代行」は cleaning の語を含まないため）。"""
+    for g in sorted(GENRES, key=lambda g: g != "kaji"):
+        conf = GENRES[g]
+        if any(w in name for w in conf["relevant"]) and not any(w in name for w in conf["exclude"]):
+            return g
+    return ""
 
 # 提携申請フォームの任意項目（このブログの実態に合わせる）
 APPLY_CHANNELS = ["SEO"]
@@ -103,19 +108,25 @@ def search(page, keyword, auto_only=False):
     return parse_cards(page)
 
 
-def is_relevant(c):
+def is_relevant(c, conf):
     hay = c["name"] + " " + c["text"]
-    return any(w in hay for w in RELEVANT) and not any(w in c["name"] for w in EXCLUDE)
+    return any(w in hay for w in conf["relevant"]) and not any(w in c["name"] for w in conf["exclude"])
 
 
-def cmd_search(page):
+def cmd_search(page, genres):
+    for g in genres:
+        search_genre(page, g)
+
+
+def search_genre(page, genre):
+    conf = GENRES[genre]
     found = {}
     auto_ids = set()
-    for kw in KEYWORDS:
+    for kw in conf["a8_search"]:
         cards = search(page, kw)
         auto = search(page, kw, auto_only=True)
         auto_ids |= {c["program_id"] for c in auto}
-        rel = [c for c in cards if c["program_id"] and is_relevant(c)]
+        rel = [c for c in cards if c["program_id"] and is_relevant(c, conf)]
         log(f"検索「{kw}」: {len(cards)} 件中 {len(rel)} 件が対象（即時提携 {len(auto)} 件）")
         for c in rel:
             found.setdefault(c["program_id"], c)
@@ -126,10 +137,16 @@ def cmd_search(page):
         m = re.search(r"確定率\s*([\d.]+%|-)", c["text"])
         c["decided_rate"] = m.group(1) if m else ""
         c.pop("rows", None)
+        c["genre"] = genre_of(c["name"]) or genre
+    # 既存の候補に追記する（申請の記録 apply_result などは消さない）
+    old = {c["program_id"]: c for c in json.loads(CANDIDATES.read_text(encoding="utf-8"))} if CANDIDATES.exists() else {}
+    for pid, c in found.items():
+        prev = old.get(pid, {})
+        old[pid] = {**c, **{k: prev[k] for k in ("apply_result", "applied_at") if k in prev}}
     DATA.mkdir(exist_ok=True)
     out = sorted(found.values(), key=lambda c: (not c["auto_contract"], c["name"]))
-    CANDIDATES.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
-    log(f"候補 {len(out)} 件を {CANDIDATES.relative_to(ROOT)} に保存")
+    CANDIDATES.write_text(json.dumps(list(old.values()), ensure_ascii=False, indent=1), encoding="utf-8")
+    log(f"[{genre}] 候補 {len(out)} 件を {CANDIDATES.relative_to(ROOT)} に追記")
     for c in out:
         log(f"  [{c['status']}] {'即時' if c['auto_contract'] else '審査'} {c['program_id']} {c['name']} / {c['reward']}")
     return out
@@ -171,11 +188,14 @@ def apply_one(page, c):
     return "結果不明（スクリーンショット確認）"
 
 
-def cmd_apply(page, limit, ids=None):
+def cmd_apply(page, limit, ids=None, genres=None):
     if not CANDIDATES.exists():
         sys.exit("先に search を実行してください。")
     cands = json.loads(CANDIDATES.read_text(encoding="utf-8"))
-    todo = [c for c in cands if "未提携" in c.get("status", "") and not c.get("apply_result")]
+    for c in cands:
+        c.setdefault("genre", genre_of(c["name"]))
+    todo = [c for c in cands if "未提携" in c.get("status", "") and not c.get("apply_result")
+            and (not genres or c.get("genre") in genres)]
     if ids:
         todo = [c for c in cands if c["program_id"] in ids]
     todo.sort(key=lambda c: not c.get("auto_contract"))
@@ -270,9 +290,13 @@ def cmd_links(page):
             "reward": c.get("reward", ""),
             "fetched_at": datetime.date.today().isoformat(),
         })
+        conf = GENRES.get(c.get("genre") or genre_of(c["name"]), {})
         entry.setdefault("label", c["name"])
-        entry.setdefault("keywords", ["クリーニング"])
-        entry.setdefault("genre_keywords", ["クリーニング", "布団", "ふとん", "家事"])
+        entry.setdefault("genre", c.get("genre") or genre_of(c["name"]))
+        entry.setdefault("keywords", conf.get("keywords", ["クリーニング"]))
+        entry.setdefault("genre_keywords", conf.get("genre_keywords", ["クリーニング"]))
+        if key not in by_pid.values():
+            entry.setdefault("needs_review", True)  # 自動運転の Claude が label/catch/table を整えたら消す
         ledger[key] = entry
         added += 1
         log(f"  取得: {pid} {key}（テキスト素材 {len(links)} 件）")
@@ -286,14 +310,16 @@ def main():
     ap.add_argument("command", choices=["search", "apply", "links", "all"])
     ap.add_argument("-n", type=int, default=20, help="apply で申請する最大件数")
     ap.add_argument("--ids", nargs="*", help="apply で申請するプログラムIDを指定（省略時は候補の未提携すべてから）")
+    ap.add_argument("--genre", choices=sorted(GENRES), help="対象ジャンル（data/genres.json の id）。省略時は全ジャンル")
     args = ap.parse_args()
+    genres = [args.genre] if args.genre else sorted(GENRES)
     with sync_playwright() as p:
         _, page = connect(p)
         try:
             if args.command in ("search", "all"):
-                cmd_search(page)
+                cmd_search(page, genres)
             if args.command in ("apply", "all"):
-                cmd_apply(page, args.n, args.ids)
+                cmd_apply(page, args.n, args.ids, genres if args.genre else None)
             if args.command in ("links", "all"):
                 cmd_links(page)
         finally:

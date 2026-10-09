@@ -6,7 +6,7 @@
   python scripts/publish.py 記事.md               # 記事.md を content/ja/ にコピーしてから公開
   python scripts/publish.py 記事.md --lang en     # 英語版として content/en/ に置いて公開
 
-流れ: (記事を content/<言語>/ に保存) → images.py（写真）→ build.py → git add/commit/push
+流れ: (記事を content/<言語>/ に保存) → images.py（写真）→ build.py → STATUS.md 更新 → git add/commit/push
        → GitHub に届くと Cloudflare Pages が自動でサイトを更新（1〜2分）
 """
 import argparse
@@ -56,6 +56,7 @@ def main():
         print("（写真の用意をスキップしました。記事は写真なしで公開されます）")
 
     run([sys.executable, str(ROOT / "scripts" / "build.py")])
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "autopilot.py"), "status"], cwd=ROOT, capture_output=True)  # STATUS.md
 
     run(["git", "add", "-A"])
     if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:
