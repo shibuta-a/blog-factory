@@ -198,3 +198,10 @@ Register-ScheduledTask -TaskName "BlogFactory-AutoPost" -Action $action -Trigger
 | 作業時のスクリーンショット | `.secrets/shots/` |
 
 `.secrets/`・`.env`・`data/a8-candidates.json` は `.gitignore` で除外済み。公開リポジトリに出るのは台帳 `data/affiliates.json`（公開前提のアフィリエイトリンクのみ）。
+
+## 売れるデザイン（2026-10-09〜）
+
+- **写真**：`scripts/images.py` が Openverse から CC0／パブリックドメインの写真だけを探して `static/img/<slug>/` に保存（APIキー不要・自サイトに置くのでホットリンクなし）。`publish.py` が自動で呼ぶ。記事のフロントマター `image_query: 英語2語` で検索語を指定できる。気に入らない写真は `python scripts/images.py --sheet <slug> <役割> [--query 英語]` で候補一覧を作り、`--pick <slug> <役割> <番号>` で差し替え。
+- **申込みボックス**：目次の下・比較表の直後・まとめの後の3か所に自動で入る（赤橙ボタン）。文言は `scripts/affiliate.py` の `BTN_*`。
+- **比較表**：2件以上の広告が合う「比較・おすすめ」記事に自動で入る。中身は `data/affiliates.json` の `table`（price/storage/days/feature）。分からない項目は「公式サイトで確認」と表示される。
+- **本文の飾り**：`==マーカー==`、`> [!POINT]` / `> [!WARN]` / `> [!NOTE]` のボックス、「ラベル：説明」の箇条書きは自動で太字、`Q.`/`A.` は Q&A 表示、「まとめ」は自動でポイントボックス。

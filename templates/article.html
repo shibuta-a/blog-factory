@@ -8,6 +8,7 @@
 <meta property="og:title" content="{{title}}">
 <meta property="og:description" content="{{description}}">
 <meta property="og:type" content="article">
+{{og_image}}
 <link rel="stylesheet" href="{{root}}assets/style.css">
 <!-- HEAD_SLOT: 広告ネットワークの<head>用スクリプト（AdSense等）はここに入れる -->
 {{slot_head}}
@@ -22,6 +23,7 @@
     <h1 class="article-title">{{title}}</h1>
     <p class="meta"><time datetime="{{date}}">{{date_label}} {{date}}</time></p>
     {{pr_notice}}
+    {{eyecatch}}
 
     <!-- AD_SLOT_TOP -->
     {{slot_ad_top}}
@@ -31,12 +33,17 @@
       {{toc}}
     </nav>
 
+    <!-- CTA_TOP: 目次の下の申込みボックス（scripts/affiliate.py が自動で入れる） -->
+    {{cta_top}}
+
     <div class="article-body">
       {{body}}
     </div>
 
     <!-- AFFILIATE_SLOT -->
     {{slot_affiliate}}
+
+    {{photo_credit}}
   </article>
 
   <p class="back"><a href="{{root}}{{lang_path}}">← {{back_label}}</a></p>

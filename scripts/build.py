@@ -8,6 +8,16 @@
 - slots/*.html の中身（広告・アフィリタグ）を全ページに自動差し込み
 - static/ の中身（画像など）は public/ にそのままコピー
 - data/affiliates.json（A8.net の提携台帳）から、記事の内容に合う広告を自動で差し込む
+- data/images.json（scripts/images.py が用意した著作権フリー写真の台帳）から、アイキャッチ・本文中の写真・
+  一覧のサムネイル・出典表記を自動で入れる
+
+■ 記事で使える「見た目」の書き方（すべて任意。書かなくても自動で整う）
+  ==大事な一文==                       … 蛍光ペン風マーカー
+  **太字**                              … 太字
+  > [!POINT] / > [!NOTE] / > [!WARN]   … 「ポイント」「メモ」「注意」のアイコン付きボックス（次の行から中身）
+  - ラベル：説明                         … 箇条書きの「：」の前を自動で太字に
+  Q. 質問 / A. 答え（2行続けて書く）      … Q&A の見た目になる
+  「まとめ」の見出しの中身は「ポイント」ボックス、「注意」を含む見出しの中身は「注意」ボックスに自動で入る
 
 使い方:  python scripts/build.py
 """
@@ -71,7 +81,25 @@ def inline(text):
     text = re.sub(r"__(.+?)__", r"<strong>\1</strong>", text)
     text = re.sub(r"(?<![\*\w])\*(?!\s)(.+?)(?<!\s)\*(?!\*)", r"<em>\1</em>", text)
     text = re.sub(r"~~(.+?)~~", r"<del>\1</del>", text)
+    text = re.sub(r"==(.+?)==", r"<mark>\1</mark>", text)
     return re.sub(r"\x00(\d+)\x00", lambda m: codes[int(m.group(1))], text)
+
+
+def bold_label(text):
+    """「ラベル：説明」形式の箇条書きは、ラベルを太字にして拾い読みしやすくする。"""
+    m = re.match(r"^([^：:*<>\[\]`]{2,24})：(.+)$", text)
+    return f"**{m.group(1)}**：{m.group(2)}" if m else text
+
+
+CALLOUTS = {  # > [!POINT] 等のボックス: (CSSクラス, 見出し)
+    "POINT": ("box-point", "ポイント"), "TIP": ("box-point", "ポイント"),
+    "NOTE": ("box-memo", "メモ"), "MEMO": ("box-memo", "メモ"),
+    "WARN": ("box-warn", "注意"), "WARNING": ("box-warn", "注意"), "CAUTION": ("box-warn", "注意"),
+}
+
+
+def box(cls, label, inner):
+    return f'<div class="box {cls}"><p class="box-label">{label}</p>{inner}</div>'
 
 
 LIST_RE = re.compile(r"^(\s*)([-*+]|\d+[.)])\s+(.*)$")
@@ -91,7 +119,7 @@ def render_list(items):
             while len(stack) > 1 and indent < stack[-1][0]:
                 out.append(f"</li></{stack.pop()[1]}>")
             out.append("</li>")
-        out.append("<li>" + inline(text))
+        out.append("<li>" + inline(bold_label(text)))
     while stack:
         out.append(f"</li></{stack.pop()[1]}>")
     return "".join(out)
@@ -165,7 +193,13 @@ def markdown(text, headings=None):
             while i < n and lines[i].strip().startswith(">"):
                 buf.append(re.sub(r"^\s*>\s?", "", lines[i]))
                 i += 1
-            out.append("<blockquote>" + markdown("\n".join(buf)) + "</blockquote>")
+            cm = re.match(r"^\s*\[!(\w+)\]\s*(.*)$", buf[0]) if buf else None
+            if cm and cm.group(1).upper() in CALLOUTS:
+                cls, label = CALLOUTS[cm.group(1).upper()]
+                rest = ([cm.group(2)] if cm.group(2) else []) + buf[1:]
+                out.append(box(cls, label, markdown("\n".join(rest))))
+            else:
+                out.append("<blockquote>" + markdown("\n".join(buf)) + "</blockquote>")
             continue
 
         # table
@@ -214,7 +248,15 @@ def markdown(text, headings=None):
         while i < n and not is_block_start(lines[i]):
             buf.append(lines[i].strip())
             i += 1
-        out.append("<p>" + "<br>\n".join(inline(b) for b in buf) + "</p>")
+        if re.match(r"^Q[.．:：\s]", buf[0]) and len(buf) >= 2 and re.match(r"^A[.．:：\s]", buf[1]):
+            q = re.sub(r"^Q[.．:：\s]\s*", "", buf[0])
+            a = " ".join(re.sub(r"^A[.．:：\s]\s*", "", b) for b in buf[1:])
+            out.append(f'<div class="faq"><p class="faq-q">{inline(q)}</p><p class="faq-a">{inline(a)}</p></div>')
+            continue
+        para = "<br>\n".join(inline(b) for b in buf)
+        # 「ポイントは〜。」の一文は自動でマーカー
+        para = re.sub(r"^(ポイントは[^。<]{4,80}。?)", r"<mark>\1</mark>", para)
+        out.append("<p>" + para + "</p>")
 
     return "\n".join(out)
 
@@ -258,6 +300,78 @@ def insert_middle_ad(body, ad_html):
     return body + "\n" + marker
 
 
+def wrap_sections(body):
+    """「まとめ」の中身はポイントボックス、「注意」を含む見出しの中身は注意ボックスで囲む（その見出しから次の h2 まで）。"""
+    parts = re.split(r"(?=<h2[ >])", body)
+    out = []
+    for part in parts:
+        m = re.match(r"(<h2[^>]*>(.*?)</h2>)(.*)", part, re.S)
+        if not m or 'class="box' in m.group(3)[:200]:
+            out.append(part)
+            continue
+        head, text, inner = m.group(1), re.sub(r"<[^>]+>", "", m.group(2)), m.group(3)
+        # 末尾に付いた広告・比較表は箱の外に出す
+        split = re.search(r'\n?(<!-- AD_SLOT_MIDDLE -->|<section class="aff-|<aside class="aff-)', inner)
+        core, after = (inner[:split.start()], inner[split.start():]) if split else (inner, "")
+        if "まとめ" in text and core.strip():
+            out.append(head + box("box-summary", "この記事のポイント", core) + after)
+        elif "注意" in text and core.strip():
+            out.append(head + box("box-warn", "注意", core) + after)
+        else:
+            out.append(part)
+    return "".join(out)
+
+
+def load_images():
+    f = ROOT / "data" / "images.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
+def img_tag(root, item, alt, w, h, lazy=True):
+    attrs = 'loading="lazy" decoding="async"' if lazy else 'fetchpriority="high" decoding="async"'
+    return (f'<img src="{root}{html.escape(item["file"], quote=True)}" width="{w}" height="{h}" '
+            f'alt="{html.escape(alt, quote=True)}" {attrs}>')
+
+
+def insert_body_images(body, imgs, root):
+    """本文中の写真を、2つ目の h2 と、後半の h2 の見出しのすぐ下に入れる（まとめ・よくある質問には入れない）。"""
+    h2s = [(m, re.sub(r"<[^>]+>", "", m.group(1))) for m in re.finditer(r"<h2[^>]*>(.*?)</h2>", body)]
+    usable = [i for i, (_, t) in enumerate(h2s) if not any(w in t for w in ("まとめ", "よくある質問", "FAQ"))]
+    if len(usable) < 2:
+        return body
+    targets = {"body-1": usable[1]}
+    if len(usable) >= 3:
+        targets["body-2"] = usable[max(2, (len(usable) * 2) // 3)]
+    if len(set(targets.values())) < len(targets):
+        targets.pop("body-2", None)
+    for role, idx in sorted(targets.items(), key=lambda x: -x[1]):  # 後ろから入れて位置がずれないように
+        item = imgs.get(role)
+        if not item:
+            continue
+        m, text = h2s[idx]
+        alt = item.get("alt") or f"{text}のイメージ写真"
+        fig = f'\n<figure class="body-img">{img_tag(root, item, alt, 960, 540)}</figure>'
+        body = body[:m.end()] + fig + body[m.end():]
+    return body
+
+
+def photo_credit(imgs):
+    """写真の出典。CC0/パブリックドメインなので表記の義務はないが、出どころを明記しておく。"""
+    items = [imgs[r] for r in ("eyecatch", "body-1", "body-2") if imgs.get(r)]
+    if not items:
+        return ""
+    links = []
+    for it in items:
+        label = html.escape(it.get("title") or "photo")
+        by = f" by {html.escape(it['creator'])}" if it.get("creator") else ""
+        src = html.escape((it.get("source") or "").capitalize())
+        href = html.escape(it.get("landing_url") or "", quote=True)
+        a = f'<a href="{href}" target="_blank" rel="noopener">{label}</a>' if href else label
+        links.append(f"{a}{by}（{html.escape(it.get('license', ''))} / {src}）")
+    return ('<p class="photo-credit">写真：' + "、".join(links)
+            + '　※著作権フリー（CC0・パブリックドメイン）素材を <a href="https://openverse.org/" target="_blank" rel="noopener">Openverse</a> 経由で使用しています。</p>')
+
+
 # ---------------------------------------------------------------------------
 # Rendering
 # ---------------------------------------------------------------------------
@@ -293,6 +407,7 @@ def main():
     tpl_index = (TEMPLATES / "index.html").read_text(encoding="utf-8")
 
     programs = affiliate.load_ledger()
+    images = load_images()
     print(f"広告台帳: 提携中 {len(programs)} 件")
 
     slots = {
@@ -343,13 +458,23 @@ def main():
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
             description = meta.get("description") or excerpt_of(body, 120)
-            body, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
+            body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
             body = insert_middle_ad(body, slots["slot_ad_middle"])
+            body = wrap_sections(body)
+            imgs = images.get(slug, {})
+            body = insert_body_images(body, imgs, root)
+            eyecatch = og_tags = ""
+            if imgs.get("eyecatch"):
+                ec = imgs["eyecatch"]
+                eyecatch = f'<figure class="eyecatch">{img_tag(root, ec, ec.get("alt") or title, 1200, 675, lazy=False)}</figure>'
+                if base_url:
+                    og_tags = (f'<meta property="og:image" content="{html.escape(base_url + "/" + ec["file"], quote=True)}">\n'
+                               '<meta name="twitter:card" content="summary_large_image">')
             slot_affiliate = slots["slot_affiliate"]
             if aff_tail:
                 slot_affiliate = f'<div class="affiliate-slot">{aff_tail}</div>' + slot_affiliate
             if pr_notice:
-                names = re.findall(r'class="aff-name">([^<]+)<', body + aff_tail)
+                names = re.findall(r'class="aff-t?name">([^<]+)<', body + aff_tail)
                 print(f"  広告 {slug}: {' / '.join(dict.fromkeys(names))}")
 
             page = render(tpl_article, {
@@ -357,19 +482,26 @@ def main():
                 "lang": lang, "root": root, "lang_path": lang_path, "year": year,
                 "title": html.escape(title), "description": html.escape(description),
                 "date": html.escape(date), "toc": build_toc(headings), "body": body,
+                "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
-            posts.append({"slug": slug, "title": title, "date": date, "excerpt": excerpt_of(body)})
+            plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)
+            posts.append({"slug": slug, "title": title, "date": date, "excerpt": excerpt_of(plain_body),
+                          "thumb": f"img/{slug}/thumb.jpg" if imgs.get("eyecatch") else ""})
             sitemap_urls.append(f"{url_prefix}{slug}")
             total += 1
 
         posts.sort(key=lambda p: (p["date"], p["slug"]), reverse=True)
-        items = "\n    ".join(
-            f'<li><time datetime="{html.escape(p["date"])}">{html.escape(p["date"])}</time>'
-            f'<a href="{p["slug"]}.html">{html.escape(p["title"])}</a>'
-            f'<p class="excerpt">{html.escape(p["excerpt"])}</p></li>'
-            for p in posts
-        )
+        def card(p, i):
+            lazy = 'loading="lazy" ' if i > 1 else ""
+            thumb = (f'<img src="{root}{p["thumb"]}" width="480" height="270" alt="" {lazy}decoding="async">'
+                     if p["thumb"] else '<span class="thumb-blank" aria-hidden="true"></span>')
+            return (f'<li class="post-card"><a href="{p["slug"]}.html">'
+                    f'<span class="thumb">{thumb}</span><span class="card-body">'
+                    f'<time datetime="{html.escape(p["date"])}">{html.escape(p["date"])}</time>'
+                    f'<span class="card-title">{html.escape(p["title"])}</span>'
+                    f'<span class="excerpt">{html.escape(p["excerpt"])}</span></span></a></li>')
+        items = "\n    ".join(card(p, i) for i, p in enumerate(posts))
         switch = ""
         if len(active) > 1:
             links = []
