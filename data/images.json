@@ -250,5 +250,101 @@
    "landing_url": "https://www.rawpixel.com/image/6082105/refrigerators-supermarket",
    "openverse_id": "49f72c0a-9e70-4404-babe-d6a7f7ae3fe3"
   }
+ },
+ "hon-takuhai-kaitori": {
+  "eyecatch": {
+   "file": "img/hon-takuhai-kaitori/eyecatch.jpg",
+   "query": "bookshelf books",
+   "title": "Bookshelf Shelves",
+   "creator": "Jay Mantri",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/bookshelf-shelves-14B430281B",
+   "openverse_id": "79b1dabd-4296-422c-918e-95cd772b7100"
+  },
+  "body-1": {
+   "file": "img/hon-takuhai-kaitori/body-1.jpg",
+   "query": "cardboard box",
+   "title": "Cardboard Box",
+   "creator": "Matt Bango",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cardboard-box-USP4WCYPBW",
+   "openverse_id": "429e6962-efd2-4986-b4c0-e9ca8b6fc30d"
+  },
+  "body-2": {
+   "file": "img/hon-takuhai-kaitori/body-2.jpg",
+   "query": "reading book",
+   "title": "Reading Book",
+   "creator": "Negative Space",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/reading-book-LXCMDRFA51",
+   "openverse_id": "62e242fe-9a2d-466e-8aef-b2a9e0169b1e"
+  }
+ },
+ "kajidaiko-hajimete-tanomikata": {
+  "eyecatch": {
+   "file": "img/kajidaiko-hajimete-tanomikata/eyecatch.jpg",
+   "query": "clean living room",
+   "title": "Two white tables joined together",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/3292532/free-photo-image-bedroom-building-cc0",
+   "openverse_id": "8afc7fe2-1b23-4e0e-991e-c9f7d9dff390"
+  },
+  "body-1": {
+   "file": "img/kajidaiko-hajimete-tanomikata/body-1.jpg",
+   "query": "cleaning kitchen",
+   "title": "Cleaning Kitchen Counter",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/6074009/cleaning-kitchen-counter",
+   "openverse_id": "2cd8c53a-a0b9-4c9f-8ac8-a404f1941895"
+  },
+  "body-2": {
+   "file": "img/kajidaiko-hajimete-tanomikata/body-2.jpg",
+   "query": "notebook checklist",
+   "title": "Checklist Goals",
+   "creator": "Glenn Carstens-Peters",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/checklist-goals-TBJ9OPDGMK",
+   "openverse_id": "e069bf08-07a3-4330-bd99-d939d419ce14"
+  }
+ },
+ "umou-futon-cleaning-ryokin": {
+  "eyecatch": {
+   "file": "img/umou-futon-cleaning-ryokin/eyecatch.jpg",
+   "query": "duvet bedroom",
+   "title": "Bedroom interior design",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/5920688/photo-image-public-domain-house-home",
+   "openverse_id": "d642916c-ba97-4203-9974-f94f771f9199"
+  },
+  "body-1": {
+   "file": "img/umou-futon-cleaning-ryokin/body-1.jpg",
+   "query": "white bedding",
+   "title": "White Bed",
+   "creator": "Cynthia del Rio",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/white-bed-0JXUC43X55",
+   "openverse_id": "1de9ac3b-902b-44a6-b0b8-93ac15237594"
+  },
+  "body-2": {
+   "file": "img/umou-futon-cleaning-ryokin/body-2.jpg",
+   "query": "folded blanket",
+   "title": "Pile colourful fabrics",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/5904063/photo-image-public-domain-fabrics-rainbow",
+   "openverse_id": "56358c5a-c01f-4dcd-8758-0beead7e3f44"
+  }
  }
 }
