@@ -273,5 +273,69 @@
    "landing_url": "https://www.rawpixel.com/image/5904063/photo-image-public-domain-fabrics-rainbow",
    "openverse_id": "56358c5a-c01f-4dcd-8758-0beead7e3f44"
   }
+ },
+ "brand-takuhai-kaitori": {
+  "eyecatch": {
+   "file": "img/brand-takuhai-kaitori/eyecatch.jpg",
+   "query": "leather handbag",
+   "title": "handmade ladies leather handbag designed",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/8811956/photo-image-public-domain-person-fashion",
+   "openverse_id": "882afae7-85f8-4021-97c7-b5f76d3d504a"
+  },
+  "body-1": {
+   "file": "img/brand-takuhai-kaitori/body-1.jpg",
+   "query": "closet bags",
+   "title": "Closet Clothes",
+   "creator": "Jay Mantri",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/closet-clothes-D1B0FAEB46",
+   "openverse_id": "659574ef-ff0b-41fa-9aa5-05f86fe91bf5"
+  },
+  "body-2": {
+   "file": "img/brand-takuhai-kaitori/body-2.jpg",
+   "query": "cardboard box",
+   "title": "Cardboard Box",
+   "creator": "Matt Bango",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cardboard-box-USP4WCYPBW",
+   "openverse_id": "429e6962-efd2-4986-b4c0-e9ca8b6fc30d"
+  }
+ },
+ "mealkit-tomobataraki": {
+  "eyecatch": {
+   "file": "img/mealkit-tomobataraki/eyecatch.jpg",
+   "query": "cooking vegetables",
+   "title": "Cooking Vegetable",
+   "creator": "Tim Sullivan",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cooking-vegetable-PMDVZLRY1B",
+   "openverse_id": "e02fcf99-ec4b-4493-8a5f-405a1badea5e"
+  },
+  "body-1": {
+   "file": "img/mealkit-tomobataraki/body-1.jpg",
+   "query": "family dinner",
+   "title": "Miss Hibernia John Bulls Family",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/9495422/miss-hibernia-john-bulls-family-dinner",
+   "openverse_id": "5e63f801-21e0-4278-bbc6-48161a32439e"
+  },
+  "body-2": {
+   "file": "img/mealkit-tomobataraki/body-2.jpg",
+   "query": "kitchen cutting board",
+   "title": "Cutting Fruit",
+   "creator": "Direct Media",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cutting-fruit-ULIKLNPKK0",
+   "openverse_id": "4b1b28d8-d7c0-43d4-b3e2-9835d2a25aaf"
+  }
  }
 }
