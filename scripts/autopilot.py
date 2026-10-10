@@ -11,6 +11,10 @@
   python scripts/autopilot.py topics-check     … 残りネタが少ないジャンルを表示（自動運転の Claude が補充する）
   python scripts/autopilot.py review           … 台帳で needs_review（label/catch/table が未整備）の案件を表示
   python scripts/autopilot.py status           … STATUS.md を更新
+  python scripts/autopilot.py refresh-next     … 次に見直す公開済み記事を表示（記事が20本未満・今週分済みなら「見直さない」）
+  python scripts/autopilot.py refresh-done <slug> "<改善内容>"  … 中身を良くした。本文が実質的に変わっていれば更新日を今日にする
+  python scripts/autopilot.py refresh-skip <slug> "<理由>"      … 見直したが直す所がなかった（更新日は変えない）
+  python scripts/autopilot.py refresh-mode auto|on|off          … 見直しを 20本たまったら自動開始 / 今すぐ開始 / 停止
 
 スパム対策: 自動生成の記事（フロントマター generated_by: autopilot）は 1日 MAX_PER_DAY 本まで。
 """
@@ -347,6 +351,13 @@ def cmd_status():
     if LOG.exists():
         lines = [l for l in LOG.read_text(encoding="utf-8", errors="replace").splitlines() if l.startswith("==")]
         recent = "\n".join(f"- {l.strip('= ')}" for l in lines[-5:])
+    now_s = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    sched = sorted((a["publish_at"], a.get("title", a["_slug"])) for a in arts if a.get("publish_at", "") > now_s)
+    sched_md = "\n".join(f"- {t.replace('T', ' ')}　{title}" for t, title in sched) or "- なし"
+    r_ok, r_why = refresh_active()
+    r_log = load_json(REFRESH_LOG, [])
+    refresh_md = "\n".join(f"| {e['date']} | {e['slug']} | {e['result']} | {e['note']} |" for e in reversed(r_log[-15:]))
+    refresh_md = ("| 日付 | 記事 | 結果 | 内容 |\n|---|---|---|---|\n" + refresh_md) if refresh_md else "まだありません"
     md = f"""# ブログ工場 STATUS
 
 最終更新: {datetime.datetime.now():%Y-%m-%d %H:%M}（記事の公開・自動実行のたびに自動更新）
@@ -356,11 +367,12 @@ def cmd_status():
 
 | 項目 | 状態 |
 |---|---|
-| 公開済み記事 | {len(arts)} 本（うち自動生成 {sum(1 for a in arts if a.get('generated_by') == 'autopilot')} 本） |
+| 公開済み記事 | {len(arts) - len(sched)} 本（うち自動生成 {sum(1 for a in arts if a.get('generated_by') == 'autopilot') - len(sched)} 本）＋ 公開予定 {len(sched)} 本 |
 | 提携中の広告 | {len(ledger)} 件 |
 | 審査待ち | {len(pending)} 件 |
 | 残りネタ | {sum(t_by.values())} 件 |
-| 毎日の自動投稿 | {"**オン**（次回: " + next_run + "）" if on else "オフ（「毎日の自動投稿をオンにして」でオン）"} |
+| 毎日の自動投稿 | {"**オン**（毎朝起動→記事を書いて予約公開→シャットダウン。次回: " + next_run + "）" if on else "オフ（「毎日の自動投稿をオンにして」でオン）"} |
+| 記事の見直し | {"**稼働中**（週 " + str(refresh_cfg()["per_week"]) + " 本まで・実質的な改善のときだけ更新日を変える）" if r_ok else r_why} |
 | 1日の上限 | 自動生成 {MAX_PER_DAY} 本まで |
 | A8 ログイン | {"OK" if state.get("a8_login_ok") else ("切れている" if state.get("a8_login_ok") is False else "未確認")}（{state.get("a8_checked_at", "-")}） |
 
@@ -370,12 +382,178 @@ def cmd_status():
 |---|---|---|---|---|
 {chr(10).join(rows)}
 
+## 公開予定（予約公開。GitHub Actions が時刻どおりに出す）
+
+{sched_md}
+
+## 記事の見直し（直近15件）
+
+{refresh_md}
+
 ## 最近の自動実行
 
 {recent or "- まだありません"}
 """
     STATUS.write_text(md, encoding="utf-8")
     log(f"STATUS.md を更新しました（記事 {len(arts)} / 提携中 {len(ledger)} / 審査待ち {len(pending)} / 残りネタ {sum(t_by.values())}）")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# 公開済み記事の見直し（scripts/refresh-prompt.md の手順で Claude Code が行う）
+# 更新日（updated）を新しくするのは、本文が実質的に変わったときだけ。日付だけの更新は refresh-done が拒否する
+# ---------------------------------------------------------------------------
+REFRESH_CFG = DATA / "refresh.json"
+REFRESH_LOG = DATA / "refresh-log.json"
+
+
+def refresh_cfg():
+    cfg = {"mode": "auto", "min_articles": 20, "per_week": 3, "min_age_days": 30, "min_changed_chars": 150}
+    cfg.update(load_json(REFRESH_CFG, {}))
+    return cfg
+
+
+def article_path(slug):
+    for md in (ROOT / "content").rglob("*.md"):
+        meta, _ = front_matter(md)
+        if (meta.get("slug") or md.stem) == slug:
+            return md
+    return None
+
+
+def published_articles():
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    return [a for a in articles() if not (a.get("publish_at") and a["publish_at"] > now)]
+
+
+def refresh_active():
+    cfg = refresh_cfg()
+    n = len(published_articles())
+    if cfg["mode"] == "off":
+        return False, "記事の見直しはオフです（data/refresh.json の mode）"
+    if cfg["mode"] == "auto" and n < cfg["min_articles"]:
+        return False, f"公開済み記事が {n} 本です。{cfg['min_articles']} 本以上になったら自動で見直しを始めます"
+    return True, ""
+
+
+def refresh_quota_left():
+    week_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
+    done = [e for e in load_json(REFRESH_LOG, []) if e["date"] > week_ago]
+    return refresh_cfg()["per_week"] - len(done)
+
+
+def cmd_refresh_next():
+    ok, why = refresh_active()
+    if not ok:
+        log(why)
+        return 2
+    if refresh_quota_left() <= 0:
+        log(f"今週の見直し（{refresh_cfg()['per_week']}本）は済んでいます。今回は見直しません。")
+        return 2
+    cfg = refresh_cfg()
+    checked = {}
+    for e in load_json(REFRESH_LOG, []):
+        checked[e["slug"]] = max(checked.get(e["slug"], ""), e["date"])
+    limit = (datetime.date.today() - datetime.timedelta(days=cfg["min_age_days"])).isoformat()
+    cands = []
+    for a in published_articles():
+        last = max(a.get("updated") or "", a.get("date") or "", checked.get(a["_slug"], ""))
+        if last <= limit:
+            cands.append((last, a))
+    if not cands:
+        log(f"見直す記事がありません（どの記事も {cfg['min_age_days']} 日以内に公開・見直し済み）。")
+        return 2
+    last, a = sorted(cands, key=lambda x: x[0])[0]
+    path = article_path(a["_slug"])
+    ledger = {k: v for k, v in load_json(LEDGER, {}).items() if isinstance(v, dict) and v.get("url")}
+    genre = a["_genre"]
+    progs = [(k, v) for k, v in ledger.items() if (v.get("genre") or "cleaning") == genre]
+    log(f"見直す記事: {a.get('title', a['_slug'])}")
+    log(f"  slug: {a['_slug']} / ファイル: {path.relative_to(ROOT).as_posix()} / ジャンル: {genre}")
+    log(f"  公開日: {a.get('date', '-')} / 最終更新: {a.get('updated', '-')} / 最後の見直し: {checked.get(a['_slug'], '-')}")
+    log(f"  記事で指定している広告: {a.get('affiliates', '（指定なし＝内容に合わせて自動）')}")
+    log(f"  このジャンルの提携中の広告（{len(progs)}件）:")
+    for k, v in progs:
+        log(f"    - {k}: {v.get('label', '')} {v.get('catch', '')}")
+    log(f"今週あと {refresh_quota_left()} 本見直せます。")
+    return 0
+
+
+def git_head_text(path):
+    r = subprocess.run(["git", "show", f"HEAD:{path.relative_to(ROOT).as_posix()}"], cwd=ROOT,
+                       capture_output=True, text=True, encoding="utf-8")
+    return r.stdout if r.returncode == 0 else None
+
+
+def front_matter_text(text):
+    tmp = ROOT / "logs" / "_fm_tmp.md"
+    tmp.parent.mkdir(exist_ok=True)
+    tmp.write_text(text, encoding="utf-8")
+    try:
+        return front_matter(tmp)
+    finally:
+        tmp.unlink()
+
+
+def changed_chars(old, new):
+    import difflib
+    sm = difflib.SequenceMatcher(None, old, new, autojunk=False)
+    return sum(max(i2 - i1, j2 - j1) for op, i1, i2, j1, j2 in sm.get_opcodes() if op != "equal")
+
+
+def set_meta_line(path, key, value):
+    text = path.read_text(encoding="utf-8")
+    head, rest = text.split("\n", 1)
+    end = re.search(r"^---\s*$", rest, re.M)
+    fm, tail = rest[: end.start()], rest[end.start():]
+    lines = [l for l in fm.splitlines() if not re.match(rf"^{key}\s*:", l)]
+    if value:
+        lines.append(f"{key}: {value}")
+    nl = "\r\n" if b"\r\n" in path.read_bytes() else "\n"   # ファイルの改行コードはそのまま
+    path.write_text(head + "\n" + "\n".join(lines) + "\n" + tail, encoding="utf-8", newline=nl)
+
+
+def refresh_record(slug, result, note):
+    entries = load_json(REFRESH_LOG, [])
+    entries.append({"date": today(), "slug": slug, "result": result, "note": note})
+    save_json(REFRESH_LOG, entries[-500:])
+
+
+def cmd_refresh_done(slug, note):
+    path = article_path(slug)
+    if not path:
+        log(f"記事 {slug} が見つかりません")
+        return 1
+    old = git_head_text(path)
+    if old is None:
+        log("この記事はまだ GitHub に送られていません（見直しの対象外）")
+        return 1
+    old_meta, old_body = front_matter_text(old)
+    new_meta, new_body = front_matter(path)
+    body_diff = changed_chars(old_body, new_body)
+    meta_changed = [k for k in ("title", "description", "affiliates") if old_meta.get(k, "") != new_meta.get(k, "")]
+    if body_diff >= refresh_cfg()["min_changed_chars"] or "affiliates" in meta_changed:
+        set_meta_line(path, "updated", today())
+        refresh_record(slug, "更新", note)
+        log(f"更新日を {today()} にしました（本文の変更 {body_diff} 字{'・' + '/'.join(meta_changed) if meta_changed else ''}）。"
+            "publish.py で公開してください。")
+        return 0
+    # 実質的な変更がないのに日付だけ新しくするのは禁止（Google にスパム扱いされる）
+    set_meta_line(path, "updated", old_meta.get("updated", ""))
+    refresh_record(slug, "見直しのみ", f"変更が小さいため更新日は据え置き（本文 {body_diff} 字）: {note}")
+    log(f"本文の変更が {body_diff} 字で、実質的な改善とは言えないため更新日は変えません（見直し済みとして記録）。"
+        "小さな修正は publish.py でそのまま公開して構いません。")
+    return 1
+
+
+def cmd_refresh_skip(slug, note):
+    path = article_path(slug)
+    if path:
+        old = git_head_text(path)
+        if old is not None:
+            set_meta_line(path, "updated", front_matter_text(old)[0].get("updated", ""))
+    refresh_record(slug, "見直しのみ", note)
+    log(f"見直し済み（変更なし）として記録しました: {slug}")
     return 0
 
 
@@ -402,6 +580,18 @@ def main():
         return cmd_review()
     if cmd == "status":
         return cmd_status()
+    if cmd == "refresh-next":
+        return cmd_refresh_next()
+    if cmd == "refresh-done" and len(rest) == 2:
+        return cmd_refresh_done(*rest)
+    if cmd == "refresh-skip" and len(rest) == 2:
+        return cmd_refresh_skip(*rest)
+    if cmd == "refresh-mode" and rest and rest[0] in ("auto", "on", "off"):
+        cfg = load_json(REFRESH_CFG, {})
+        cfg["mode"] = rest[0]
+        save_json(REFRESH_CFG, cfg)
+        log(f"記事の見直し: {rest[0]}")
+        return 0
     print(__doc__)
     return 1
 

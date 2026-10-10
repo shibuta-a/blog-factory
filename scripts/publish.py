@@ -12,6 +12,7 @@
 """
 import argparse
 import datetime
+import re
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,23 @@ def run(cmd, check=True):
         print(r.stderr.strip(), file=sys.stderr)
         sys.exit(r.returncode)
     return r
+
+
+def undo_date_only_updates():
+    """公開済み記事で、本文もタイトル等も同じなのに updated（更新日）だけ変わっていたら元に戻す。
+    中身を変えずに日付だけ新しくするのは Google にスパム扱いされるため（実質的な改善の判定は autopilot.py refresh-done）。"""
+    r = subprocess.run(["git", "diff", "--name-only", "HEAD", "--", "content"], cwd=ROOT,
+                       capture_output=True, text=True, encoding="utf-8")
+    for rel in r.stdout.split():
+        path = ROOT / rel
+        old = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT, capture_output=True)
+        if old.returncode != 0 or not path.exists():
+            continue
+        strip = lambda b: re.sub(r"^updated\s*:.*\n?", "", b.decode("utf-8", "replace").replace("\r\n", "\n"), flags=re.M)
+        new = path.read_bytes()
+        if new != old.stdout and strip(new) == strip(old.stdout):
+            path.write_bytes(old.stdout)   # 送信済みの内容そのもの（改行コードも）に戻す
+            print(f"（{rel}: 中身が同じで更新日だけ変わっていたので、元に戻しました）")
 
 
 def main():
@@ -50,6 +68,8 @@ def main():
         if src != dest:
             shutil.copy(src, dest)
         added.append(dest.relative_to(ROOT).as_posix())
+
+    undo_date_only_updates()
 
     # 新しい自動生成の記事に、公開予定時刻（今から24時間以内のランダムな時刻）を付ける。手で渡した記事はすぐ公開
     run([sys.executable, str(ROOT / "scripts" / "publish_schedule.py")])

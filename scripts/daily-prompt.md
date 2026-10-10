@@ -25,7 +25,7 @@
   ```
   ---
   title: （32字前後。ネタのキーワードを自然に含める）
-  date: （今日の日付 YYYY-MM-DD）
+  date: （今日の日付 YYYY-MM-DD。公開予定時刻は publish.py が自動で付けて date も直すので、publish_at は書かない）
   description: （120字以内の要約）
   slug: （英小文字とハイフン）
   genre: （next で表示されたジャンルの id）
@@ -47,7 +47,8 @@
 
 ## 3. 公開
 
-1. `python scripts/publish.py -m "auto: <書いた記事のslugをカンマ区切り>"` … 写真の取得・ビルド・公開・STATUS.md 更新まで自動
+1. `python scripts/publish.py -m "auto: <書いた記事のslugをカンマ区切り>"` … 公開予定時刻の割り振り（24時間以内のランダム）・写真の取得・ビルド・
+   GitHub への送信・STATUS.md 更新まで自動。記事は予定時刻になると GitHub Actions がサイトに出す（今すぐは出ない）
 2. 出力に「写真の用意をスキップ」「使える写真が見つからず」と出たら、その記事の `image_query` を別の一般的な英単語（1〜2語）に変えて
    `python scripts/images.py <slug>` → もう一度 `python scripts/publish.py -m "auto: 写真の補完"` を実行する
 

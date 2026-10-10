@@ -150,20 +150,20 @@ python scripts/publish.py                      # 台帳の変更をサイトに�
 
 ## 全自動運転（記事・写真・広告・提携を毎日まわす）
 
-※ 毎日の自動実行は現在**オフ**。渋田さんが「毎日の自動投稿をオンにして」と言ったときだけ Claude Code がオンにする。
+※ 2026-10-10 から**省エネ運転（毎朝起動→記事を書いて予約公開→シャットダウン）で稼働中**。詳しくは下の「省エネ運転と予約公開」。
 現状は `STATUS.md`（公開のたびに自動更新）で一目で分かる。
 
 ### 仕組み
 
 ```
-タスクスケジューラ（毎日 9:00）→ auto-generate.bat → scripts/auto-generate.py
+BIOS の時刻起動（毎朝 4:00）→ 自動ログオン → BlogFactory-Boot → scripts/boot-run.py → scripts/auto-generate.py
   → Claude Code をヘッドレス起動（claude -p。外部APIの従量課金は使わない）
   → scripts/daily-prompt.md の手順で Claude Code 自身が動く:
       ① autopilot.py sync     審査待ちの承認を取り込む → 新しい広告の説明文・比較表データを整える
       ② autopilot.py next     次のネタ（topics.txt）・ジャンル・型・既存記事を確認（1日の上限もここで判定）
       ③ autopilot.py ads      そのジャンルの広告が足りなければ A8 で検索 → 提携申請 → 即時提携分を台帳へ（エンジン②）
       ④ 型に沿って記事を書く → content/ja/ に保存 → autopilot.py done でネタに印
-      ⑤ publish.py            写真（Openverse）→ ビルド（比較表・申込みボックス・PR表記）→ 公開 → STATUS.md
+      ⑤ publish.py            公開予定時刻の割り振り → 写真（Openverse）→ ビルド（比較表・申込みボックス・PR表記）→ GitHub へ → STATUS.md
       ⑥ autopilot.py topics-check  残りネタが少ないジャンルは Claude Code が10個補充
 ```
 
@@ -175,7 +175,7 @@ python scripts/publish.py                      # 台帳の変更をサイトに�
 | `scripts/daily-prompt.md` | 自動運転の Claude Code への手順書（記事のルール・スパム対策・禁止事項） |
 | `scripts/autopilot.py` | 司令塔の道具（next / done / ads / sync / a8-check / topics-check / review / status） |
 | `scripts/auto-generate.py` | Claude Code を起動する（許可するコマンドは autopilot・publish・images だけ） |
-| `scripts/schedule.ps1` | 毎日の自動実行のオン／オフ |
+| `scripts/schedule.ps1` | 省エネ運転のオン／オフ・起動時刻の変更 |
 | `STATUS.md` | 記事数・ジャンル別内訳・提携中/審査待ち・残りネタ・自動投稿オン/オフ・要対応 |
 | `logs/autopilot.log` | 自動実行の記録 |
 
@@ -189,9 +189,45 @@ python scripts/publish.py                      # 台帳の変更をサイトに�
 ### コマンド
 
 - 今すぐ1回まわす（2本）：`python scripts/auto-generate.py`（1本だけ：`-n 1`）
-- 毎日の自動実行をオン：`powershell -ExecutionPolicy Bypass -File scripts\schedule.ps1 on`（時刻と本数を変える：`… on 10:30 3`）
-- オフ：`… schedule.ps1 off`　状態：`… schedule.ps1 status`
-- 前提：PC が起動していて渋田さんがログオン中であること（実行時刻に止まっていたら、次の起動時に1回実行）
+- 省エネ運転をオン：`powershell -ExecutionPolicy Bypass -File scripts\schedule.ps1 on`（起動時刻を変える：`… on 05:30`。BIOS の RTC Alarm も同じ時刻にする）
+- オフ：`… schedule.ps1 off`　状態と公開予定：`… schedule.ps1 status`
+
+## 省エネ運転と予約公開（2026-10-10〜）
+
+```
+毎朝 4:00  BIOS の RTC Alarm で完全シャットダウンから起動 → 自動ログオン（Owner はパスワードなし。scripts/autologon.ps1）
++1分       BlogFactory-Boot → scripts/boot-run.py（1日1回。state/boot-done.txt）
+           記事を 1〜3 本（1本15%・2本70%・3本15%）書く → publish.py が各記事に公開予定時刻 publish_at を付けて GitHub へ
+           （記事が20本以上なら、続けて公開済み記事の見直しを1本）
+終了       scripts/power-guard.py：誰も触っていない・4:00±15分の起動・起動から60分以内・最後まで終わった → 60秒後に shutdown /s
+           1つでも欠けたら落とさない（起動後にマウスかキーボードを1回でも触ったら絶対に落とさない）
+   ↓
+GitHub Actions（.github/workflows/release.yml・毎時7分と37分）が、公開予定時刻が来た記事を data/released.json に記録して push
+→ Cloudflare Pages が作り直して記事が出る（PCは不要）
+```
+
+- 公開予定時刻：今から15分後〜24時間後のランダム（分単位）。予約どうし2時間以上あけ、公開日1日あたり3本まで（`scripts/publish_schedule.py`）
+- 判定は日本時間（Cloudflare のビルド環境は UTC）。`publish_at` が未来の記事は一覧・記事ページ・サイトマップのどれにも出ない
+- 手で渡した記事（`generated_by: autopilot` でない記事）は、これまで通りすぐ公開
+- 操作の記録係 `IdleBeacon`（`scripts/idle-beacon.pyw`）がログオン時から20秒ごとに入力を `state/idle-beacon.json` に記録
+- 猶予の60秒の間にマウスを動かせば取り消し。`cancel-sleep.bat` でも取り消せる。設定は `data/power.json`（`bios_wake_time` は BIOS と必ず同じに）
+- ログ：`logs/boot-run.log`・`logs/power-guard.log`・`logs/idle-beacon.log`・`logs/autopilot.log`
+- 公開予定の一覧：`python scripts/publish_schedule.py --list`（STATUS.md にも出る）
+
+### BIOS の設定（ASRock H570 Phantom Gaming 4・渋田さんが1回だけ）
+
+Del で BIOS → F6 で Advanced Mode → Advanced → ACPI Configuration → **RTC Alarm Power On = Enabled**、時刻 4:00:00、Date 0（毎日）。
+Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存。
+※ BIOS の起動時刻を Windows から毎日書き換えることはできない（非公開ツールか危険なドライバが必要）ので、起動は固定時刻・公開時刻だけランダムにしている。
+
+## 公開済み記事の見直し（自動更新）
+
+- 公開済み記事が **20本以上**になると自動で始まる（`data/refresh.json` の `mode: auto`）。今すぐ始める：`python scripts/autopilot.py refresh-mode on`、止める：`… off`
+- 毎朝の新規記事のあと1本、**週3本まで**、公開・更新・見直しから30日たった記事を古い順に（`autopilot.py refresh-next`）
+- 手順書は `scripts/refresh-prompt.md`：古い情報・新しく提携した広告・比較の選択肢・分かりやすさを確かめ、直す所があるときだけ直す
+- **更新日（updated）は本文が150字以上変わったか、広告の指定を変えたときだけ** `autopilot.py refresh-done` が付ける。足りなければ拒否して据え置き
+- 安全装置：`publish.py` は、中身が同じで updated だけ変わった記事を元に戻してから公開する（日付だけの偽装更新はできない）
+- 記録は `data/refresh-log.json`、STATUS.md の「記事の見直し」に直近15件
 
 ## Google Search Console（検索に載せる）
 

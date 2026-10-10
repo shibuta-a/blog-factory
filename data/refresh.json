@@ -1,0 +1,8 @@
+{
+ "mode": "auto",
+ "min_articles": 20,
+ "per_week": 3,
+ "min_age_days": 30,
+ "min_changed_chars": 150,
+ "_help": "mode: auto=公開済み記事が min_articles 本以上で自動的に見直し開始 / on=今すぐ開始 / off=止める。per_week=1週間に見直す本数、min_age_days=公開・更新からこの日数たった記事だけ見直す、min_changed_chars=本文がこの文字数以上変わったときだけ更新日を新しくする"
+}

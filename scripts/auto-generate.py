@@ -9,6 +9,7 @@ scripts/daily-prompt.md の手順（承認の取り込み → ネタ選び → �
   python scripts/auto-generate.py            … 2本書いて公開（既定）
   python scripts/auto-generate.py -n 1       … 1本だけ
   python scripts/auto-generate.py --print    … 実行せずに、渡す手順書を表示するだけ
+  python scripts/auto-generate.py --refresh  … 新規ではなく、公開済み記事の見直し（scripts/refresh-prompt.md）を1回行う
 
 ★ 毎日の自動実行は、渋田さんが「毎日の自動投稿をオンにして」と言ったときだけ
   `powershell -ExecutionPolicy Bypass -File scripts\\schedule.ps1 on` で登録する（オフは off）。
@@ -25,6 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PROMPT = ROOT / "scripts" / "daily-prompt.md"
+REFRESH_PROMPT = ROOT / "scripts" / "refresh-prompt.md"
 LOG = ROOT / "logs" / "autopilot.log"
 
 # 自動運転の Claude Code に許す道具（これ以外のコマンドは実行できない）
@@ -48,9 +50,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("-n", type=int, default=2, help="書く記事の本数（1〜3。1日の上限は autopilot.py が別に守る）")
     ap.add_argument("--print", action="store_true", help="手順書を表示するだけ")
+    ap.add_argument("--refresh", action="store_true", help="公開済み記事の見直しを1回行う")
     args = ap.parse_args()
     n = max(1, min(args.n, 3))
-    prompt = PROMPT.read_text(encoding="utf-8").replace("{N}", str(n))
+    prompt = (REFRESH_PROMPT if args.refresh else PROMPT).read_text(encoding="utf-8").replace("{N}", str(n))
+    label = "記事の見直し" if args.refresh else f"{n}本"
     if args.print:
         print(prompt)
         return 0
@@ -58,7 +62,7 @@ def main():
     claude = find_claude()
     LOG.parent.mkdir(exist_ok=True)
     with LOG.open("a", encoding="utf-8") as log:
-        log.write(f"\n== {datetime.datetime.now():%Y-%m-%d %H:%M} 自動実行 開始（{n}本） ==\n")
+        log.write(f"\n== {datetime.datetime.now():%Y-%m-%d %H:%M} 自動実行 開始（{label}） ==\n")
         if not claude:
             log.write("Claude Code（claude コマンド）が見つかりません。\n")
             return 1

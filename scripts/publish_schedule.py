@@ -82,7 +82,8 @@ def set_front_matter(path, updates):
                 break
         else:
             lines.append(f"{k}: {v}")
-    path.write_text(head + sep + "\n".join(lines) + "\n" + tail, encoding="utf-8")
+    nl = "\r\n" if b"\r\n" in path.read_bytes() else "\n"   # ファイルの改行コードはそのまま
+    path.write_text(head + sep + "\n".join(lines) + "\n" + tail, encoding="utf-8", newline=nl)
 
 
 def pick_time(taken, per_date, now):
