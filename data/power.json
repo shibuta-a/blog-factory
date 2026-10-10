@@ -1,0 +1,16 @@
+{
+    "shutdown":  {
+                     "enabled":  true,
+                     "mode":  "shutdown",
+                     "bios_wake_time":  "04:00",
+                     "boot_window_min":  15,
+                     "max_uptime_min":  45,
+                     "grace_sec":  60,
+                     "timer_wake_keywords":  [
+                                                 "BlogFactory",
+                                                 "タイマー",
+                                                 "Timer"
+                                             ],
+                     "_rule":  "起動後に一度でも操作があれば絶対に落とさない。BIOSの時刻起動（bios_wake_time±boot_window_min）で立ち上がり、操作が無いまま、起動からmax_uptime_min以内、処理完了のときだけシャットダウンする。bios_wake_time は BIOS の RTC Alarm の時刻と必ず同じにする。"
+                 }
+}

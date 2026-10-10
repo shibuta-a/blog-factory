@@ -441,8 +441,11 @@ def main():
     if default_lang not in active:
         active.insert(0, default_lang)
 
-    today = datetime.date.today().isoformat()
-    year = datetime.date.today().year
+    # 日付・予約は日本時間で判定する（Cloudflare のビルド環境は UTC のため）
+    now_jst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    today = now_jst.date().isoformat()
+    now_str = now_jst.strftime("%Y-%m-%dT%H:%M")
+    year = now_jst.year
     sitemap_urls = []
     total = 0
 
@@ -461,9 +464,16 @@ def main():
             if meta.get("draft", "").lower() in ("true", "yes", "1"):
                 continue
             slug = re.sub(r"[^A-Za-z0-9_-]+", "-", meta.get("slug") or md.stem).strip("-") or "post"
-            date = meta.get("date") or today
+            publish_at = meta.get("publish_at", "")
+            if publish_at and publish_at > now_str:
+                continue  # 予約公開：公開予定時刻（日本時間）が来るまで出さない（scripts/publish_schedule.py）
+            date = publish_at[:10] if publish_at else (meta.get("date") or today)
             if date > today:
                 continue  # 予約投稿：日付が未来の記事はまだ出さない
+            updated = meta.get("updated", "")
+            updated_html = (f' <span class="updated">（{L.get("updated_label", "更新")} '
+                            f'<time datetime="{html.escape(updated)}">{html.escape(updated)}</time>）</span>'
+                            if updated > date else "")
             headings = []
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
@@ -495,17 +505,17 @@ def main():
                 **L, **slots, "slot_affiliate": slot_affiliate, "pr_notice": pr_notice,
                 "lang": lang, "root": root, "lang_path": lang_path, "year": year,
                 "title": html.escape(title), "description": html.escape(description),
-                "date": html.escape(date), "toc": build_toc(headings), "body": body,
+                "date": html.escape(date), "updated": updated_html, "toc": build_toc(headings), "body": body,
                 "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
             plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)
-            posts.append({"slug": slug, "title": title, "date": date, "excerpt": excerpt_of(plain_body),
+            posts.append({"slug": slug, "title": title, "date": date, "at": publish_at, "excerpt": excerpt_of(plain_body),
                           "thumb": f"img/{slug}/thumb.jpg" if imgs.get("eyecatch") else ""})
             sitemap_urls.append((f"{url_prefix}{slug}", meta.get("updated") or date))
             total += 1
 
-        posts.sort(key=lambda p: (p["date"], p["slug"]), reverse=True)
+        posts.sort(key=lambda p: (p["date"], p["at"], p["slug"]), reverse=True)
         def card(p, i):
             lazy = 'loading="lazy" ' if i > 1 else ""
             thumb = (f'<img src="{root}{p["thumb"]}" width="480" height="270" alt="" {lazy}decoding="async">'

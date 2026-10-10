@@ -31,7 +31,7 @@ CANDIDATES = DATA / "a8-candidates.json"
 STATE = DATA / "autopilot-state.json"
 STATUS = ROOT / "STATUS.md"
 LOG = ROOT / "logs" / "autopilot.log"
-TASK_NAME = "BlogFactory-Daily"
+TASK_NAME = "BlogFactory-Boot"
 
 MAX_PER_DAY = 3          # 自動生成の記事は1日この本数まで（Google のスパム判定を避ける）
 LOW_TOPICS = 5           # 残りネタがこれ未満のジャンルは補充する
@@ -114,7 +114,8 @@ def read_topics():
 
 
 def auto_today():
-    return [a for a in articles() if a.get("generated_by") == "autopilot" and a.get("date") == today()]
+    # 予約公開の記事は date が公開日になるので、書いた日（created）で数える
+    return [a for a in articles() if a.get("generated_by") == "autopilot" and (a.get("created") or a.get("date")) == today()]
 
 
 def cmd_next():

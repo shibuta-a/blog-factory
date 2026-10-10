@@ -7,3 +7,6 @@ __pycache__/
 .secrets/
 *.secret
 data/a8-candidates.json
+
+# 電源まわりの実行状態（PCごと・GitHubに上げない）
+state/

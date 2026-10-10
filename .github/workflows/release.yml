@@ -1,0 +1,39 @@
+# 予約公開：30分おきに、公開予定時刻（publish_at・日本時間）が来た記事がないか確かめる。
+# あれば data/released.json を更新して push → Cloudflare Pages がサイトを作り直して記事が出る（PCは不要）。
+# 時刻の割り振りは scripts/publish_schedule.py、記事を出すかどうかの判定は scripts/build.py。
+name: 予約記事の公開
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"   # 毎時7分・37分（GitHub の混雑で数分〜十数分遅れることがある）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 公開時刻が来た記事を確かめる
+        id: due
+        run: python3 scripts/publish_schedule.py --due
+
+      - name: 記録して push（Cloudflare が自動で作り直す）
+        if: steps.due.outputs.changed == 'true'
+        run: |
+          git config user.name "blog-factory-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/released.json
+          git commit -m "release: ${{ steps.due.outputs.slugs }}"
+          for i in 1 2 3; do
+            git pull --rebase && git push && exit 0
+            sleep 10
+          done
+          exit 1
