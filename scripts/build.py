@@ -407,6 +407,26 @@ def excerpt_of(body_html, length=90):
     return text[:length] + ("…" if len(text) > length else "")
 
 
+CAUTION_NOTICE = ('<p class="pr-notice">※本記事は、詐欺やトラブルの被害を防ぐための注意喚起です。'
+                  '特定の投資・金融商品・サービスの勧誘や助言ではありません。</p>')
+CONSULT_BOX = (
+    '<div class="box box-memo"><p class="box-label">困ったとき・迷ったときの相談先</p><ul>'
+    '<li><strong>消費者ホットライン「188」</strong>：お近くの消費生活センターなどにつながります（契約・勧誘のトラブル全般）</li>'
+    '<li><strong>警察相談専用電話「#9110」</strong>：詐欺かもしれない、脅されている、など緊急ではない相談。'
+    '今まさに被害にあっている・危険が迫っているときは 110 番へ</li>'
+    '<li><strong>金融庁</strong>：無登録の業者か確かめたいとき、投資の勧誘で困ったときは'
+    '<a href="https://www.fsa.go.jp/" target="_blank" rel="noopener">金融庁の公式サイト</a>の相談窓口へ</li>'
+    '<li><strong>国民生活センター</strong>：最新の手口や相談事例は'
+    '<a href="https://www.kokusen.go.jp/" target="_blank" rel="noopener">国民生活センターの公式サイト</a>で確認できます</li>'
+    '</ul><p>お金を払う前、個人情報を伝える前に、ひとりで決めずに相談してください。</p></div>')
+
+
+def load_genres():
+    f = ROOT / "data" / "genres.json"
+    g = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    return {k: v for k, v in g.items() if not k.startswith("_") and isinstance(v, dict)}
+
+
 def featured_parts(lang, L, images, root):
     """site.json の featured（自社サービス）を、ヘッダーの入り口・トップの固定枠・記事末の誘導ボックスにする。"""
     f = L.get("featured") or {}
@@ -449,6 +469,7 @@ def main():
 
     programs = affiliate.load_ledger()
     images = load_images()
+    genres = load_genres()
     print(f"広告台帳: 提携中 {len(programs)} 件")
 
     slots = {
@@ -512,8 +533,13 @@ def main():
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
             description = meta.get("description") or excerpt_of(body, 120)
+            caution = genres.get(meta.get("genre", ""), {}).get("ads") == "none"  # 注意喚起ジャンル（詐欺対策など）
             body, cta_top, pr_notice = affiliate.apply_own(body, meta)  # 自社サービスの紹介記事
-            if cta_top:
+            if caution:
+                body = (body.replace("<!-- AFFILIATE_COMPARE -->", "").replace("<!-- AFFILIATE_CTA -->", "")
+                        + "\n" + CONSULT_BOX)
+                cta_top, aff_tail, pr_notice = "", "", CAUTION_NOTICE
+            elif cta_top:
                 aff_tail = ""
             else:
                 body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
@@ -542,7 +568,7 @@ def main():
                 "date": html.escape(date), "updated": updated_html, "toc": build_toc(headings), "body": body,
                 "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
                 "featured_nav": feat.get("featured_nav", ""),
-                "featured_box": "" if slug == feat.get("slug") else feat.get("featured_box", ""),
+                "featured_box": "" if slug == feat.get("slug") or caution else feat.get("featured_box", ""),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
             plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)

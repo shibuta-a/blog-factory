@@ -141,20 +141,32 @@ def cmd_next():
     _, genre, _, keyword = topic
     conf = GENRES[genre]
     ledger = load_json(LEDGER, {})
-    ads = [k for k, v in ledger.items() if isinstance(v, dict) and v.get("url") and v.get("genre") == genre
+    ads = [k for k, v in ledger.items() if isinstance(v, dict) and v.get("url") and v.get("genre") in ad_genres(genre)
            and v.get("enabled") is not False]
     arts = articles()
     log(f"■ 本日の自動記事: {len(done_today)}/{MAX_PER_DAY} 本")
     log(f"■ ネタ: {keyword}")
     log(f"■ ジャンル: {genre}（{conf['label']}）")
     log(f"■ 型: {conf['kata']}")
-    log(f"■ このジャンルの提携中広告: {len(ads)} 件 {('（' + ' / '.join(ads) + '）') if ads else ''}")
-    if len(ads) < conf.get("min_ads", 2):
+    if conf.get("note"):
+        log(f"■ このジャンルのルール（必ず守る）: {conf['note']}")
+    if conf.get("ads") == "none":
+        log("■ 広告: このジャンルはアフィリ広告を入れない注意喚起ジャンルです（注意喚起の表記・相談窓口は自動で入る）")
+    else:
+        log(f"■ このジャンルの提携中広告: {len(ads)} 件 {('（' + ' / '.join(ads) + '）') if ads else ''}")
+    if conf.get("images") == "none":
+        log("■ 写真: このジャンルは写真を自動で付けません（image_query / image_queries は書かなくてよい）")
+    if conf.get("ads") != "none" and len(ads) < conf.get("min_ads", 2):
         log(f"  → 広告が足りません。先に `python scripts/autopilot.py ads {genre}` を実行してください。")
     log("■ 公開済みの記事（切り口・タイトルが重ならないようにする）:")
     for a in arts:
         log(f"  - [{a['_genre']}] {a.get('title', a['_slug'])}  ({a['_slug']})")
     return 0
+
+
+def ad_genres(genre):
+    """そのジャンルの記事に使える広告のジャンル（genres.json の ad_genres。省略時は自分だけ）。"""
+    return GENRES.get(genre, {}).get("ad_genres") or [genre]
 
 
 def cmd_done(keyword, slug):
@@ -293,8 +305,11 @@ def cmd_ads(genre):
         log(f"ジャンル {genre} は data/genres.json にありません")
         return 1
     conf = GENRES[genre]
+    if conf.get("ads") == "none" or not conf.get("a8_search"):
+        log(f"[{genre}] このジャンルは A8 の提携を使いません。")
+        return 0
     ledger = load_json(LEDGER, {})
-    have = [k for k, v in ledger.items() if isinstance(v, dict) and v.get("url") and v.get("genre") == genre]
+    have = [k for k, v in ledger.items() if isinstance(v, dict) and v.get("url") and v.get("genre") in ad_genres(genre)]
     if len(have) >= conf.get("min_ads", 2):
         log(f"[{genre}] 提携中の広告が {len(have)} 件あります。新しい申請は不要です。")
         return 0

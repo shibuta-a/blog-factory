@@ -167,9 +167,18 @@ def fetch_role(slug, role, query, used_ids, skip_ids=()):
     return None
 
 
+def no_images(meta):
+    """genres.json で images: none のジャンル（ポケカなど、カード・キャラクター画像が混じりやすいもの）は写真を付けない。"""
+    f = ROOT / "data" / "genres.json"
+    genres = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    return (genres.get(meta.get("genre", "")) or {}).get("images") == "none" if isinstance(genres, dict) else False
+
+
 def prepare(md, redo=False):
     meta = front_matter(md)
     slug = slug_of(md, meta)
+    if no_images(meta):
+        return False
     manifest = load_manifest()
     entry = manifest.get(slug, {})
     if entry and all(r in entry for r in ROLES) and not redo:
