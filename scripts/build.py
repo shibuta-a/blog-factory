@@ -556,6 +556,13 @@ def main():
         (PUBLIC / "sitemap.xml").write_text("\n".join(xml) + "\n", encoding="utf-8")
         (PUBLIC / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n", encoding="utf-8")
 
+    # 404 ページ（これがないと Cloudflare Pages は、存在しないURLや削除した記事にトップページを 200 で返してしまう）
+    (PUBLIC / "404.html").write_text(
+        '<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1"><title>ページが見つかりません</title>'
+        '<link rel="stylesheet" href="/assets/style.css"></head><body><main style="padding:3em 1em;text-align:center">'
+        '<p>ページが見つかりません。</p><p><a href="/">トップページへ</a></p></main></body></html>\n', encoding="utf-8")
+
     # 予約公開の一覧と、門番（functions/_middleware.js）を動かすURLの範囲（Cloudflare Pages が読む）
     (PUBLIC / "_schedule.json").write_text(json.dumps(schedule, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (PUBLIC / "_routes.json").write_text(json.dumps(
