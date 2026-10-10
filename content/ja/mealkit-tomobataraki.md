@@ -6,7 +6,7 @@ slug: mealkit-tomobataraki
 genre: food
 generated_by: autopilot
 image_query: cooking vegetables
-image_queries: family dinner | kitchen cutting board
+image_queries: dinner table | kitchen cutting board
 publish_at: 2026-10-11T20:50
 created: 2026-10-11
 ---
