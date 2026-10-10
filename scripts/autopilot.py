@@ -236,8 +236,10 @@ def a8_logged_in():
 
 
 def fetch(*args):
+    # 子プロセスのエラー出力も UTF-8 にそろえる（cp932 のままだと読み取りで落ちて、A8 側の本当のエラーが見えない）
+    env = {**__import__("os").environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
     r = subprocess.run([sys.executable, str(ROOT / "scripts" / "fetch-affiliates.py"), *args],
-                       cwd=ROOT, text=True, encoding="utf-8", capture_output=True)
+                       cwd=ROOT, text=True, encoding="utf-8", errors="replace", capture_output=True, env=env)
     print(r.stdout.strip())
     if r.returncode != 0:
         print(r.stderr.strip()[-800:])
