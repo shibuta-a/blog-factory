@@ -155,8 +155,9 @@ def cmd_next():
     else:
         log(f"■ このジャンルの提携中広告: {len(ads)} 件 {('（' + ' / '.join(ads) + '）') if ads else ''}")
     if conf.get("rakuten"):
-        log("■ 楽天の商品リンク: このジャンルは使う。フロントマターに `rakuten: 検索語 | 検索語` を書く"
-            f"（記事で紹介する道具・本など、実際に読者が買いそうな物を2〜3個。例: {conf['rakuten']}）")
+        log("■ 楽天の商品リンク: このジャンルは使える。本文で道具・本・収納用品など「物」を紹介する記事なら、"
+            "フロントマターに `rakuten: 検索語 | 検索語` を書く（読者が実際に買いそうな物を2〜3個。"
+            f"例: {conf['rakuten']}）。物を紹介しない記事には書かない")
     if conf.get("images") == "none":
         log("■ 写真: このジャンルは写真を自動で付けません（image_query / image_queries は書かなくてよい）")
     if conf.get("ads") != "none" and len(ads) < conf.get("min_ads", 2):

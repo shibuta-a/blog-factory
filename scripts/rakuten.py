@@ -17,7 +17,7 @@
   価格・レビューは変わるので表示しない（「楽天市場で価格を見る」ボタンにする）。
 
 ■ 商品の選び方: 検索結果（在庫あり・画像あり）から、genres.json の rakuten_ng と下の NG 語を含む商品を除き、
-  レビュー件数の多い順。同じショップ・同じ商品は重ねない。
+  検索語を全部含む商品を、楽天の検索順（関連の強い順）で。レビューが3件未満の商品は後回し。同じショップ・同じ商品は重ねない。
 
 ■ キー: .secrets/rakuten.json（GitHub に上げない）
     {"application_id": "...", "access_key": "...", "affiliate_id": "...", "origin": "https://blog-factory-cf7.pages.dev"}
@@ -112,15 +112,19 @@ def search(keys, keyword, hits=20):
 def clean_name(name):
     """楽天の商品名は宣伝文句が長いので、【】や★などを外して短くする。"""
     name = re.sub(r"[【\[［(（<＜《][^】\]］)）>＞》]{0,40}[】\]］)）>＞》]", " ", name)
+    name = re.sub(r"(楽天)?ランキング\s*\d+\s*冠?位?(獲得|受賞)?|送料無料|ポイント\s*\d+\s*倍|\d+%\s*OFF|クーポン(配布中|あり)?|あす楽|期間限定|SALE|セール", " ", name, flags=re.I)
     name = re.sub(r"[★☆◆◇■□●○♪！!※＼／]+", " ", name)
     name = re.sub(r"\s+", " ", name).strip()
     return (name[:48] + "…") if len(name) > 48 else name
 
 
-def choose(cands, ng, used_codes, used_shops):
+def choose(cands, ng, used_codes, used_shops, query=""):
     ok = [c for c in cands if c["url"] and c["code"] not in used_codes
           and not any(w in c["name"] for w in NG + tuple(ng))]
-    ok.sort(key=lambda c: -c["reviews"])
+    words = query.split()
+    # 検索語を全部含む商品を先に。その中は楽天の検索順（＝関連の強い順）のまま。レビューがほとんどない商品は後回し
+    ok = [dict(c, rank=i) for i, c in enumerate(ok)]
+    ok.sort(key=lambda c: (-sum(w.lower() in c["name"].lower() for w in words), c["reviews"] < 3, c["rank"]))
     for c in ok:
         if c["shop"] not in used_shops:
             return c
@@ -145,7 +149,7 @@ def prepare(md, keys, redo=False):
     items, codes, shops = [], set(), set()
     for q in qs:
         try:
-            c = choose(search(keys, q), ng, codes, shops)
+            c = choose(search(keys, q), ng, codes, shops, q)
         except RuntimeError as e:
             log(f"  {slug}: 「{q}」{e}")
             return False
@@ -177,6 +181,12 @@ def main():
         for c in search(keys, a.test, 10)[:5]:
             log(f"- {clean_name(c['name'])}（{c['shop']} / レビュー {c['reviews']}件）\n  {c['url'][:90]}")
         return 0
+    # 記事を消したら台帳からも外す
+    ledger = load_json(LEDGER, {})
+    alive = {slug_of(md, front_matter(md)) for md in CONTENT.rglob("*.md")}
+    if any(s not in alive for s in ledger):
+        LEDGER.write_text(json.dumps({s: v for s, v in ledger.items() if s in alive}, ensure_ascii=False, indent=1) + "\n",
+                          encoding="utf-8")
     for md in sorted(CONTENT.rglob("*.md")):
         meta = front_matter(md)
         if meta.get("draft", "").lower() in ("true", "yes", "1"):
