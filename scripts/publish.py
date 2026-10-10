@@ -7,7 +7,7 @@
   python scripts/publish.py 記事.md --lang en     # 英語版として content/en/ に置いて公開
 
 流れ: (記事を content/<言語>/ に保存) → publish_schedule.py（新しい自動記事に公開予定時刻）→ images.py（写真）→ build.py
-       → STATUS.md 更新 → git add/commit → git pull --rebase（GitHub Actions の予約公開の記録を取り込む）→ git push
+       → STATUS.md 更新 → git add/commit → git pull --rebase（GitHub 側の変更を取り込む）→ git push
        → GitHub に届くと Cloudflare Pages が自動でサイトを更新（1〜2分）
 """
 import argparse
@@ -89,7 +89,7 @@ def main():
     stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     msg = args.message or (f"publish: {', '.join(added)}" if added else f"publish: update {stamp}")
     run(["git", "commit", "-m", msg])
-    # GitHub Actions が予約公開の記録（data/released.json）を push していることがあるので、先に取り込んでから送る
+    # GitHub 側に別の変更があっても衝突しないよう、先に取り込んでから送る
     for attempt in range(3):
         run(["git", "pull", "--rebase", "--autostash"])
         if run(["git", "push"], check=attempt == 2).returncode == 0:

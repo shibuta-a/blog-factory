@@ -447,6 +447,7 @@ def main():
     now_str = now_jst.strftime("%Y-%m-%dT%H:%M")
     year = now_jst.year
     sitemap_urls = []
+    schedule = {}  # まだ公開時刻が来ていない記事 {slug: publish_at}
     total = 0
 
     for lang in active:
@@ -466,10 +467,11 @@ def main():
             slug = re.sub(r"[^A-Za-z0-9_-]+", "-", meta.get("slug") or md.stem).strip("-") or "post"
             publish_at = meta.get("publish_at", "")
             if publish_at and publish_at > now_str:
-                continue  # 予約公開：公開予定時刻（日本時間）が来るまで出さない（scripts/publish_schedule.py）
+                # 予約公開：ページは作っておき、公開予定時刻（日本時間）までは functions/_middleware.js が隠す
+                schedule[slug] = publish_at
             date = publish_at[:10] if publish_at else (meta.get("date") or today)
-            if date > today:
-                continue  # 予約投稿：日付が未来の記事はまだ出さない
+            if date > today and not publish_at:
+                continue  # 予約投稿（publish_at なしの旧方式）：日付が未来の記事はまだ出さない
             updated = meta.get("updated", "")
             updated_html = (f' <span class="updated">（{L.get("updated_label", "更新")} '
                             f'<time datetime="{html.escape(updated)}">{html.escape(updated)}</time>）</span>'
@@ -520,7 +522,7 @@ def main():
             lazy = 'loading="lazy" ' if i > 1 else ""
             thumb = (f'<img src="{root}{p["thumb"]}" width="480" height="270" alt="" {lazy}decoding="async">'
                      if p["thumb"] else '<span class="thumb-blank" aria-hidden="true"></span>')
-            return (f'<li class="post-card"><a href="{p["slug"]}.html">'
+            return (f'<li class="post-card" data-slug="{p["slug"]}"><a href="{p["slug"]}.html">'
                     f'<span class="thumb">{thumb}</span><span class="card-body">'
                     f'<time datetime="{html.escape(p["date"])}">{html.escape(p["date"])}</time>'
                     f'<span class="card-title">{html.escape(p["title"])}</span>'
@@ -542,7 +544,7 @@ def main():
             "posts": items, "lang_switch": switch,
         })
         (out_dir / "index.html").write_text(index, encoding="utf-8")
-        sitemap_urls.append((url_prefix, max([p["date"] for p in posts] or [today])))
+        sitemap_urls.append((url_prefix, max([p["date"] for p in posts if p["slug"] not in schedule] or [today])))
         print(f"[{lang}] {len(posts)} 記事")
 
     if base_url:
@@ -553,6 +555,13 @@ def main():
         xml.append("</urlset>")
         (PUBLIC / "sitemap.xml").write_text("\n".join(xml) + "\n", encoding="utf-8")
         (PUBLIC / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {base_url}/sitemap.xml\n", encoding="utf-8")
+
+    # 予約公開の一覧と、門番（functions/_middleware.js）を動かすURLの範囲（Cloudflare Pages が読む）
+    (PUBLIC / "_schedule.json").write_text(json.dumps(schedule, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (PUBLIC / "_routes.json").write_text(json.dumps(
+        {"version": 1, "include": ["/*"], "exclude": ["/assets/*", "/img/*", "/robots.txt"]}, indent=1) + "\n", encoding="utf-8")
+    if schedule:
+        print("  予約（時刻まで非表示）: " + ", ".join(f"{s} {t.replace('T', ' ')}" for s, t in sorted(schedule.items(), key=lambda x: x[1])))
 
     print(f"ビルド完了: 合計 {total} 記事 -> {PUBLIC}")
 

@@ -202,12 +202,13 @@ BIOS の時刻起動（毎朝 4:00）→ 自動ログオン → BlogFactory-Boot
 終了       scripts/power-guard.py：誰も触っていない・4:00±15分の起動・起動から60分以内・最後まで終わった → 60秒後に shutdown /s
            1つでも欠けたら落とさない（起動後にマウスかキーボードを1回でも触ったら絶対に落とさない）
    ↓
-GitHub Actions（.github/workflows/release.yml・毎時7分と37分）が、公開予定時刻が来た記事を data/released.json に記録して push
-→ Cloudflare Pages が作り直して記事が出る（PCは不要）
+Cloudflare の門番（functions/_middleware.js）が、アクセスのたびに公開予定時刻（日本時間）を判定
+→ 時刻前の記事は 404、一覧・サイトマップからも外す。時刻が来た瞬間から表示（定時実行に頼らない。PCも不要）
 ```
 
 - 公開予定時刻：今から15分後〜24時間後のランダム（分単位）。予約どうし2時間以上あけ、公開日1日あたり3本まで（`scripts/publish_schedule.py`）
-- 判定は日本時間（Cloudflare のビルド環境は UTC）。`publish_at` が未来の記事は一覧・記事ページ・サイトマップのどれにも出ない
+- 判定は日本時間。予約記事のページもビルドしておき、`public/_schedule.json`（まだ時刻が来ていない記事の一覧）を門番が読む。
+  門番が動くURLは `public/_routes.json`（画像・CSS は対象外）。2026-10-10 までは GitHub Actions の定時実行だったが、動かないことがあったため廃止
 - 手で渡した記事（`generated_by: autopilot` でない記事）は、これまで通りすぐ公開
 - 操作の記録係 `IdleBeacon`（`scripts/idle-beacon.pyw`）がログオン時から20秒ごとに入力を `state/idle-beacon.json` に記録
 - 猶予の60秒の間にマウスを動かせば取り消し。`cancel-sleep.bat` でも取り消せる。設定は `data/power.json`（`bios_wake_time` は BIOS と必ず同じに）

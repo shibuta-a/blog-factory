@@ -227,6 +227,12 @@ def a8_logged_in():
             page.wait_for_timeout(3000)
             ok = logged_in_url(page.url)
             if ok:
+                # トップは開けても、提携の画面だけ再認証を求められることがある。取り込みで使う画面まで確かめる
+                page.goto(MEDIA_CONSOLE.rstrip("/") + "/program/list/partnered?pageNo=1&pageSize=100",
+                          wait_until="domcontentloaded", timeout=60000)
+                page.wait_for_timeout(3000)
+                ok = logged_in_url(page.url)
+            if ok:
                 page.close()  # ログイン画面のときはタブを残し、渋田さんがそのままログインできるようにする
     except Exception as e:
         log(f"[A8] 確認中にエラー: {e.__class__.__name__}")
@@ -243,7 +249,36 @@ def fetch(*args):
     print(r.stdout.strip())
     if r.returncode != 0:
         print(r.stderr.strip()[-800:])
+    # A8 を実際に使った結果で、ログイン状態の記録を更新する（STATUS.md が古い「OK」のまま残らないように）
+    now = datetime.datetime.now().isoformat(timespec="minutes")
+    if "ログインが切れています" in r.stdout + r.stderr:
+        set_state(a8_login_ok=False, a8_checked_at=now)
+    elif r.returncode == 0:
+        set_state(a8_login_ok=True, a8_checked_at=now)
     return r.returncode
+
+
+def a8_status():
+    """(ログインが今も生きていると言えるか, STATUS.md に出す文)。
+    A8 はブラウザを閉じるとログインが消える。PC の再起動・シャットダウンをまたいだ「OK」や、6時間より古い「OK」は信用しない。"""
+    state = load_json(STATE, {})
+    at = state.get("a8_checked_at", "")
+    if state.get("a8_login_ok") is None or not at:
+        return False, "未確認"
+    if state.get("a8_login_ok") is False:
+        return False, f"**切れている**（{at.replace('T', ' ')} 確認）"
+    checked = datetime.datetime.fromisoformat(at)
+    try:
+        import ctypes
+        ctypes.windll.kernel32.GetTickCount64.restype = ctypes.c_ulonglong
+        boot = datetime.datetime.now() - datetime.timedelta(milliseconds=ctypes.windll.kernel32.GetTickCount64())
+    except (AttributeError, OSError):
+        boot = datetime.datetime.min
+    if checked < boot:
+        return False, f"**切れている見込み**（{at.replace('T', ' ')} にはOK。その後 PC が再起動したためログインは消えています）"
+    if datetime.datetime.now() - checked > datetime.timedelta(hours=6):
+        return False, f"不明（{at.replace('T', ' ')} にはOK。6時間以上たっているので、今も使えるかは次の確認まで分かりません）"
+    return True, f"OK（{at.replace('T', ' ')} 確認）"
 
 
 def cmd_a8_check():
@@ -343,9 +378,10 @@ def cmd_status():
         rows.append(f"| {labels.get(g, g)} | {a_by.get(g, 0)} | {l_by.get(g, 0)} | {p_by.get(g, 0)} | "
                     f"{t_by.get(g, '-') if g in GENRES else '-'} |")
     alerts = []
-    if state.get("a8_login_ok") is False:
-        alerts.append(f"- A8 のログインが切れています（{state.get('a8_checked_at', '')} 確認）。"
-                      "Claude Code に「A8に再ログインして」と言うか、開いている Chrome でログインしてください。")
+    a8_ok, a8_text = a8_status()
+    if not a8_ok:
+        alerts.append(f"- A8: {a8_text}。広告の取り込み・新しい提携は止まっています（記事の作成・公開は続きます）。"
+                      "PC を使うときに Claude Code に「A8に再ログインして」と言ってください。")
     review = [k for k, v in ledger.items() if v.get("needs_review")]
     if review:
         alerts.append(f"- 新しく提携した広告 {len(review)} 件の説明文が未整備です（次の自動実行で整えます）: {' / '.join(review)}")
@@ -376,7 +412,7 @@ def cmd_status():
 | 毎日の自動投稿 | {"**オン**（毎朝起動→記事を書いて予約公開→シャットダウン。次回: " + next_run + "）" if on else "オフ（「毎日の自動投稿をオンにして」でオン）"} |
 | 記事の見直し | {"**稼働中**（週 " + str(refresh_cfg()["per_week"]) + " 本まで・実質的な改善のときだけ更新日を変える）" if r_ok else r_why} |
 | 1日の上限 | 自動生成 {MAX_PER_DAY} 本まで |
-| A8 ログイン | {"OK" if state.get("a8_login_ok") else ("切れている" if state.get("a8_login_ok") is False else "未確認")}（{state.get("a8_checked_at", "-")}） |
+| A8 ログイン | {a8_text} |
 
 ## ジャンル別
 
@@ -384,7 +420,7 @@ def cmd_status():
 |---|---|---|---|---|
 {chr(10).join(rows)}
 
-## 公開予定（予約公開。GitHub Actions が時刻どおりに出す）
+## 公開予定（予約公開。時刻が来た瞬間から自動で表示される）
 
 {sched_md}
 

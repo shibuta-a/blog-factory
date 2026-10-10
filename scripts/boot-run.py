@@ -5,7 +5,7 @@
   ・毎日の bios_wake_time の数分後（その時刻に PC がすでに点いていた日の保険。このときは起動から時間がたっているので落とさない）
 
 本数は 1本15% / 2本70% / 3本15%（1日の上限3本は autopilot.py が別に守る）。
-書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送り、GitHub Actions が時刻どおりに公開する。
+書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る。Cloudflare の門番（functions/_middleware.js）がアクセスのたびに判定し、時刻が来た瞬間から表示する。
 新規記事のあと、公開済み記事の見直し（scripts/refresh-prompt.md）を1本行う（記事が20本以上・今週3本まで）。
 """
 import json

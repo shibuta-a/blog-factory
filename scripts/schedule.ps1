@@ -7,7 +7,7 @@
 #
 # 流れ: BIOS の RTC Alarm で毎朝起動 → 自動ログオン → BlogFactory-Boot（ログオン1分後）→ scripts\boot-run.py が1〜3本書く
 #       → publish.py が各記事に公開予定時刻（24時間以内のランダム）を付けて GitHub へ → 無人ならシャットダウン
-#       → GitHub Actions が30分おきに、時刻が来た記事をサイトに出す
+#       → Cloudflare の門番（functions/_middleware.js）がアクセスのたびに判定し、時刻が来た瞬間から表示する
 # ★ 起動時刻を変えたら、BIOS の RTC Alarm の時刻も同じに変えること（ずれていると安全のためシャットダウンしない）
 param([string]$Mode = "status", [string]$Time = "")
 
