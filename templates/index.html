@@ -12,11 +12,15 @@
 <body>
 <header class="site-header">
   <a class="site-name" href="{{root}}{{lang_path}}">{{site_name}}</a>
+  {{featured_nav}}
   {{lang_switch}}
 </header>
 
 <main class="container">
   <p class="site-description">{{site_description}}</p>
+
+  <!-- FEATURED: 自社サービスの固定表示（site.json の featured） -->
+  {{featured_hero}}
 
   <!-- AD_SLOT_TOP -->
   {{slot_ad_top}}

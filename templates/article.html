@@ -16,6 +16,7 @@
 <body>
 <header class="site-header">
   <a class="site-name" href="{{root}}{{lang_path}}">{{site_name}}</a>
+  {{featured_nav}}
 </header>
 
 <main class="container">
@@ -39,6 +40,9 @@
     <div class="article-body">
       {{body}}
     </div>
+
+    <!-- FEATURED: 自社サービスへの誘導（広告より先に出す） -->
+    {{featured_box}}
 
     <!-- AFFILIATE_SLOT -->
     {{slot_affiliate}}

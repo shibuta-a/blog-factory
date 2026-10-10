@@ -407,6 +407,37 @@ def excerpt_of(body_html, length=90):
     return text[:length] + ("…" if len(text) > length else "")
 
 
+def featured_parts(lang, L, images, root):
+    """site.json の featured（自社サービス）を、ヘッダーの入り口・トップの固定枠・記事末の誘導ボックスにする。"""
+    f = L.get("featured") or {}
+    slug = f.get("slug", "")
+    md = CONTENT / lang / f"{slug}.md"
+    if not slug or not md.exists():
+        return None
+    meta, _ = parse_front_matter(md.read_text(encoding="utf-8"))
+    if meta.get("draft", "").lower() in ("true", "yes", "1"):
+        return None
+    title = html.escape(meta.get("title") or slug)
+    lead = html.escape(meta.get("cta_note") or meta.get("description") or "")
+    badge = html.escape(f.get("badge", ""))
+    button = html.escape(f.get("button", "くわしく見る"))
+    href = f"{root}{slug}.html"
+    thumb = images.get(slug, {}).get("eyecatch") and f"{root}img/{slug}/thumb.jpg"
+    img = (f'<img src="{thumb}" width="480" height="270" alt="" decoding="async">' if thumb
+           else '<span class="thumb-blank" aria-hidden="true"></span>')
+    nav = f'<a class="featured-nav" href="{href}">{html.escape(f.get("nav_label") or meta.get("cta_name") or "")}</a>'
+    hero = (f'<section class="featured-hero" aria-label="{badge}"><a href="{href}">'
+            f'<span class="thumb">{img}</span><span class="featured-body">'
+            f'<span class="featured-badge">{badge}</span><span class="featured-title">{title}</span>'
+            f'<span class="featured-lead">{lead}</span><span class="featured-btn">{button}</span></span></a></section>')
+    box = (f'<aside class="featured-box"><p class="featured-badge">{badge}</p>'
+           f'<p class="featured-box-title">{html.escape(f.get("box_title") or "")}</p>'
+           f'<a class="featured-box-link" href="{href}"><span class="thumb">{img}</span>'
+           f'<span><span class="featured-title">{title}</span><span class="featured-lead">{lead}</span></span></a>'
+           f'<p class="featured-box-more"><a class="featured-btn" href="{href}">{button}</a></p></aside>')
+    return {"slug": slug, "featured_nav": nav, "featured_hero": hero, "featured_box": box}
+
+
 def main():
     config = json.loads((ROOT / "site.json").read_text(encoding="utf-8"))
     default_lang = config.get("default_lang", "ja")
@@ -458,6 +489,7 @@ def main():
         root = "" if is_default else "../"
         lang_path = "index.html" if is_default else f"{lang}/index.html"
         url_prefix = "" if is_default else f"{lang}/"
+        feat = featured_parts(lang, L, images, root) or {}
 
         posts = []
         for md in sorted((CONTENT / lang).glob("*.md")) if (CONTENT / lang).is_dir() else []:
@@ -509,6 +541,8 @@ def main():
                 "title": html.escape(title), "description": html.escape(description),
                 "date": html.escape(date), "updated": updated_html, "toc": build_toc(headings), "body": body,
                 "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
+                "featured_nav": feat.get("featured_nav", ""),
+                "featured_box": "" if slug == feat.get("slug") else feat.get("featured_box", ""),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
             plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)
@@ -527,7 +561,8 @@ def main():
                     f'<time datetime="{html.escape(p["date"])}">{html.escape(p["date"])}</time>'
                     f'<span class="card-title">{html.escape(p["title"])}</span>'
                     f'<span class="excerpt">{html.escape(p["excerpt"])}</span></span></a></li>')
-        items = "\n    ".join(card(p, i) for i, p in enumerate(posts))
+        listed = [p for p in posts if p["slug"] != feat.get("slug")]  # 固定表示した記事は一覧に重複させない
+        items = "\n    ".join(card(p, i) for i, p in enumerate(listed))
         switch = ""
         if len(active) > 1:
             links = []
@@ -542,6 +577,7 @@ def main():
             **L, **slots,
             "lang": lang, "root": root, "lang_path": lang_path, "year": year,
             "posts": items, "lang_switch": switch,
+            "featured_nav": feat.get("featured_nav", ""), "featured_hero": feat.get("featured_hero", ""),
         })
         (out_dir / "index.html").write_text(index, encoding="utf-8")
         sitemap_urls.append((url_prefix, max([p["date"] for p in posts if p["slug"] not in schedule] or [today])))

@@ -10,7 +10,14 @@
       "toc_label": "目次",
       "date_label": "公開日",
       "back_label": "記事一覧へ戻る",
-      "switch_label": "日本語"
+      "switch_label": "日本語",
+      "featured": {
+        "slug": "orishan-fukugyou",
+        "nav_label": "オリジナルシャンパンで開業",
+        "badge": "MAF GROUP の自社サービス",
+        "button": "開業パッケージをくわしく見る",
+        "box_title": "自分のお酒ブランドで開業しませんか？"
+      }
     },
     "en": {
       "site_name": "MAF Blog",
