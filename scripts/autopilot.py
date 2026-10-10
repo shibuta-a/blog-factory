@@ -154,6 +154,9 @@ def cmd_next():
         log("■ 広告: このジャンルはアフィリ広告を入れない注意喚起ジャンルです（注意喚起の表記・相談窓口は自動で入る）")
     else:
         log(f"■ このジャンルの提携中広告: {len(ads)} 件 {('（' + ' / '.join(ads) + '）') if ads else ''}")
+    if conf.get("rakuten"):
+        log("■ 楽天の商品リンク: このジャンルは使う。フロントマターに `rakuten: 検索語 | 検索語` を書く"
+            f"（記事で紹介する道具・本など、実際に読者が買いそうな物を2〜3個。例: {conf['rakuten']}）")
     if conf.get("images") == "none":
         log("■ 写真: このジャンルは写真を自動で付けません（image_query / image_queries は書かなくてよい）")
     if conf.get("ads") != "none" and len(ads) < conf.get("min_ads", 2):

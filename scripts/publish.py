@@ -79,16 +79,23 @@ def main():
     if r.returncode != 0:
         print("（写真の用意をスキップしました。記事は写真なしで公開されます）")
 
+    # 楽天の商品リンク（フロントマターに rakuten: がある記事。キーがなければスキップ。失敗しても公開は続ける）
+    r = subprocess.run([sys.executable, str(ROOT / "scripts" / "rakuten.py")], cwd=ROOT, text=True, encoding="utf-8")
+    if r.returncode != 0:
+        print("（楽天の商品リンクの用意をスキップしました）")
+
     run([sys.executable, str(ROOT / "scripts" / "build.py")])
     subprocess.run([sys.executable, str(ROOT / "scripts" / "autopilot.py"), "status"], cwd=ROOT, capture_output=True)  # STATUS.md
 
     run(["git", "add", "-A"])
-    if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:
+    if run(["git", "diff", "--cached", "--quiet"], check=False).returncode != 0:
+        stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        msg = args.message or (f"publish: {', '.join(added)}" if added else f"publish: update {stamp}")
+        run(["git", "commit", "-m", msg])
+    elif run(["git", "rev-list", "--count", "@{u}..HEAD"], check=False).stdout.strip() in ("", "0"):
         print("変更なし。公開済みの状態と同じです。")
         return
-    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    msg = args.message or (f"publish: {', '.join(added)}" if added else f"publish: update {stamp}")
-    run(["git", "commit", "-m", msg])
+    # （先に手でコミットしてあり、まだ GitHub に送っていない場合もここで送る）
     # GitHub 側に別の変更があっても衝突しないよう、先に取り込んでから送る
     for attempt in range(3):
         run(["git", "pull", "--rebase", "--autostash"])

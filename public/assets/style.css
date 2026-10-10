@@ -21,6 +21,7 @@
   --warn: #b45309;  --warn-soft: #fff8e6;
   --memo: #475569;  --memo-soft: #f1f5f9;
   --gold: #b8892b; --gold-soft: #fbf6ea; --gold-ink: #7a5a12;   /* 自社サービス（シャンパンゴールド） */
+  --rk: #bf0000;   /* 楽天市場のボタン */
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -30,6 +31,7 @@
     --marker: rgba(255, 214, 64, 0.35);
     --point: #5cc3cf; --point-soft: #1b2d31; --warn: #f0a63a; --warn-soft: #2d2415; --memo: #a3b3c6; --memo-soft: #1f252c;
     --gold: #d4a94a; --gold-soft: #2a2416; --gold-ink: #9a7020;
+    --rk: #c8323a;
   }
 }
 
@@ -276,4 +278,31 @@ img { max-width: 100%; height: auto; }
   .aff-table td[data-label]::before { content: attr(data-label); flex: none; width: 6.5em; color: var(--muted); font-size: 0.8rem; padding-top: 2px; }
   .aff-table .aff-td-btn { padding: 10px 14px 16px; }
   .aff-btn-sm { width: 100%; min-height: 52px; font-size: 1rem; }
+}
+
+/* ---------- 楽天市場の関連商品（scripts/rakuten.py → affiliate.render_rakuten） ---------- */
+.rk-box { margin: 32px 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--soft); }
+.rk-title { margin: 0 0 12px; font-weight: 800; }
+.rk-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+.rk-item a {
+  display: flex; gap: 12px; align-items: center; height: 100%; padding: 10px; color: var(--text); text-decoration: none;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+}
+.rk-item a:hover { border-color: var(--rk); }
+.rk-img { flex: 0 0 88px; }
+.rk-img img { display: block; width: 88px; height: 88px; object-fit: contain; background: #fff; border-radius: 6px; }
+.rk-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rk-name { font-weight: 700; font-size: 0.92rem; line-height: 1.5; }
+.rk-shop { color: var(--muted); font-size: 0.78rem; }
+.rk-btn {
+  align-self: flex-start; margin-top: 4px; padding: 5px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700;
+  color: #fff; background: var(--rk);
+}
+.rk-btn::after { content: " →"; }
+@media (min-width: 620px) {
+  .rk-list { grid-template-columns: repeat(3, 1fr); }
+  .rk-item a { flex-direction: column; align-items: stretch; text-align: left; }
+  .rk-img { flex: none; }
+  .rk-img img { width: 100%; height: 140px; }
+  .rk-noimg .rk-item a { justify-content: space-between; }
 }

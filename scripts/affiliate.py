@@ -239,6 +239,39 @@ def apply(body_html, meta, title, programs):
 
 
 # ---------------------------------------------------------------------------
+# 楽天市場の商品リンク（scripts/rakuten.py が data/rakuten.json に用意したもの）
+# ---------------------------------------------------------------------------
+def render_rakuten(items, show_images=True):
+    """楽天の商品枠。価格・レビューは変わるので出さず、楽天市場のページで確かめてもらう。"""
+    cards = []
+    for it in items:
+        url = html.escape(it["url"], quote=True)
+        img = (f'<img src="{html.escape(it["image"], quote=True)}" width="150" height="150" alt="" loading="lazy" decoding="async">'
+               if show_images and it.get("image") else "")
+        cards.append(
+            f'<li class="rk-item"><a href="{url}" target="_blank" rel="nofollow sponsored noopener">'
+            + (f'<span class="rk-img">{img}</span>' if img else "")
+            + f'<span class="rk-body"><span class="rk-name">{html.escape(it["name"])}</span>'
+            f'<span class="rk-shop">{html.escape(it.get("shop", ""))}</span>'
+            '<span class="rk-btn">楽天市場で価格を見る</span></span></a></li>')
+    return ('<section class="rk-box" aria-label="楽天市場の関連商品">'
+            '<p class="rk-title">この記事に関連する商品（楽天市場）</p>'
+            f'<ul class="rk-list{"" if show_images else " rk-noimg"}">{"".join(cards)}</ul>'
+            '<p class="aff-note">※価格・在庫・送料は変わることがあります。購入前に楽天市場の商品ページでご確認ください。</p>'
+            "</section>")
+
+
+def apply_rakuten(body_html, items, show_images=True):
+    """<!-- RAKUTEN --> の位置、なければ「よくある質問」か「まとめ」の直前に商品枠を入れる。"""
+    if not items:
+        return body_html.replace("<!-- RAKUTEN -->", ""), False
+    block = render_rakuten(items, show_images)
+    if "<!-- RAKUTEN -->" in body_html:
+        return body_html.replace("<!-- RAKUTEN -->", block, 1).replace("<!-- RAKUTEN -->", ""), True
+    return _insert_before_heading(body_html, block), True
+
+
+# ---------------------------------------------------------------------------
 # 自社サービス（A8 以外）の申込みボックス
 # ---------------------------------------------------------------------------
 OWN_CTA_RE = re.compile(r"<!--\s*CTA:\s*(.+?)\s*(?:→|->)\s*(https?://\S+?)\s*-->")

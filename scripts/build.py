@@ -470,6 +470,8 @@ def main():
     programs = affiliate.load_ledger()
     images = load_images()
     genres = load_genres()
+    rakuten = json.loads((ROOT / "data" / "rakuten.json").read_text(encoding="utf-8")) \
+        if (ROOT / "data" / "rakuten.json").exists() else {}
     print(f"広告台帳: 提携中 {len(programs)} 件")
 
     slots = {
@@ -543,6 +545,12 @@ def main():
                 aff_tail = ""
             else:
                 body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
+            # 楽天市場の商品リンク（注意喚起ジャンルには入れない。images: none のジャンルは商品画像も出さない）
+            gconf = genres.get(meta.get("genre", ""), {})
+            rk_items = [] if caution else (rakuten.get(slug) or {}).get("items", [])
+            body, rk_used = affiliate.apply_rakuten(body, rk_items, gconf.get("images") != "none")
+            if rk_used and not pr_notice:
+                pr_notice = affiliate.PR_NOTICE
             body = insert_middle_ad(body, slots["slot_ad_middle"])
             body = wrap_sections(body)
             imgs = images.get(slug, {})
