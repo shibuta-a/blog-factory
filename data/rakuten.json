@@ -1,1 +1,56 @@
-{}
+{
+ "jitan-heijitsu-15fun-kondate": {
+  "queries": [
+   "保存容器 冷凍",
+   "キッチンタイマー",
+   "時短 献立 本"
+  ],
+  "fetched_at": "2026-10-12",
+  "items": [
+   {
+    "name": "VAKUEN 真空保存容器 電動 強力密閉 鮮度長持ち コンテナ タッパー キャニスター BPA…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00txego.iretp47c.g00txego.iretq6b7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fkitchenavi%2F2498-001010%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fkitchenavi%2Fi%2F10000408%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/kitchenavi/cabinet/vakuen/vakuen_sl_1_16.jpg?_ex=300x300",
+    "shop": "KitcheNavi楽天市場店",
+    "query": "保存容器 冷凍"
+   },
+   {
+    "name": "デジタルタイマー キッチンタイマー マグネット デジタル おしゃれ アラーム タイマー ダイヤル…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00uddbo.iretpbd5.g00uddbo.iretqf57/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fignis%2F2307sd571%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fignis%2Fi%2F10000174%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/ignis/cabinet/unei/imgrc0135650652.jpg?_ex=300x300",
+    "shop": "霜山楽天市場店",
+    "query": "キッチンタイマー"
+   },
+   {
+    "name": "じけいえんごはん 特別養護老人ホーム監修 介護食参考書 時短レシピ 本 レシピ本 介護食 参考書…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00tp68o.iretp381.g00tp68o.iretqdaf/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ff012165-ashibetsu%2Fjikeien-001%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Ff012165-ashibetsu%2Fi%2F10000144%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/f012165-ashibetsu/cabinet/d_202402/sku_112337_01_web_s.jpg?_ex=300x300",
+    "shop": "北海道芦別市",
+    "query": "時短 献立 本"
+   }
+  ]
+ },
+ "vod-kazoku-erabikata": {
+  "queries": [
+   "ストリーミング端末 テレビ",
+   "HDMI ケーブル"
+  ],
+  "fetched_at": "2026-10-12",
+  "items": [
+   {
+    "name": "ワイヤレスミラーキャスト スマホ テレビに映す 無線 メディアストリーミング端末 HDMI 大画…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00skpso.iretp814.g00skpso.iretq8d3/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Faidort%2Fslub-1137a2%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Faidort%2Fi%2F10002690%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/aidort/cabinet/08122988/1137a1-zhu.jpg?_ex=300x300",
+    "shop": "愛度楽天市場店",
+    "query": "ストリーミング端末 テレビ"
+   },
+   {
+    "name": "HDMIケーブル 1m 2m 3m 5m 4K対応 HDMI2.0規格 ハイスピード 12ヶ月保…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00t3u1o.iretp911.g00t3u1o.iretq6e2/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fonedayonestyle%2Fhdmi2010014k%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fonedayonestyle%2Fi%2F10000374%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/onedayonestyle/cabinet/06666376/imgrc0074294526.jpg?_ex=300x300",
+    "shop": "ONE DAY ONE STYLE",
+    "query": "HDMI ケーブル"
+   }
+  ]
+ }
+}

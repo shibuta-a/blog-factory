@@ -342,5 +342,69 @@
    "landing_url": "https://stocksnap.io/photo/chopped-tomatoes-03JNS3TYGF",
    "openverse_id": "43bd079f-a043-4212-a5ad-c42e0d362636"
   }
+ },
+ "jitan-heijitsu-15fun-kondate": {
+  "eyecatch": {
+   "file": "img/jitan-heijitsu-15fun-kondate/eyecatch.jpg",
+   "query": "cooking kitchen",
+   "title": "Cooking Kitchen",
+   "creator": "JESHOOTS.com",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cooking-kitchen-80C03C2071",
+   "openverse_id": "4d97004b-fd43-47ff-af22-eb85e50b45b1"
+  },
+  "body-1": {
+   "file": "img/jitan-heijitsu-15fun-kondate/body-1.jpg",
+   "query": "vegetables cutting",
+   "title": "Freshly chopped herbs vegetables cutting",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/3304105/free-photo-image-arugula-cc0-creative-commons",
+   "openverse_id": "58f45867-d72c-4e27-ba4b-e605bd86e5a6"
+  },
+  "body-2": {
+   "file": "img/jitan-heijitsu-15fun-kondate/body-2.jpg",
+   "query": "dinner table",
+   "title": "Folded napkins dinner table",
+   "creator": "Markus Spiske",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/432599/free-photo-image-cc0-creative-commons",
+   "openverse_id": "4cc0be39-9ba3-4de6-b1f1-1a3e8484cd98"
+  }
+ },
+ "vod-kazoku-erabikata": {
+  "eyecatch": {
+   "file": "img/vod-kazoku-erabikata/eyecatch.jpg",
+   "query": "family television",
+   "title": "Silhouette Family",
+   "creator": "RachelH",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/silhouette-family-Q7UIKF58IR",
+   "openverse_id": "8d6613d0-142b-4fcc-86b7-b1f553decad5"
+  },
+  "body-1": {
+   "file": "img/vod-kazoku-erabikata/body-1.jpg",
+   "query": "living room",
+   "title": "Living Room",
+   "creator": "Dan Gold",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/living-room-BI0P6D3WL9",
+   "openverse_id": "52eceae4-f5cd-4b50-ad23-53648d022d0a"
+  },
+  "body-2": {
+   "file": "img/vod-kazoku-erabikata/body-2.jpg",
+   "query": "remote control",
+   "title": "Remote Control",
+   "creator": "50Fish",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/remote-control-XXNJAOGTCN",
+   "openverse_id": "274c0827-8c5e-4092-a473-a583606bf8b4"
+  }
  }
 }
