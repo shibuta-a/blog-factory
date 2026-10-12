@@ -9,6 +9,7 @@
   python scripts/autopilot.py sync             … 審査待ちが承認されていたら広告リンクを台帳に取り込む
   python scripts/autopilot.py a8-check         … A8 にログインした Chrome が使えるか確認（なければ起動を試す）
   python scripts/autopilot.py topics-check     … 残りネタが少ないジャンルを表示（自動運転の Claude が補充する）
+  python scripts/autopilot.py weekly-due       … 週1本のジャンル（genres.json の weekly_day。オリシャン記事）を今日書く日なら 0、違えば 1
   python scripts/autopilot.py review           … 台帳で needs_review（label/catch/table が未整備）の案件を表示
   python scripts/autopilot.py status           … STATUS.md を更新
   python scripts/autopilot.py refresh-next     … 次に見直す公開済み記事を表示（記事が20本未満・今週分済みなら「見直さない」）
@@ -17,6 +18,7 @@
   python scripts/autopilot.py refresh-mode auto|on|off          … 見直しを 20本たまったら自動開始 / 今すぐ開始 / 停止
 
 スパム対策: 自動生成の記事（フロントマター generated_by: autopilot）は 1日 MAX_PER_DAY 本まで。
+週1本のジャンル（weekly_day）: その曜日以降でその週にまだ書いていなければ next が最優先で出す。それ以外の日は通常の順番に入らない。
 """
 import datetime
 import json
@@ -122,21 +124,55 @@ def auto_today():
     return [a for a in articles() if a.get("generated_by") == "autopilot" and (a.get("created") or a.get("date")) == today()]
 
 
+def weekly_genres():
+    return [g for g, c in GENRES.items() if isinstance(c.get("weekly_day"), int)]
+
+
+def weekly_due(topics=None):
+    """今日書くべき週1本のジャンル（weekly_day の曜日以降で、今週まだ書いていない・未使用ネタがある）。なければ None。"""
+    d = datetime.date.today()
+    monday = (d - datetime.timedelta(days=d.weekday())).isoformat()
+    topics = topics if topics is not None else [t for t in read_topics() if not t[2]]
+    arts = articles()
+    for g in weekly_genres():
+        if d.weekday() < GENRES[g]["weekly_day"]:
+            continue
+        if any(a["_genre"] == g and a.get("generated_by") == "autopilot"
+               and monday <= (a.get("created") or a.get("date") or "") for a in arts):
+            continue
+        if any(t[1] == g for t in topics):
+            return g
+    return None
+
+
+def cmd_weekly_due():
+    g = weekly_due()
+    if g:
+        log(f"今日は週1本の {g}（{GENRES[g]['label']}）を書く日です")
+        return 0
+    log("今日は週1本のジャンルを書く日ではありません")
+    return 1
+
+
 def cmd_next():
     done_today = auto_today()
     if len(done_today) >= MAX_PER_DAY:
         log(f"本日の上限（{MAX_PER_DAY}本）に達しています。今日はこれ以上書かないでください。")
         return 2
     topics = [t for t in read_topics() if not t[2]]
+    due = weekly_due(topics)
+    # 週1本のジャンルは、書く日だけ最優先。それ以外の日は通常の順番に入れない
+    if not due:
+        topics = [t for t in topics if t[1] not in weekly_genres()]
     if not topics:
         log("未使用のネタがありません。topics-check の手順でネタを補充してください。")
         return 3
     # ジャンルを順番に回す（直近に書いたジャンルの次から）。同じジャンルばかり続けない
-    order = list(GENRES)
+    order = [g for g in GENRES if g not in weekly_genres()]
     state = load_json(STATE, {})
     last = state.get("last_genre")
     start = (order.index(last) + 1) % len(order) if last in order else 0
-    rotated = order[start:] + order[:start]
+    rotated = ([due] if due else []) + order[start:] + order[:start]
     topic = next((t for g in rotated for t in topics if t[1] == g), topics[0])
     _, genre, _, keyword = topic
     conf = GENRES[genre]
@@ -150,8 +186,15 @@ def cmd_next():
     log(f"■ 型: {conf['kata']}")
     if conf.get("note"):
         log(f"■ このジャンルのルール（必ず守る）: {conf['note']}")
+    if due == genre:
+        log("■ 今日は週1本の自社サービス記事の日です（この1本を書いたら、残りは通常のジャンルに戻る）")
+    if conf.get("facts"):
+        log(f"■ 使ってよい事実: {conf['facts']}（書く前に必ず読む。数字・実績はここにあるものだけ）")
     if conf.get("ads") == "none":
         log("■ 広告: このジャンルはアフィリ広告を入れない注意喚起ジャンルです（注意喚起の表記・相談窓口は自動で入る）")
+    elif conf.get("ads") == "own":
+        log("■ 広告: 自社サービスの記事です。A8・楽天の広告は入りません（AFFILIATE の差し込み口と rakuten: は書かない）。"
+            "PR表記・収益保証なしの注記は自動で入ります。末尾に型どおり CTA 2行を書く")
     else:
         log(f"■ このジャンルの提携中広告: {len(ads)} 件 {('（' + ' / '.join(ads) + '）') if ads else ''}")
     if conf.get("rakuten"):
@@ -160,7 +203,7 @@ def cmd_next():
             f"例: {conf['rakuten']}）。物を紹介しない記事には書かない")
     if conf.get("images") == "none":
         log("■ 写真: このジャンルは写真を自動で付けません（image_query / image_queries は書かなくてよい）")
-    if conf.get("ads") != "none" and len(ads) < conf.get("min_ads", 2):
+    if conf.get("ads") not in ("none", "own") and len(ads) < conf.get("min_ads", 2):
         log(f"  → 広告が足りません。先に `python scripts/autopilot.py ads {genre}` を実行してください。")
     log("■ 公開済みの記事（切り口・タイトルが重ならないようにする）:")
     for a in arts:
@@ -179,9 +222,10 @@ def cmd_done(keyword, slug):
         if kw == keyword and not used:
             lines[i] = f"- [x] {kw} → {slug}（{today()}）"
             TOPICS.write_text("\n".join(lines) + "\n", encoding="utf-8")
-            state = load_json(STATE, {})
-            state["last_genre"] = genre
-            save_json(STATE, state)
+            if genre not in weekly_genres():  # 週1本のジャンルは通常の順番を動かさない
+                state = load_json(STATE, {})
+                state["last_genre"] = genre
+                save_json(STATE, state)
             log(f"使用済みにしました: {kw} → {slug}")
             return 0
     log(f"topics.txt に未使用のネタ「{keyword}」が見つかりません（印は付けていません）")
@@ -415,6 +459,13 @@ def cmd_status():
     r_log = load_json(REFRESH_LOG, [])
     refresh_md = "\n".join(f"| {e['date']} | {e['slug']} | {e['result']} | {e['note']} |" for e in reversed(r_log[-15:]))
     refresh_md = ("| 日付 | 記事 | 結果 | 内容 |\n|---|---|---|---|\n" + refresh_md) if refresh_md else "まだありません"
+    days = "月火水木金土日"
+    week_start = (datetime.date.today() - datetime.timedelta(days=datetime.date.today().weekday())).isoformat()
+    weekly_md = "\n".join(
+        f"| {GENRES[g]['label']}（週1本・{days[GENRES[g]['weekly_day']]}曜） | 今週: "
+        + ("書いた" if any(a["_genre"] == g and a.get("generated_by") == "autopilot"
+                         and week_start <= (a.get("created") or a.get("date") or "") for a in arts) else "まだ")
+        + f"・残りネタ {t_by.get(g, 0)} 件 |" for g in weekly_genres())
     md = f"""# ブログ工場 STATUS
 
 最終更新: {datetime.datetime.now():%Y-%m-%d %H:%M}（記事の公開・自動実行のたびに自動更新）
@@ -431,6 +482,7 @@ def cmd_status():
 | 毎日の自動投稿 | {"**オン**（毎朝起動→記事を書いて予約公開→シャットダウン。次回: " + next_run + "）" if on else "オフ（「毎日の自動投稿をオンにして」でオン）"} |
 | 記事の見直し | {"**稼働中**（週 " + str(refresh_cfg()["per_week"]) + " 本まで・実質的な改善のときだけ更新日を変える）" if r_ok else r_why} |
 | 1日の上限 | 自動生成 {MAX_PER_DAY} 本まで |
+{weekly_md}
 | A8 ログイン | {a8_text} |
 
 ## ジャンル別
@@ -631,6 +683,8 @@ def main():
         return cmd_sync()
     if cmd == "a8-check":
         return cmd_a8_check()
+    if cmd == "weekly-due":
+        return cmd_weekly_due()
     if cmd == "topics-check":
         return cmd_topics_check()
     if cmd == "review":

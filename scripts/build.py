@@ -531,6 +531,14 @@ def main():
             updated_html = (f' <span class="updated">（{L.get("updated_label", "更新")} '
                             f'<time datetime="{html.escape(updated)}">{html.escape(updated)}</time>）</span>'
                             if updated > date else "")
+            gconf = genres.get(meta.get("genre", ""), {})
+            own = gconf.get("ads") == "own"  # 自社サービスの誘導ジャンル（オリシャン）: A8・楽天は入れない
+            if own:
+                for k in ("cta_name", "cta_note", "pr_notice"):
+                    meta.setdefault(k, gconf.get(k, ""))
+                text = text.replace("<!-- AFFILIATE_COMPARE -->", "").replace("<!-- AFFILIATE_CTA -->", "")
+                if "<!-- CTA:" not in text:  # CTA を書き忘れても A8 の広告にならないよう、既定のボタンを足す
+                    text += "\n\n" + "\n".join(f"<!-- CTA: {t} → {u} -->" for t, u in gconf.get("own_cta", []))
             headings = []
             body = markdown(text, headings)
             title = meta.get("title") or (headings[0][2] if headings else md.stem)
@@ -545,9 +553,10 @@ def main():
                 aff_tail = ""
             else:
                 body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
-            # 楽天市場の商品リンク（注意喚起ジャンルには入れない。images: none のジャンルは商品画像も出さない）
-            gconf = genres.get(meta.get("genre", ""), {})
-            rk_items = [] if caution else (rakuten.get(slug) or {}).get("items", [])
+            if own and gconf.get("disclaimer"):
+                body += f'\n<p class="pr-notice own-disclaimer">{html.escape(gconf["disclaimer"])}</p>'
+            # 楽天市場の商品リンク（注意喚起・自社サービスのジャンルには入れない。images: none のジャンルは商品画像も出さない）
+            rk_items = [] if caution or own else (rakuten.get(slug) or {}).get("items", [])
             body, rk_used = affiliate.apply_rakuten(body, rk_items, gconf.get("images") != "none")
             if rk_used and not pr_notice:
                 pr_notice = affiliate.PR_NOTICE
@@ -562,7 +571,7 @@ def main():
                 if base_url:
                     og_tags = (f'<meta property="og:image" content="{html.escape(base_url + "/" + ec["file"], quote=True)}">\n'
                                '<meta name="twitter:card" content="summary_large_image">')
-            slot_affiliate = slots["slot_affiliate"]
+            slot_affiliate = "" if own else slots["slot_affiliate"]
             if aff_tail:
                 slot_affiliate = f'<div class="affiliate-slot">{aff_tail}</div>' + slot_affiliate
             if pr_notice:
@@ -576,7 +585,7 @@ def main():
                 "date": html.escape(date), "updated": updated_html, "toc": build_toc(headings), "body": body,
                 "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
                 "featured_nav": feat.get("featured_nav", ""),
-                "featured_box": "" if slug == feat.get("slug") or caution else feat.get("featured_box", ""),
+                "featured_box": "" if slug == feat.get("slug") or caution or own else feat.get("featured_box", ""),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
             plain_body = re.sub(r"<(aside|section|figure)\b.*?</\1>", "", body, flags=re.S)

@@ -5,6 +5,7 @@
   ・毎日の bios_wake_time の数分後（その時刻に PC がすでに点いていた日の保険。このときは起動から時間がたっているので落とさない）
 
 本数は 1本15% / 2本70% / 3本15%（1日の上限3本は autopilot.py が別に守る）。
+週1本の自社サービス記事（オリシャン・既定は水曜）を書く日は、それ＋通常1本の計2本。
 書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る。Cloudflare の門番（functions/_middleware.js）がアクセスのたびに判定し、時刻が来た瞬間から表示する。
 新規記事のあと、公開済み記事の見直し（scripts/refresh-prompt.md）を1本行う（記事が20本以上・今週3本まで）。
 """
@@ -38,7 +39,12 @@ def main():
 
     r = random.randrange(100)
     n = 1 if r < 15 else 2 if r < 85 else 3
-    log(f"記事を {n} 本書きます")
+    # 週1本の自社サービス記事（オリシャン）の日は、それ＋通常1本の計2本にする
+    weekly = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "autopilot.py"), "weekly-due"],
+                            cwd=ROOT, capture_output=True).returncode == 0
+    if weekly:
+        n = 2
+    log(f"記事を {n} 本書きます" + ("（うち1本は週1本の自社サービス記事）" if weekly else ""))
     with open(os.path.join(ROOT, "logs", "auto-generate.log"), "a", encoding="utf-8") as out:
         code = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "auto-generate.py"), "-n", str(n)],
                               cwd=ROOT, stdout=out, stderr=subprocess.STDOUT).returncode
