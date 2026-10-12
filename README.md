@@ -303,6 +303,7 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
   console.x.com の Billing で前払いクレジットと上限を設定する。`with_link: false` でリンクなしにできる
 - **note**：`python scripts/note-run.py`（毎朝自動）／`--dry --slug <slug>`（書いて重複チェックだけ）／`check`（ログイン確認）／`list`。
   ログインが切れたら STATUS.md の「要対応」に出る →「noteに再ログインして」で `python scripts/note-login.py`
+- **note の見出し画像**：ブログのアイキャッチ（Openverse の CC0/PD 写真）を 1280×670 に切り出して自動で付ける（state/note-img/）。写真のない記事（ポケカなど）はタイトル入りの紺地の画像を自動で作る。画像だけ失敗しても記事は出す。あとから付けるときは `python scripts/note-run.py header`
 - **重複コンテンツ対策**：note 版はブログの要約ではなく「一つの視点に絞った短い読み物」。ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し、3回だめなら投稿しない
 - **相互誘導**：note → ブログは記事末尾に1回だけ。ブログ → note は note に出した記事だけ末尾に1行。X → ブログは記事URL。
   オリシャン（本業）への案内は orishan ジャンルの記事の note 版だけ（ブログ側はトップ固定枠・各記事の誘導ボックスで既に出ている）

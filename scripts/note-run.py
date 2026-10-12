@@ -7,6 +7,7 @@
   python scripts/note-run.py --slug X   … 記事を指定（テスト用。1日の上限は見ない）
   python scripts/note-run.py check      … note のログインが生きているか確かめる
   python scripts/note-run.py list       … note に投稿済みの記事
+  python scripts/note-run.py header     … 投稿済みで見出し画像のない記事に、あとから見出し画像を付ける
 
 流れ:
   1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを新しい順に選ぶ
@@ -196,6 +197,94 @@ def shot(page, name):
         pass
 
 
+HEADER_SIZE = (1280, 670)  # note の見出し画像の推奨サイズ
+FONT = Path(r"C:\Windows\Fonts\YuGothB.ttc")
+
+
+def header_image(slug, title):
+    """note の見出し画像を用意する。ブログのアイキャッチ（Openverse の CC0/PD 写真）を 1280×670 に切り出す。
+    写真のない記事（images: none のジャンルなど）は、タイトル入りの無地の画像を作る。作れなければ None。"""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+    except ImportError:
+        return None
+    out = ROOT / "state" / "note-img" / f"{slug}.jpg"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    images = json.loads((ROOT / "data" / "images.json").read_text(encoding="utf-8")) if (ROOT / "data" / "images.json").exists() else {}
+    ec = (images.get(slug) or {}).get("eyecatch") or {}
+    src = ROOT / "static" / ec.get("file", "-")
+    W, H = HEADER_SIZE
+    if ec and src.exists():
+        im = Image.open(src).convert("RGB")
+        scale = max(W / im.width, H / im.height)
+        im = im.resize((round(im.width * scale), round(im.height * scale)), Image.LANCZOS)
+        left, top = (im.width - W) // 2, (im.height - H) // 2
+        im.crop((left, top, left + W, top + H)).save(out, quality=90)
+        return out
+    if not FONT.exists():
+        return None
+    im = Image.new("RGB", (W, H), (34, 58, 94))
+    d = ImageDraw.Draw(im)
+    d.rectangle((48, 48, W - 48, H - 48), outline=(201, 168, 92), width=4)
+    font = ImageFont.truetype(str(FONT), 64)
+    lines, cur = [], ""
+    for ch in title:                       # 幅に合わせて折り返す（最大3行）
+        if d.textlength(cur + ch, font=font) > W - 220:
+            lines.append(cur)
+            cur = ""
+        cur += ch
+    lines = (lines + [cur])[:3]
+    y = (H - len(lines) * 92) // 2
+    for line in lines:
+        d.text(((W - d.textlength(line, font=font)) // 2, y), line, font=font, fill=(255, 255, 255))
+        y += 92
+    small = ImageFont.truetype(str(FONT), 30)
+    d.text((W - 110 - d.textlength("MAF ブログ", font=small), H - 100), "MAF ブログ", font=small, fill=(201, 168, 92))
+    im.save(out, quality=90)
+    return out
+
+
+def set_header_image(page, path):
+    """編集画面のタイトル上の画像ボタン →「画像をアップロード」→ 切り抜きの確定。"""
+    page.locator('textarea[placeholder="記事タイトル"]').locator("xpath=preceding::button[1]").click()
+    with page.expect_file_chooser(timeout=15000) as fc:
+        page.get_by_role("button", name=re.compile("画像をアップロード")).click()
+    fc.value.set_files(str(path))
+    page.wait_for_timeout(2500)
+    shot(page, "0-header-crop")
+    save = page.get_by_role("button", name=re.compile("^(保存|適用|決定)$"))
+    if save.count():
+        save.last.click()
+    # アップロード中は「公開に進む」が押せない。押せるようになるまで待つ
+    page.wait_for_function("""() => [...document.querySelectorAll('button')]
+        .some(b => b.innerText.trim() === '公開に進む' && !b.disabled)""", timeout=90000)
+    page.wait_for_timeout(1500)
+    title_y = page.locator('textarea[placeholder="記事タイトル"]').bounding_box()["y"]
+    ok = page.evaluate("(ty) => [...document.querySelectorAll('img')].some(i => { const r = i.getBoundingClientRect();"
+                       " return r.width > 300 && r.bottom <= ty; })", title_y)
+    if not ok:
+        raise RuntimeError("見出し画像を設定できませんでした（note の画面の仕様が変わった可能性）")
+
+
+def add_header_to_posted(page, url, image):
+    """投稿済みの記事に、あとから見出し画像を付けて「更新する」。"""
+    key = url.rstrip("/").split("/")[-1]
+    page.goto(f"https://editor.note.com/notes/{key}/edit/", wait_until="domcontentloaded")
+    page.locator('textarea[placeholder="記事タイトル"]').wait_for(timeout=30000)
+    page.wait_for_timeout(3000)
+    title_y = page.locator('textarea[placeholder="記事タイトル"]').bounding_box()["y"]
+    has = page.evaluate("(ty) => [...document.querySelectorAll('img')].some(i => { const r = i.getBoundingClientRect();"
+                        " return r.width > 300 && r.bottom <= ty; })", title_y)
+    if not has:
+        set_header_image(page, image)
+    page.get_by_role("button", name="公開に進む").click()
+    page.wait_for_url(re.compile(r"/publish"), timeout=60000)
+    page.wait_for_timeout(2000)
+    page.get_by_role("button", name=re.compile("^更新する")).click()
+    page.wait_for_url(lambda u: "/publish" not in u, timeout=60000)
+    page.wait_for_timeout(2000)
+
+
 PASTE_JS = """(html) => {
   const el = document.querySelector('.ProseMirror');
   el.focus();
@@ -206,14 +295,25 @@ PASTE_JS = """(html) => {
 }"""
 
 
-def post_to_note(page, user, title, body_html, tags, publish=True):
-    """note の新規記事画面で、タイトル・本文・ハッシュタグを入れて公開する。公開した記事のURLを返す。"""
+def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
+    """note の新規記事画面で、見出し画像・タイトル・本文・ハッシュタグを入れて公開する。(記事のURL, 見出し画像を付けられたか) を返す。"""
     page.goto("https://note.com/notes/new", wait_until="domcontentloaded")
     page.wait_for_url(re.compile(r"editor\.note\.com/notes/\w+/edit"), timeout=60000)
     key = re.search(r"/notes/(\w+)/", page.url).group(1)
     title_box = page.locator('textarea[placeholder="記事タイトル"]')
     title_box.wait_for(timeout=30000)
     title_box.fill(title)
+    has_header = False
+    if image:
+        try:
+            set_header_image(page, image)
+            has_header = True
+        except Exception as e:  # 画像だけ失敗しても記事は出す
+            shot(page, "error-header")
+            log(f"note: 見出し画像を付けられませんでした（{type(e).__name__}: {str(e)[:200]}）。画像なしで続けます")
+            close = page.get_by_role("button", name="キャンセル")
+            if close.count():
+                close.last.click()
     body = page.locator(".ProseMirror").first
     body.click()
     page.evaluate(PASTE_JS, body_html)
@@ -232,7 +332,7 @@ def post_to_note(page, user, title, body_html, tags, publish=True):
         page.wait_for_timeout(500)
     shot(page, "2-publish")
     if not publish:
-        return page.url
+        return page.url, has_header
     page.get_by_role("button", name=re.compile("^投稿する")).click()
     # 公開すると編集画面から離れる（初回は「はじめての作品」画面、以後は記事やシェアの画面）
     page.wait_for_url(lambda u: "/publish" not in u, timeout=60000)
@@ -241,14 +341,14 @@ def post_to_note(page, user, title, body_html, tags, publish=True):
     url = f"https://note.com/{user}/n/{key}"
     if page.request.get(url).status != 200:
         raise RuntimeError(f"公開後の記事が表示されません: {url}")
-    return url
+    return url, has_header
 
 
 # ---------------------------------------------------------------------------
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list"])
+    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header"])
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--slug")
     args = ap.parse_args()
@@ -265,7 +365,7 @@ def main():
         return 0
 
     today = datetime.date.today().isoformat()
-    if args.slug:
+    if args.slug and args.cmd != "header":
         md = next((p for p in (ROOT / "content" / "ja").glob("*.md") if (read_md(p)[0].get("slug") or p.stem) == args.slug), None)
         if not md:
             sys.exit(f"記事が見つかりません: {args.slug}")
@@ -303,6 +403,21 @@ def main():
             print(f"note: ログイン中（{user}）")
             close_chrome(browser)
             return 0
+        if args.cmd == "header":  # 投稿済みで見出し画像のない記事に、あとから付ける
+            for slug, v in done.items():
+                if v.get("header") or (args.slug and slug != args.slug):
+                    continue
+                img = header_image(slug, v.get("title", ""))
+                try:
+                    add_header_to_posted(page, v["url"], img)
+                    v["header"] = True
+                    save_log(done)
+                    log(f"note: 見出し画像を付けました {slug} → {v['url']}")
+                except Exception as e:
+                    shot(page, f"error-header-{slug}")
+                    log(f"note: {slug} の見出し画像に失敗（{type(e).__name__}: {str(e)[:300]}）")
+            close_chrome(browser)
+            return 0
         for _, slug, md, meta in targets:
             ver = ensure_version(slug, md, meta, base_url)
             if not ver:
@@ -310,12 +425,14 @@ def main():
             n_meta, n_body = read_md(ver)
             tags = [t.strip().lstrip("#") for t in n_meta.get("tags", "").split("|") if t.strip()][:5]
             try:
-                url = post_to_note(page, user, n_meta["title"], to_html(n_body), tags)
+                url, has_header = post_to_note(page, user, n_meta["title"], to_html(n_body), tags,
+                                   image=header_image(slug, n_meta["title"]))
             except Exception as e:  # note の画面が変わったときなど
                 shot(page, f"error-{slug}")
                 log(f"note: {slug} の投稿に失敗しました（{type(e).__name__}: {str(e)[:300]}）。画面: .secrets/shots/note-error-{slug}.png")
                 continue
-            done[slug] = {"url": url, "title": n_meta["title"], "posted_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")}
+            done[slug] = {"url": url, "title": n_meta["title"], "header": has_header,
+                          "posted_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")}
             save_log(done)
             posted.append(slug)
             log(f"note: 投稿しました {slug} → {url}")
