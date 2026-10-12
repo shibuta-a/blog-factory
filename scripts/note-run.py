@@ -244,6 +244,20 @@ def header_image(slug, title):
     return out
 
 
+def wait_js(page, js, timeout=60):
+    """js（真偽を返す関数）が真になるまで1秒ごとに確かめる。
+    note の画面は CSP で Playwright の wait_for_function（文字列の評価）が使えないため、evaluate で見る。"""
+    end = time.time() + timeout
+    while time.time() < end:
+        try:
+            if page.evaluate(js):
+                return
+        except Exception:
+            pass   # 画面の切り替わり中など
+        page.wait_for_timeout(1000)
+    raise TimeoutError(f"{timeout}秒待っても画面が変わりませんでした")
+
+
 def set_header_image(page, path):
     """編集画面のタイトル上の画像ボタン →「画像をアップロード」→ 切り抜きの確定。"""
     page.locator('textarea[placeholder="記事タイトル"]').locator("xpath=preceding::button[1]").click()
@@ -252,18 +266,24 @@ def set_header_image(page, path):
     fc.value.set_files(str(path))
     page.wait_for_timeout(2500)
     shot(page, "0-header-crop")
-    save = page.get_by_role("button", name=re.compile("^(保存|適用|決定)$"))
-    if save.count():
-        save.last.click()
-    # アップロード中は「公開に進む」が押せない。押せるようになるまで待つ
-    page.wait_for_function("""() => [...document.querySelectorAll('button')]
-        .some(b => b.innerText.trim() === '公開に進む' && !b.disabled)""", timeout=90000)
-    page.wait_for_timeout(1500)
-    title_y = page.locator('textarea[placeholder="記事タイトル"]').bounding_box()["y"]
-    ok = page.evaluate("(ty) => [...document.querySelectorAll('img')].some(i => { const r = i.getBoundingClientRect();"
-                       " return r.width > 300 && r.bottom <= ty; })", title_y)
-    if not ok:
-        raise RuntimeError("見出し画像を設定できませんでした（note の画面の仕様が変わった可能性）")
+    save = page.get_by_role("button", name="保存", exact=True)
+    save.last.wait_for(timeout=30000)   # 切り抜きの画面が出るまで待つ
+    save.last.click()
+    save.last.wait_for(state="hidden", timeout=30000)
+    # アップロードが終わって、タイトルの上に画像が出るまで待つ（新規の記事でも、更新でも）
+    ok = True
+    try:
+        wait_js(page, "() => { const t = document.querySelector('textarea[placeholder=\"記事タイトル\"]');"
+                      " const ty = t.getBoundingClientRect().top;"
+                      " return [...document.querySelectorAll('img')].some(i => { const r = i.getBoundingClientRect();"
+                      " return r.width > 300 && r.bottom <= ty + 5 && i.complete && i.naturalWidth > 0; }); }", 90)
+        wait_js(page, "() => [...document.querySelectorAll('button')]"
+                      ".some(b => b.innerText.trim() === '公開に進む' && !b.disabled)", 60)
+        page.wait_for_timeout(1500)
+    except Exception as e:
+        ok = str(e).splitlines()[0][:150]
+    if ok is not True:
+        raise RuntimeError(f"見出し画像を設定できませんでした（note の画面の仕様が変わった可能性: {ok}）")
 
 
 def add_header_to_posted(page, url, image):
@@ -281,7 +301,7 @@ def add_header_to_posted(page, url, image):
     page.wait_for_url(re.compile(r"/publish"), timeout=60000)
     page.wait_for_timeout(2000)
     page.get_by_role("button", name=re.compile("^更新する")).click()
-    page.wait_for_url(lambda u: "/publish" not in u, timeout=60000)
+    wait_js(page, "() => !location.pathname.includes('/publish') || document.body.innerText.includes('シェアしてみましょう')", 60)
     page.wait_for_timeout(2000)
 
 
@@ -334,8 +354,8 @@ def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
     if not publish:
         return page.url, has_header
     page.get_by_role("button", name=re.compile("^投稿する")).click()
-    # 公開すると編集画面から離れる（初回は「はじめての作品」画面、以後は記事やシェアの画面）
-    page.wait_for_url(lambda u: "/publish" not in u, timeout=60000)
+    # 公開できたら、初回は別の画面へ移り、2本目からは同じ画面に「記事をシェアしてみましょう」が出る
+    wait_js(page, "() => !location.pathname.includes('/publish') || document.body.innerText.includes('シェアしてみましょう')", 60)
     page.wait_for_timeout(3000)
     shot(page, "3-done")
     url = f"https://note.com/{user}/n/{key}"
