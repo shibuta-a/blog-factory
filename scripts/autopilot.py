@@ -445,6 +445,18 @@ def cmd_status():
     if not a8_ok:
         alerts.append(f"- A8: {a8_text}。広告の取り込み・新しい提携は止まっています（記事の作成・公開は続きます）。"
                       "PC を使うときに Claude Code に「A8に再ログインして」と言ってください。")
+    note_st = load_json(ROOT / "state" / "note-status.json", {})
+    note_log = load_json(ROOT / "data" / "note.json", {})
+    if note_st and not note_st.get("ok"):
+        alerts.append(f"- note: {note_st.get('text')}（{note_st.get('at')}）。note への投稿は止まっています（ブログ・X は続きます）。"
+                      "PC を使うときに Claude Code に「noteに再ログインして」と言ってください。")
+    x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x", {})
+    x_keys = (ROOT / ".secrets" / "x_api.json").exists()
+    x_text = ("**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
+              if x_cfg.get("enabled") and x_cfg.get("worker_url") else
+              "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else "オフ")
+    note_text = (f"{'**オン**' if load_json(ROOT / 'data' / 'social.json', {}).get('note', {}).get('enabled') else 'オフ'}"
+                 f"（投稿済み {len(note_log)} 本・ログイン: {note_st.get('text', '未確認')}）")
     review = [k for k, v in ledger.items() if v.get("needs_review")]
     if review:
         alerts.append(f"- 新しく提携した広告 {len(review)} 件の説明文が未整備です（次の自動実行で整えます）: {' / '.join(review)}")
@@ -484,6 +496,8 @@ def cmd_status():
 | 1日の上限 | 自動生成 {MAX_PER_DAY} 本まで |
 {weekly_md}
 | A8 ログイン | {a8_text} |
+| X 自動ポスト | {x_text} |
+| note 自動投稿 | {note_text} |
 
 ## ジャンル別
 

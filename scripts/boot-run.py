@@ -8,6 +8,8 @@
 週1本の自社サービス記事（オリシャン・既定は水曜）を書く日は、それ＋通常1本の計2本。
 書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る。Cloudflare の門番（functions/_middleware.js）がアクセスのたびに判定し、時刻が来た瞬間から表示する。
 新規記事のあと、公開済み記事の見直し（scripts/refresh-prompt.md）を1本行う（記事が20本以上・今週3本まで）。
+最後に、公開済みの記事を note 用の別バージョンにして note に投稿する（scripts/note-run.py・1日1本）。
+X へのポストは PC ではなく Cloudflare の workers/x-poster が公開時刻に行う。
 """
 import json
 import os
@@ -62,6 +64,15 @@ def main():
         code = code or rc
     else:
         log("見直しなし: " + (r2.stdout.strip().splitlines() or [""])[0])
+    # note への展開（公開済みの記事を、別バージョンにして1日1本。ログインが切れていたら STATUS.md で再ログインを頼む）
+    try:
+        with open(os.path.join(ROOT, "logs", "note-run.log"), "a", encoding="utf-8") as out:
+            rn = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "note-run.py")],
+                                cwd=ROOT, stdout=out, stderr=subprocess.STDOUT, timeout=40 * 60).returncode
+        log(f"note への展開が終了（終了コード {rn}）")
+    except subprocess.TimeoutExpired:
+        log("note への展開が40分で終わらなかったため中断")
+    subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "autopilot.py"), "status"], cwd=ROOT, capture_output=True)
     log("シャットダウンの判定へ")
     subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "power-guard.py"),
                     "--exit-code", str(code), "--task", "BlogFactory-Boot"], cwd=ROOT)

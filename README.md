@@ -275,3 +275,35 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 - **申込みボックス**：目次の下・比較表の直後・まとめの後の3か所に自動で入る（赤橙ボタン）。文言は `scripts/affiliate.py` の `BTN_*`。
 - **比較表**：2件以上の広告が合う「比較・おすすめ」記事に自動で入る。中身は `data/affiliates.json` の `table`（price/storage/days/feature）。分からない項目は「公式サイトで確認」と表示される。
 - **本文の飾り**：`==マーカー==`、`> [!POINT]` / `> [!WARN]` / `> [!NOTE]` のボックス、「ラベル：説明」の箇条書きは自動で太字、`Q.`/`A.` は Q&A 表示、「まとめ」は自動でポイントボックス。
+
+## note・X への自動展開（2026-10-12〜・指示書⑨）
+
+```
+毎朝の自動実行（boot-run.py）
+  記事を書く（フロントマターに x_text＝X の紹介文も書く）→ publish.py → build.py が public/_x_queue.json を出力 → GitHub
+  最後に scripts/note-run.py：公開済みで note 未投稿の記事を1日1本、別バージョンにして note に投稿 → ブログ側に note への案内を足して publish
+
+記事の公開時刻（PC は止まっていてよい）
+  Cloudflare Workers の workers/x-poster が10分ごとに GitHub の _x_queue.json を読み、公開時刻を過ぎた記事を X にポスト（記事が 200 で表示されることを確かめてから）
+```
+
+| もの | 場所 |
+|---|---|
+| 設定（オン/オフ・1日の本数・ハッシュタグ） | `data/social.json` |
+| X のポスト係（Cloudflare Workers） | `workers/x-poster/`（設置・更新は `python scripts/xpost.py deploy`） |
+| X のキー | `.secrets/x_api.json`（Cloudflare の秘密の設定にもコピー。GitHub には上げない） |
+| note の別バージョン | `data/note/<slug>.md`（Claude Code が `scripts/note-prompt.md` で書く） |
+| note に投稿済みの記録 | `data/note.json`（ブログの記事末尾の note 案内はここから出る） |
+| note のログイン状態 | `.secrets/note-browser-profile/`（ブラウザを閉じても残る） |
+| ログ | `logs/note.log`・`logs/note-run.log`・X は `python scripts/xpost.py status` |
+
+- **X**：`python scripts/xpost.py preview`（予定の文面）／`check`（キー確認）／`test`（1件ポスト）／`status`（ポスト係の記録）。
+  ポスト文はフロントマター `x_text` ＋ ジャンルのハッシュタグ（social.json の x_tags）＋ 記事URL。`since` より前の記事・公開から48時間たった記事はポストしない。記事ごとに止めるときは `x: none`
+- **X の費用**：2026年は無料枠なしの従量課金。リンク付きポスト 1件 約$0.20（リンクなし 約$0.015）。1日2本で月 約$12。
+  console.x.com の Billing で前払いクレジットと上限を設定する。`with_link: false` でリンクなしにできる
+- **note**：`python scripts/note-run.py`（毎朝自動）／`--dry --slug <slug>`（書いて重複チェックだけ）／`check`（ログイン確認）／`list`。
+  ログインが切れたら STATUS.md の「要対応」に出る →「noteに再ログインして」で `python scripts/note-login.py`
+- **重複コンテンツ対策**：note 版はブログの要約ではなく「一つの視点に絞った短い読み物」。ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し、3回だめなら投稿しない
+- **相互誘導**：note → ブログは記事末尾に1回だけ。ブログ → note は note に出した記事だけ末尾に1行。X → ブログは記事URL。
+  オリシャン（本業）への案内は orishan ジャンルの記事の note 版だけ（ブログ側はトップ固定枠・各記事の誘導ボックスで既に出ている）
+- note の画面が変わって投稿に失敗したら、`logs/note.log` と `.secrets/shots/note-error-*.png` を見て `scripts/note-run.py` の `post_to_note` を直す

@@ -1,0 +1,12 @@
+# X への自動ポスト係（scripts/xpost.py deploy が設定・デプロイする）
+name = "maf-x-poster"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[triggers]
+crons = ["*/10 * * * *"]
+
+[[kv_namespaces]]
+binding = "POSTED"
+id = "KV_ID"

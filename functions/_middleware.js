@@ -30,7 +30,7 @@ export async function onRequest(context) {
   const path = url.pathname;
 
   // 予約の一覧そのものは見せない
-  if (path === "/_schedule.json") return notFound();
+  if (path === "/_schedule.json" || path === "/_x_queue.json") return notFound();
 
   const schedule = await loadSchedule(context);
   const now = nowJst();

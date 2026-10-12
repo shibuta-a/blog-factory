@@ -31,6 +31,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affiliate  # noqa: E402  記事の内容に合わせた広告の自動差し込み
+import social  # noqa: E402  note・X への自動展開（X のポスト文・note 記事へのリンク）
 
 ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
@@ -473,6 +474,9 @@ def main():
     rakuten = json.loads((ROOT / "data" / "rakuten.json").read_text(encoding="utf-8")) \
         if (ROOT / "data" / "rakuten.json").exists() else {}
     print(f"広告台帳: 提携中 {len(programs)} 件")
+    social_cfg = social.load_config()
+    note_log = json.loads(social.NOTE_LOG.read_text(encoding="utf-8")) if social.NOTE_LOG.exists() else {}
+    x_queue = []  # X に自動ポストする記事（Cloudflare の workers/x-poster が公開時刻に投稿する）
 
     slots = {
         "slot_head": verification_tag(config) + load_slot("head", None),
@@ -553,6 +557,11 @@ def main():
                 aff_tail = ""
             else:
                 body, cta_top, aff_tail, pr_notice = affiliate.apply(body, meta, title, programs)
+            # note に別バージョンがある記事だけ、本文の最後に控えめに案内する（全記事に機械的には貼らない）
+            note_url = (note_log.get(slug) or {}).get("url", "") if is_default else ""
+            if note_url:
+                body += ('\n<p class="note-link">この記事の要点を、別の切り口で短くまとめたものを '
+                         f'<a href="{html.escape(note_url, quote=True)}" target="_blank" rel="noopener">note</a> にも載せています。</p>')
             if own and gconf.get("disclaimer"):
                 body += f'\n<p class="pr-notice own-disclaimer">{html.escape(gconf["disclaimer"])}</p>'
             # 楽天市場の商品リンク（注意喚起・自社サービスのジャンルには入れない。images: none のジャンルは商品画像も出さない）
@@ -592,6 +601,12 @@ def main():
             posts.append({"slug": slug, "title": title, "date": date, "at": publish_at, "excerpt": excerpt_of(plain_body),
                           "thumb": f"img/{slug}/thumb.jpg" if imgs.get("eyecatch") else ""})
             sitemap_urls.append((f"{url_prefix}{slug}", meta.get("updated") or date))
+            if is_default and base_url and meta.get("x", "").lower() != "none":
+                xc = social_cfg.get("x", {})
+                x_queue.append({"slug": slug, "at": publish_at or f"{date}T00:00", "url": f"{base_url}/{slug}",
+                                "text": social.x_post_text(meta, f"{base_url}/{slug}",
+                                                           social_cfg.get("x_tags", {}).get(meta.get("genre", ""), []),
+                                                           xc.get("with_link", True))})
             total += 1
 
         posts.sort(key=lambda p: (p["date"], p["at"], p["slug"]), reverse=True)
@@ -646,6 +661,12 @@ def main():
     (PUBLIC / "_schedule.json").write_text(json.dumps(schedule, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (PUBLIC / "_routes.json").write_text(json.dumps(
         {"version": 1, "include": ["/*"], "exclude": ["/assets/*", "/img/*", "/robots.txt"]}, indent=1) + "\n", encoding="utf-8")
+    # X への自動ポストの予定表（Cloudflare の workers/x-poster が GitHub から読み、公開時刻が来た記事を1件ずつポストする）
+    xc = social_cfg.get("x", {})
+    x_queue = [q for q in x_queue if q["at"] >= xc.get("since", "9999")]
+    (PUBLIC / "_x_queue.json").write_text(json.dumps(
+        {"enabled": bool(xc.get("enabled")), "since": xc.get("since", ""), "max_per_day": xc.get("max_per_day", 3),
+         "items": sorted(x_queue, key=lambda q: q["at"])}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     if schedule:
         print("  予約（時刻まで非表示）: " + ", ".join(f"{s} {t.replace('T', ' ')}" for s, t in sorted(schedule.items(), key=lambda x: x[1])))
 
