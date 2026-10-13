@@ -406,5 +406,69 @@
    "landing_url": "https://stocksnap.io/photo/remote-control-XXNJAOGTCN",
    "openverse_id": "274c0827-8c5e-4092-a473-a583606bf8b4"
   }
+ },
+ "fukugyou-jibun-brand": {
+  "eyecatch": {
+   "file": "img/fukugyou-jibun-brand/eyecatch.jpg",
+   "query": "small business",
+   "title": "Free unique small business interior",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/5912328/image-public-domain-free-cocktails",
+   "openverse_id": "742d2fa1-abc4-4e94-b163-5ae21303db4a"
+  },
+  "body-1": {
+   "file": "img/fukugyou-jibun-brand/body-1.jpg",
+   "query": "craft workshop",
+   "title": "Carpenter Workshop",
+   "creator": "James Frid",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/carpenter-workshop-YPM6VH3FCW",
+   "openverse_id": "bd9d7152-82ac-4e51-98a0-4d95ed25af12"
+  },
+  "body-2": {
+   "file": "img/fukugyou-jibun-brand/body-2.jpg",
+   "query": "gift box",
+   "title": "Gift Box",
+   "creator": "George Dolgikh",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/gift-box-KBGJKIUPDH",
+   "openverse_id": "d1b74b97-ac85-48c9-b5a2-85228b0ab291"
+  }
+ },
+ "zaitaku-shikaku-shufu": {
+  "eyecatch": {
+   "file": "img/zaitaku-shikaku-shufu/eyecatch.jpg",
+   "query": "home study",
+   "title": "Books Reading",
+   "creator": "Lia Leslie",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/books-reading-2XTL98GVVF",
+   "openverse_id": "d2117e64-a588-4e85-86d7-4941d2295743"
+  },
+  "body-1": {
+   "file": "img/zaitaku-shikaku-shufu/body-1.jpg",
+   "query": "notebook desk",
+   "title": "Notebook Desk",
+   "creator": "Artsy Crafty",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/notebook-desk-GRGCZJ7CNE",
+   "openverse_id": "abf75a0f-2c3e-4b32-b03d-55a2597658af"
+  },
+  "body-2": {
+   "file": "img/zaitaku-shikaku-shufu/body-2.jpg",
+   "query": "coffee laptop",
+   "title": "Coffee Laptop",
+   "creator": "Freestocks.org",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/coffee-laptop-67DQTL11QL",
+   "openverse_id": "ec679647-e7d6-411e-9e48-bc9ea3c824a3"
+  }
  }
 }

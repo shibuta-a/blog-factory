@@ -2,5 +2,18 @@
  "enabled": true,
  "since": "2026-10-12T18:00",
  "max_per_day": 3,
- "items": []
+ "items": [
+  {
+   "slug": "fukugyou-jibun-brand",
+   "at": "2026-10-14T16:06",
+   "url": "https://blog-factory-cf7.pages.dev/fukugyou-jibun-brand",
+   "text": "副業で「自分のブランド」を持ちたいけれど、何から決めればいいか迷っていませんか。\n名前・売る相手・商品の選び方と、本業と両立するための注意点を整理しました。\n\n#オリジナルシャンパン #開業\nhttps://blog-factory-cf7.pages.dev/fukugyou-jibun-brand"
+  },
+  {
+   "slug": "zaitaku-shikaku-shufu",
+   "at": "2026-10-15T01:32",
+   "url": "https://blog-factory-cf7.pages.dev/zaitaku-shikaku-shufu",
+   "text": "家事の合間に資格の勉強をしたいけれど、どれを選べば続くのか迷っていませんか。\n目的の決め方と、在宅で学ぶ講座を比べるときの見どころをまとめました。\n\n#資格勉強 #通信講座\nhttps://blog-factory-cf7.pages.dev/zaitaku-shikaku-shufu"
+  }
+ ]
 }

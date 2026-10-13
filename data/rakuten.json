@@ -52,5 +52,36 @@
     "query": "HDMI ケーブル"
    }
   ]
+ },
+ "zaitaku-shikaku-shufu": {
+  "queries": [
+   "簿記3級 テキスト",
+   "医療事務 テキスト",
+   "学習 タイマー"
+  ],
+  "fetched_at": "2026-10-14",
+  "items": [
+   {
+    "name": "簿記教科書 パブロフ流でみんな合格 日商簿記3級 テキスト＆問題集 2026年度版",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00q072o.iretp105.g00q072o.iretq51b/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbook%2F18492615%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbook%2Fi%2F21838684%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/4660/9784798194660_1_123.jpg?_ex=300x300",
+    "shop": "楽天ブックス",
+    "query": "簿記3級 テキスト"
+   },
+   {
+    "name": "2026年実施 医師事務作業補助者研修 DVD10枚セット 32時間MA研修 テキスト＆問題集付…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00tgx1o.iretpe8f.g00tgx1o.iretq611/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fgokaku%2Fh03%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fgokaku%2Fi%2F10000017%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/gokaku/cabinet/imgrc0098441330.jpg?_ex=300x300",
+    "shop": "合格DVD",
+    "query": "医療事務 テキスト"
+   },
+   {
+    "name": "dretec ドリテック 勉強タイマー T-587 学習タイマー ラーニングタイマー タイムアッ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00q020o.iretp99d.g00q020o.iretq73a/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fogawahan%2F10009091%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fogawahan%2Fi%2F10009091%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/ogawahan/cabinet/notopado/imgrc0191405909.jpg?_ex=300x300",
+    "shop": "印鑑はんこ製造直売店@小川祥雲堂",
+    "query": "学習 タイマー"
+   }
+  ]
  }
 }
