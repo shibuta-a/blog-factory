@@ -8,6 +8,7 @@
   python scripts/note-run.py check      … note のログインが生きているか確かめる
   python scripts/note-run.py list       … note に投稿済みの記事
   python scripts/note-run.py header     … 投稿済みで見出し画像のない記事に、あとから見出し画像を付ける
+  python scripts/note-run.py due        … 今日投稿する記事があるか（あれば終了コード 0）
 
 流れ:
   1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを新しい順に選ぶ
@@ -15,7 +16,7 @@
   3. 重複チェック: ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し（3回書いてだめなら見送り）
   4. note 用の Chrome（ログイン済みプロファイル）で記事を入力して公開 → URL を data/note.json に記録
   5. publish.py でブログ側の記事末尾に note への案内を足す（note に出した記事だけ）
-ログインが切れていたら投稿は飛ばし、STATUS.md の「要対応」に「noteに再ログインして」と出す。
+ログインが切れていたら .secrets/note.json で自動でログインし直す。通らなければ note だけ見送り、STATUS.md の「要対応」に理由を出す。
 """
 import argparse
 import datetime
@@ -30,7 +31,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import social  # noqa: E402
-from note_browser import CDP_URL, SHOTS, close_chrome, current_user, published_notes, save_status, start_chrome  # noqa: E402
+from claude_env import claude_env  # noqa: E402
+from note_browser import CDP_URL, SHOTS, auto_login, close_chrome, current_user, published_notes, save_status, start_chrome  # noqa: E402
 
 ROOT = social.ROOT
 NOTE_DIR = ROOT / "data" / "note"
@@ -116,7 +118,7 @@ def write_version(slug, md, meta, base_url, feedback=""):
         return None
     r = subprocess.run([claude, "-p", prompt, "--permission-mode", "acceptEdits",
                         "--allowedTools", "Read", "Write", "Edit"],
-                       cwd=ROOT, text=True, encoding="utf-8", errors="replace", capture_output=True, timeout=20 * 60)
+                       cwd=ROOT, text=True, encoding="utf-8", errors="replace", capture_output=True, timeout=20 * 60, env=claude_env())
     if not out.exists():
         log(f"{slug}: 別バージョンが保存されませんでした（{r.stdout[-300:]}{r.stderr[-300:]}）")
         return None
@@ -400,7 +402,7 @@ def find_same_title(user, title):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header"])
+    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header", "due"])
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--slug")
     args = ap.parse_args()
@@ -424,7 +426,10 @@ def main():
         targets = [(None, args.slug, md, read_md(md)[0])]
     else:
         left = cfg.get("max_per_day", 1) - sum(1 for v in done.values() if v.get("posted_at", "")[:10] == today)
-        targets = due_articles(cfg, done)[:max(0, left)] if args.cmd == "run" else []
+        targets = due_articles(cfg, done)[:max(0, left)] if args.cmd in ("run", "due") else []
+        if args.cmd == "due":  # 今日 note に投稿する記事があるか（boot-run.py が待ち時間を置くかの判断に使う）
+            print(" ".join(s for _, s, _, _ in targets) or "なし")
+            return 0 if targets else 1
         if args.cmd == "run" and not targets:
             log("note: 今日投稿する記事はありません")
             return 0
@@ -445,11 +450,16 @@ def main():
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         page.goto("https://note.com/", wait_until="domcontentloaded")
         user = current_user(page)
-        if not user:
-            save_status(False, "ログインが切れています")
-            log("note: ログインが切れています → 渋田さんに「noteに再ログインして」と依頼（python scripts/note-login.py）")
-            close_chrome(browser)
-            return 2
+        if not user:  # 切れていたら、保存済みの ID・パスワードで自動でログインし直す
+            user, why = auto_login(page)
+            if user:
+                log(f"note: ログインが切れていたため、自動でログインし直しました（{user}）")
+            else:
+                shot(page, "login-error")
+                save_status(False, f"自動ログインできませんでした: {why}")
+                log(f"note: 自動ログインできませんでした（{why}）→ 今日の note は見送り（ブログ記事は続行）")
+                close_chrome(browser)
+                return 2
         save_status(True, f"OK（{user}）")
         if args.cmd == "check":
             print(f"note: ログイン中（{user}）")

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+★ 2026-10-15 中止: X API は使わない（data/social.json の x.enabled: false の間、このスクリプトは何もしない）。
 X への自動ポスト（記事の公開と同時に、紹介ポスト＋リンクを X に出す）。
 
 仕組み: 記事の公開予定時刻には PC が止まっていることが多いので、ポストはクラウド（Cloudflare Workers）で行う。
@@ -147,6 +148,10 @@ def cmd_status():
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     cmd = sys.argv[1] if len(sys.argv) > 1 else "preview"
+    if not social.load_config().get("x", {}).get("enabled"):
+        print("X API への自動ポストは中止しました（2026-10-15・data/social.json の x.enabled: false）。"
+              "X へのシェアは note の X 連携で行います。")
+        return 0
     if cmd == "test":
         text = sys.argv[sys.argv.index("--text") + 1] if "--text" in sys.argv else None
         return cmd_test(text)

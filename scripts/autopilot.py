@@ -277,27 +277,47 @@ def a8_logged_in():
             time.sleep(1)
             if tabs() is not None:
                 break
-    # 実際にメディア管理画面を開いて、ログイン画面に飛ばされないか確かめる
+    from a8_browser import auto_login
+
+    def usable(page):
+        """メディア管理画面を開いて、ログイン画面に飛ばされないか。
+        トップは開けても、提携の画面だけ再認証を求められることがある。取り込みで使う画面まで確かめる"""
+        for url in (MEDIA_CONSOLE, MEDIA_CONSOLE.rstrip("/") + "/program/list/partnered?pageNo=1&pageSize=100"):
+            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_timeout(3000)
+            if not logged_in_url(page.url):
+                return False
+        return True
+
+    fail = ""
     try:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:
             browser = p.chromium.connect_over_cdp(CDP_URL, timeout=60000)
             page = browser.contexts[0].new_page()
-            page.goto(MEDIA_CONSOLE, wait_until="domcontentloaded", timeout=60000)
-            page.wait_for_timeout(3000)
-            ok = logged_in_url(page.url)
-            if ok:
-                # トップは開けても、提携の画面だけ再認証を求められることがある。取り込みで使う画面まで確かめる
-                page.goto(MEDIA_CONSOLE.rstrip("/") + "/program/list/partnered?pageNo=1&pageSize=100",
-                          wait_until="domcontentloaded", timeout=60000)
-                page.wait_for_timeout(3000)
-                ok = logged_in_url(page.url)
+            ok = usable(page)
+            if not ok:  # 切れていたら、保存済みの ID・パスワードで自動でログインし直す
+                ok, fail = auto_login(page)
+                ok = ok and usable(page)
+                if ok:
+                    log("[A8] ログインが切れていたため、自動でログインし直しました。")
+                else:
+                    fail = fail or "自動ログイン後も提携の画面を開けませんでした"
+                    log(f"[A8] 自動ログインできませんでした: {fail}")
+                    try:
+                        SHOTS_DIR = ROOT / ".secrets" / "shots"
+                        SHOTS_DIR.mkdir(parents=True, exist_ok=True)
+                        page.screenshot(path=str(SHOTS_DIR / "a8-login-error.png"))
+                    except Exception:
+                        pass
             if ok:
                 page.close()  # ログイン画面のときはタブを残し、渋田さんがそのままログインできるようにする
     except Exception as e:
         log(f"[A8] 確認中にエラー: {e.__class__.__name__}")
         ok = False
-    set_state(a8_login_ok=ok, a8_checked_at=datetime.datetime.now().isoformat(timespec="minutes"))
+        fail = f"確認中にエラー（{e.__class__.__name__}）"
+    set_state(a8_login_ok=ok, a8_checked_at=datetime.datetime.now().isoformat(timespec="minutes"),
+              a8_login_fail="" if ok else fail)
     return ok
 
 
@@ -344,7 +364,7 @@ def a8_status():
 def cmd_a8_check():
     ok = a8_logged_in()
     log("[A8] ログイン済み。自動で提携作業ができます。" if ok else
-        "[A8] ログインが切れています。渋田さんに「A8に再ログインして」と1回お願いする（開いた Chrome でログインするだけ）。")
+        "[A8] ログインできませんでした（自動ログインも不可。理由は STATUS.md）。A8 の作業はとばして、記事の作成は続ける。")
     return 0 if ok else 1
 
 
@@ -442,19 +462,33 @@ def cmd_status():
                     f"{t_by.get(g, '-') if g in GENRES else '-'} |")
     alerts = []
     a8_ok, a8_text = a8_status()
-    if not a8_ok:
-        alerts.append(f"- A8: {a8_text}。広告の取り込み・新しい提携は止まっています（記事の作成・公開は続きます）。"
-                      "PC を使うときに Claude Code に「A8に再ログインして」と言ってください。")
+    if state.get("a8_login_ok") is False:  # 自動ログインも通らなかったときだけ（再起動で切れただけなら次の実行で自動で入り直す）
+        alerts.append(f"- A8: 自動ログインできませんでした（{state.get('a8_login_fail') or '理由不明'}・"
+                      f"{state.get('a8_checked_at', '').replace('T', ' ')}）。広告の取り込み・新しい提携は止まっています"
+                      "（記事の作成・公開は続きます）。毎朝自動で再試行します。続くときは Claude Code に「A8に再ログインして」と言ってください。")
+    elif not a8_ok:
+        a8_text += "→ 次の自動実行で自動ログイン"
     note_st = load_json(ROOT / "state" / "note-status.json", {})
     note_log = load_json(ROOT / "data" / "note.json", {})
     if note_st and not note_st.get("ok"):
-        alerts.append(f"- note: {note_st.get('text')}（{note_st.get('at')}）。note への投稿は止まっています（ブログ・X は続きます）。"
-                      "PC を使うときに Claude Code に「noteに再ログインして」と言ってください。")
+        alerts.append(f"- note: {note_st.get('text')}（{note_st.get('at')}）。note への投稿だけ見送っています（ブログ記事は続きます）。"
+                      "毎朝自動で再試行します。続くときは Claude Code に「noteに再ログインして」と言ってください。")
+    claude_tok = load_json(ROOT / ".secrets" / "claude-token.json", {})
+    if claude_tok.get("expires"):
+        left = (datetime.date.fromisoformat(claude_tok["expires"]) - datetime.date.today()).days
+        claude_text = f"長期トークン（期限 {claude_tok['expires']}・あと {left} 日）"
+        if left <= 30:
+            alerts.insert(0, f"- **Claude Code のトークンの期限が近い**（{claude_tok['expires']}・あと {left} 日）。"
+                             "期限が切れると記事が書けなくなります。setup-once.bat をダブルクリックしてトークンを取り直してください（3/3 だけ行います）。")
+    else:
+        claude_text = "**長期トークン未設定**（通常のログインで動作。ログインが切れると記事が0本になる）"
+        alerts.append("- Claude Code の長期トークンが未設定です。setup-once.bat をダブルクリックして設定してください。")
     x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x", {})
     x_keys = (ROOT / ".secrets" / "x_api.json").exists()
     x_text = ("**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
               if x_cfg.get("enabled") and x_cfg.get("worker_url") else
-              "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else "オフ")
+              "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else
+              "中止（X API は使わない。X へのシェアは note の X 連携）")
     note_text = (f"{'**オン**' if load_json(ROOT / 'data' / 'social.json', {}).get('note', {}).get('enabled') else 'オフ'}"
                  f"（投稿済み {len(note_log)} 本・ログイン: {note_st.get('text', '未確認')}）")
     review = [k for k, v in ledger.items() if v.get("needs_review")]
@@ -495,6 +529,7 @@ def cmd_status():
 | 記事の見直し | {"**稼働中**（週 " + str(refresh_cfg()["per_week"]) + " 本まで・実質的な改善のときだけ更新日を変える）" if r_ok else r_why} |
 | 1日の上限 | 自動生成 {MAX_PER_DAY} 本まで |
 {weekly_md}
+| Claude Code ログイン | {claude_text} |
 | A8 ログイン | {a8_text} |
 | X 自動ポスト | {x_text} |
 | note 自動投稿 | {note_text} |

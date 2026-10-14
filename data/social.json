@@ -1,7 +1,8 @@
 {
   "_about": "note・X への自動展開の設定（scripts/social.py が読む）。キー・ログイン状態は .secrets/ にあり、ここには書かない",
   "x": {
-    "enabled": true,
+    "enabled": false,
+    "_stopped": "2026-10-15 中止（経営判断）。X API は使わない。X へのシェアは note の X 連携（note 標準機能・無料）で行う。build.py は X の予定表を空で出し、xpost.py は動かない",
     "since": "2026-10-12T18:00",
     "with_link": true,
     "max_per_day": 3,

@@ -31,7 +31,7 @@ switch ($Mode) {
     $action = New-ScheduledTaskAction -Execute $Python -Argument "`"$Root\scripts\boot-run.py`"" -WorkingDirectory $Root
     $t1 = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME; $t1.Delay = "PT1M"
     $t2 = New-ScheduledTaskTrigger -Daily -At $at.AddMinutes(5)   # その時刻に PC がすでに点いていた日の保険
-    $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Hours 2) -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries -MultipleInstances IgnoreNew
+    $settings = New-ScheduledTaskSettingsSet -ExecutionTimeLimit (New-TimeSpan -Hours 4) -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries -MultipleInstances IgnoreNew
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $t1, $t2 -Settings $settings `
       -Description "ブログ工場 起動したら記事を書いて予約公開→無人ならシャットダウン（1日1回）" -Force | Out-Null
     $ab = New-ScheduledTaskAction -Execute ($Python -replace 'python.exe$', 'pythonw.exe') -Argument "`"$Root\scripts\idle-beacon.pyw`"" -WorkingDirectory $Root

@@ -4,7 +4,7 @@
 
 記事を書くのは Claude Code 自身。このスクリプトは Claude Code をヘッドレス（claude -p）で起動し、
 scripts/daily-prompt.md の手順（承認の取り込み → ネタ選び → 広告確保 → 記事執筆 → 公開 → ネタ補充 → STATUS更新）を実行させる。
-外部の Claude API（従量課金）は使わない。Claude Code にログインしているアカウントで動く。
+外部の Claude API（従量課金）は使わない。Claude Code の長期トークン（.secrets/claude-token.json・scripts/claude_env.py）があればそれで、なければログイン中のアカウントで動く。
 
   python scripts/auto-generate.py            … 2本書いて公開（既定）
   python scripts/auto-generate.py -n 1       … 1本だけ
@@ -23,6 +23,9 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from claude_env import claude_env  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 PROMPT = ROOT / "scripts" / "daily-prompt.md"
@@ -69,7 +72,7 @@ def main():
         cmd = [claude, "-p", prompt, "--permission-mode", "acceptEdits", "--allowedTools", *ALLOWED_TOOLS]
         try:
             r = subprocess.run(cmd, cwd=ROOT, text=True, encoding="utf-8", errors="replace",
-                               capture_output=True, timeout=90 * 60)
+                               capture_output=True, timeout=90 * 60, env=claude_env())
             log.write(r.stdout)
             if r.stderr.strip():
                 log.write("\n[stderr]\n" + r.stderr[-3000:])
