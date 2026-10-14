@@ -62,6 +62,25 @@ def current_user(page):
         return None
 
 
+def published_notes(user, max_pages=30):
+    """公開中の自分の note 記事を {key: {"title", "url"}} で返す（ログイン不要の公開API。下書きは含まない）。
+    取れなかったら None（ネットワークの不調など）。"""
+    out = {}
+    try:
+        for page in range(1, max_pages + 1):
+            req = urllib.request.Request(f"https://note.com/api/v2/creators/{user}/contents?kind=note&page={page}",
+                                         headers={"User-Agent": "Mozilla/5.0 blog-factory"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                data = json.loads(r.read().decode("utf-8")).get("data") or {}
+            for n in data.get("contents") or []:
+                out[n["key"]] = {"title": n.get("name", ""), "url": f"https://note.com/{user}/n/{n['key']}"}
+            if data.get("isLastPage", True):
+                break
+        return out
+    except Exception:
+        return None
+
+
 def close_chrome(browser):
     """接続した Chrome を閉じる（note はログインが残るので、閉じてよい）。"""
     try:

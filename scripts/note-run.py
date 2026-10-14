@@ -30,7 +30,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import social  # noqa: E402
-from note_browser import CDP_URL, SHOTS, close_chrome, current_user, save_status, start_chrome  # noqa: E402
+from note_browser import CDP_URL, SHOTS, close_chrome, current_user, published_notes, save_status, start_chrome  # noqa: E402
 
 ROOT = social.ROOT
 NOTE_DIR = ROOT / "data" / "note"
@@ -323,17 +323,15 @@ def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
     title_box = page.locator('textarea[placeholder="記事タイトル"]')
     title_box.wait_for(timeout=30000)
     title_box.fill(title)
-    has_header = False
-    if image:
-        try:
-            set_header_image(page, image)
-            has_header = True
-        except Exception as e:  # 画像だけ失敗しても記事は出す
-            shot(page, "error-header")
-            log(f"note: 見出し画像を付けられませんでした（{type(e).__name__}: {str(e)[:200]}）。画像なしで続けます")
-            close = page.get_by_role("button", name="キャンセル")
-            if close.count():
-                close.last.click()
+    # 見出し画像（サムネ）は必須。付けられなければ白サムネのまま出さず、例外で投稿をやめる（次回に再試行）
+    if not image:
+        raise HeaderError("見出し画像を作れませんでした")
+    try:
+        set_header_image(page, image)
+    except Exception as e:
+        shot(page, "error-header")
+        raise HeaderError(f"見出し画像を付けられませんでした（{type(e).__name__}: {str(e)[:200]}）") from e
+    has_header = True
     body = page.locator(".ProseMirror").first
     body.click()
     page.evaluate(PASTE_JS, body_html)
@@ -354,14 +352,48 @@ def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
     if not publish:
         return page.url, has_header
     page.get_by_role("button", name=re.compile("^投稿する")).click()
-    # 公開できたら、初回は別の画面へ移り、2本目からは同じ画面に「記事をシェアしてみましょう」が出る
-    wait_js(page, "() => !location.pathname.includes('/publish') || document.body.innerText.includes('シェアしてみましょう')", 60)
+    # 公開後の画面は note 側の都合で変わる（別画面へ移る・「シェアしてみましょう」・「記事が公開されました」
+    # 「○日連続投稿！」のお祝いポップアップなど）。画面の文言は目安にとどめ、成否は公開APIに記事が出たかで決める
+    try:
+        wait_js(page, "() => !location.pathname.includes('/publish') || /シェアしてみましょう|記事が公開されました|連続投稿/"
+                      ".test(document.body.innerText)", 60)
+    except TimeoutError:
+        pass
     page.wait_for_timeout(3000)
     shot(page, "3-done")
-    url = f"https://note.com/{user}/n/{key}"
-    if page.request.get(url).status != 200:
-        raise RuntimeError(f"公開後の記事が表示されません: {url}")
+    url = wait_published(user, key)
+    if not url:
+        raise RuntimeError(f"投稿後3分たっても公開中の記事一覧に出ません（記事ID {key}）")
     return url, has_header
+
+
+class HeaderError(RuntimeError):
+    """見出し画像を付けられなかった（白サムネで出さないため、投稿をやめて次回に再試行する）"""
+
+
+def wait_published(user, key, timeout=180):
+    """公開中の記事一覧（公開API）に記事 key が出たら、その URL を返す。出なければ None。"""
+    end = time.time() + timeout
+    while True:
+        found = published_notes(user) or {}
+        if key in found:
+            return found[key]["url"]
+        if time.time() >= end:
+            return None
+        time.sleep(10)
+
+
+def norm_title(s):
+    return re.sub(r"[\s　]", "", s or "")
+
+
+def find_same_title(user, title):
+    """自分の note に同じタイトルの公開記事があれば、その URL を返す（二重投稿の防止）。
+    一覧を取れなければ例外（確かめられないまま投稿しない）。"""
+    found = published_notes(user)
+    if found is None:
+        raise RuntimeError("note の公開記事一覧を取れませんでした（二重投稿を防ぐため今回は投稿しません）")
+    return next((v["url"] for v in found.values() if norm_title(v["title"]) == norm_title(title)), None)
 
 
 # ---------------------------------------------------------------------------
@@ -445,8 +477,19 @@ def main():
             n_meta, n_body = read_md(ver)
             tags = [t.strip().lstrip("#") for t in n_meta.get("tags", "").split("|") if t.strip()][:5]
             try:
+                same = find_same_title(user, n_meta["title"])
+                if same:  # 前回、投稿できていたのに記録を取りこぼした場合など
+                    done[slug] = {"url": same, "title": n_meta["title"], "header": True,
+                                  "posted_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "_recovered": True}
+                    save_log(done)
+                    posted.append(slug)
+                    log(f"note: {slug} は同じタイトルの記事がすでに note にあるため投稿しません（記録だけ補いました → {same}）")
+                    continue
                 url, has_header = post_to_note(page, user, n_meta["title"], to_html(n_body), tags,
                                    image=header_image(slug, n_meta["title"]))
+            except HeaderError as e:
+                log(f"note: {slug} は{e}。白サムネで出さないよう投稿をやめ、次回に再試行します")
+                continue
             except Exception as e:  # note の画面が変わったときなど
                 shot(page, f"error-{slug}")
                 log(f"note: {slug} の投稿に失敗しました（{type(e).__name__}: {str(e)[:300]}）。画面: .secrets/shots/note-error-{slug}.png")
