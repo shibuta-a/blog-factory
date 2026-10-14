@@ -102,16 +102,16 @@ A8.net（提携・広告リンク取得）  ──scripts/fetch-affiliates.py─
   `cta`（ボタン文言。省略時「◯◯の公式サイトを見る」）・`enabled: false`（出さない）は手で調整してよい。更新しても上書きされない
 - 広告リンク内の `a8mat=…` はアフィリエイトID（公開されることが前提のもの）。ログイン情報は含まれない
 
-### 提携・リンク取得の更新（Claude Code が実行する。渋田さんの作業はA8.netへのログインだけ）
+### 提携・リンク取得の更新（Claude Code が実行する。A8.net へのログインもプログラムが .secrets/a8.json で自動で行う）
 ```
-python scripts/a8-login.py                     # ログイン済みChromeを用意（開いていれば何もしない）
+python scripts/a8-login.py                     # ログイン済みChromeを用意（開いていれば何もしない・切れていれば自動ログイン）
 python scripts/fetch-affiliates.py search      # 候補を検索 → data/a8-candidates.json（Git管理外）
 python scripts/fetch-affiliates.py apply -n 20 # 未提携の候補に提携申請（即時提携を優先）
 python scripts/fetch-affiliates.py apply --ids s00000013507003   # 指定したプログラムだけ申請
 python scripts/fetch-affiliates.py links       # 提携中の広告リンクを取得して台帳を更新
 python scripts/publish.py                      # 台帳の変更をサイトに反映
 ```
-- A8.net は**ブラウザを閉じるとログインが消える**。`a8-login.py` が開いた Chrome でログインしたら、作業が終わるまで閉じない
+- A8.net は**ブラウザを閉じるとログインが消える**。`a8-login.py` が開いて自動ログインした Chrome は、作業が終わるまで閉じない
 - 審査ありの案件は、承認された後に `links` を実行すれば台帳に入る（2026-10-09 時点で11件が審査待ち）
 - 別ジャンル（宅配食・通信講座など）に広げるときは、`fetch-affiliates.py` 冒頭の `KEYWORDS` / `RELEVANT` を変える
 - 広告を載せた記事を公開したら、A8.net の「広告掲載URL管理」に記事URLを提出する（A8.net のルール）
@@ -264,7 +264,7 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 
 | もの | 場所 |
 |---|---|
-| A8.net のログイン状態（ブラウザのデータ） | `.secrets/a8-browser-profile/` ※ID・パスワードそのものは保存していない |
+| A8.net のログイン状態（ブラウザのデータ） | `.secrets/a8-browser-profile/` ※ID・パスワードは `.secrets/a8.json`（setup-once.bat で入力・GitHub に上げない） |
 | 作業時のスクリーンショット | `.secrets/shots/` |
 
 `.secrets/`・`.env`・`data/a8-candidates.json` は `.gitignore` で除外済み。公開リポジトリに出るのは台帳 `data/affiliates.json`（公開前提のアフィリエイトリンクのみ）。
@@ -302,7 +302,7 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 - **X の費用**：2026年は無料枠なしの従量課金。リンク付きポスト 1件 約$0.20（リンクなし 約$0.015）。1日2本で月 約$12。
   console.x.com の Billing で前払いクレジットと上限を設定する。`with_link: false` でリンクなしにできる
 - **note**：`python scripts/note-run.py`（毎朝自動）／`--dry --slug <slug>`（書いて重複チェックだけ）／`check`（ログイン確認）／`list`。
-  ログインが切れたら STATUS.md の「要対応」に出る →「noteに再ログインして」で `python scripts/note-login.py`
+  ログインが切れたら .secrets/note.json の ID・パスワードで自動ログイン（scripts/note_browser.py auto_login・人の操作なし）。通らなければ理由が STATUS.md の「要対応」に出る
 - **note の見出し画像**：ブログのアイキャッチ（Openverse の CC0/PD 写真）を 1280×670 に切り出して自動で付ける（state/note-img/）。写真のない記事（ポケカなど）はタイトル入りの紺地の画像を自動で作る。画像だけ失敗しても記事は出す。あとから付けるときは `python scripts/note-run.py header`
 - **重複コンテンツ対策**：note 版はブログの要約ではなく「一つの視点に絞った短い読み物」。ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し、3回だめなら投稿しない
 - **相互誘導**：note → ブログは記事末尾に1回だけ。ブログ → note は note に出した記事だけ末尾に1行。X → ブログは記事URL。

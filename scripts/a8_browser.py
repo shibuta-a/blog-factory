@@ -2,7 +2,7 @@
 A8.net をブラウザ自動操作するための共通設定（Playwright + このPCの Chrome）。
 
 A8.net はブラウザを閉じるとログインが消える（セッション方式）。そのため、
-  1. `python scripts/a8-login.py` が「デバッグ用ポート 9333 付き」で Chrome を開き、渋田さんが1回ログイン
+  1. `python scripts/a8-login.py`（または autopilot.py a8-check）が「デバッグ用ポート 9333 付き」で Chrome を開き、保存済みの ID・パスワードで自動ログイン
   2. その Chrome を開いたまま、`scripts/fetch-affiliates.py` が後から接続して操作する
 という2段構え。ログイン状態などのブラウザのデータは .secrets/a8-browser-profile/（GitHub非公開）に置く。
 ログインが切れていたら、.secrets/a8.json（login_id / password。渋田さんが setup-once.bat で直接入力）で自動でログインし直す。

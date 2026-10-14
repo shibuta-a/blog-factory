@@ -3,10 +3,11 @@ A8.net にログインした Chrome を用意する（fetch-affiliates.py を動
 
   python scripts/a8-login.py
 
-- すでにログイン済みの Chrome が開いていれば、何もせず終わる
-- 開いていなければ Chrome でログイン画面を開き、渋田さんがログインするのを最大30分待つ
-  （ID・パスワードは画面に直接入力。このスクリプトはパスワードを一切扱わない・保存しない）
-- ログインした Chrome は閉じずにそのまま。閉じるとログインが消える
+- すでにログイン済みの Chrome（ポート 9333）が開いていれば、何もせず終わる
+- 開いていなければ Chrome を開き、.secrets/a8.json の ID・パスワードでプログラムが自分でログインする（人の操作なし）
+  ID・パスワードは setup-once.bat で最初に1回だけ入れる。画面にもログにも出さない
+- 自動ログインが通らなかったら（CAPTCHA・追加認証・パスワード違いなど）、理由を表示して終わる。人にログインを待つことはしない
+- ログインした Chrome は閉じずにそのまま（A8 は閉じるとログインが消える）
 """
 import json
 import subprocess
@@ -16,7 +17,7 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from a8_browser import CDP_PORT, CDP_URL, CHROME_PATHS, LOGIN_URL, PROFILE, logged_in_url  # noqa: E402
+from a8_browser import CDP_PORT, CDP_URL, CHROME_PATHS, MEDIA_CONSOLE, PROFILE, auto_login, logged_in_url  # noqa: E402
 
 
 def tabs():
@@ -40,18 +41,22 @@ def main():
             return 1
         PROFILE.mkdir(parents=True, exist_ok=True)
         subprocess.Popen([chrome, f"--user-data-dir={PROFILE}", f"--remote-debugging-port={CDP_PORT}",
-                          "--remote-debugging-address=127.0.0.1", "--no-first-run", "--window-size=1280,900", LOGIN_URL],
+                          "--remote-debugging-address=127.0.0.1", "--no-first-run", "--window-size=1280,900", MEDIA_CONSOLE],
                          creationflags=getattr(subprocess, "DETACHED_PROCESS", 0))
-    print("[A8] Chrome でログイン画面を開きました。メディア会員としてログインしてください（最大30分待ちます）。")
-    deadline = time.time() + 30 * 60
-    while time.time() < deadline:
-        urls = tabs() or []
-        if any(logged_in_url(u) for u in urls):
-            print("[A8] ログインを確認しました。Chrome は閉じずにそのままにしてください。")
-            return 0
-        time.sleep(3)
-    print("[A8] 30分以内にログインが確認できませんでした。")
-    return 1
+        for _ in range(30):
+            time.sleep(1)
+            if tabs() is not None:
+                break
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.connect_over_cdp(CDP_URL, timeout=60000)
+        page = browser.contexts[0].new_page()
+        page.goto(MEDIA_CONSOLE, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
+        ok, why = (True, "") if logged_in_url(page.url) else auto_login(page)
+        page.close()
+    print("[A8] ログインしました（保存済みの ID・パスワードで自動ログイン）。" if ok else f"[A8] 自動ログインできませんでした: {why}")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

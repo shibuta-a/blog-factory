@@ -310,8 +310,7 @@ def a8_logged_in():
                         page.screenshot(path=str(SHOTS_DIR / "a8-login-error.png"))
                     except Exception:
                         pass
-            if ok:
-                page.close()  # ログイン画面のときはタブを残し、渋田さんがそのままログインできるようにする
+            page.close()  # 人にログインさせる作りにしない（ログイン画面を開いたまま残さない）
     except Exception as e:
         log(f"[A8] 確認中にエラー: {e.__class__.__name__}")
         ok = False
@@ -465,14 +464,14 @@ def cmd_status():
     if state.get("a8_login_ok") is False:  # 自動ログインも通らなかったときだけ（再起動で切れただけなら次の実行で自動で入り直す）
         alerts.append(f"- A8: 自動ログインできませんでした（{state.get('a8_login_fail') or '理由不明'}・"
                       f"{state.get('a8_checked_at', '').replace('T', ' ')}）。広告の取り込み・新しい提携は止まっています"
-                      "（記事の作成・公開は続きます）。毎朝自動で再試行します。続くときは Claude Code に「A8に再ログインして」と言ってください。")
+                      "（記事の作成・公開は続きます）。毎朝自動で再試行します（人のログインは不要）。パスワードを変えた・入力ミスのときだけ setup-once.bat で入れ直してください。")
     elif not a8_ok:
         a8_text += "→ 次の自動実行で自動ログイン"
     note_st = load_json(ROOT / "state" / "note-status.json", {})
     note_log = load_json(ROOT / "data" / "note.json", {})
     if note_st and not note_st.get("ok"):
         alerts.append(f"- note: {note_st.get('text')}（{note_st.get('at')}）。note への投稿だけ見送っています（ブログ記事は続きます）。"
-                      "毎朝自動で再試行します。続くときは Claude Code に「noteに再ログインして」と言ってください。")
+                      "毎朝自動で再試行します（人のログインは不要）。パスワードを変えた・入力ミスのときだけ setup-once.bat で入れ直してください。")
     claude_tok = load_json(ROOT / ".secrets" / "claude-token.json", {})
     if claude_tok.get("expires"):
         left = (datetime.date.fromisoformat(claude_tok["expires"]) - datetime.date.today()).days
