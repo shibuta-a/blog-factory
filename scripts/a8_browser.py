@@ -46,10 +46,13 @@ def blocked_reason(page):
     """ログイン画面で止まったとき、CAPTCHA や追加認証が出ているならその説明を返す。"""
     try:
         text = page.evaluate("() => document.body.innerText")
-        frames = " ".join(f.url for f in page.frames)
+        # 見えている大きな枠だけ（見えない reCAPTCHA が入っているだけなら CAPTCHA とみなさない）
+        frames = " ".join(page.evaluate("""() => [...document.querySelectorAll('iframe')]
+            .filter(f => { const r = f.getBoundingClientRect(); return r.width > 100 && r.height > 100 && getComputedStyle(f).visibility !== 'hidden'; })
+            .map(f => f.src)"""))
     except Exception:
         return ""
-    if "recaptcha" in frames or "hcaptcha" in frames or "turnstile" in frames or "ロボットではありません" in text:
+    if any(w in frames for w in ("recaptcha", "hcaptcha", "turnstile")) or "ロボットではありません" in text:
         return "CAPTCHA（ロボット確認）が出たため自動ログインできませんでした"
     if any(w in text for w in ("認証コード", "ワンタイム", "二段階", "2段階", "確認コード")):
         return "追加認証（認証コード）を求められたため自動ログインできませんでした"

@@ -91,10 +91,16 @@ def auto_login(page):
         return user, ""
     try:
         text = page.evaluate("() => document.body.innerText")
-        frames = " ".join(f.url for f in page.frames)
+        # 見えている枠だけ（隠れた reCAPTCHA の問題枠は数えない）
+        frames = " ".join(page.evaluate("""() => [...document.querySelectorAll('iframe')]
+            .filter(f => { const r = f.getBoundingClientRect(); return r.width > 100 && r.height > 100 && getComputedStyle(f).visibility !== 'hidden'; })
+            .map(f => f.src)"""))
     except Exception:
         text = frames = ""
-    if any(w in frames for w in ("recaptcha", "hcaptcha", "turnstile")) or "ロボットではありません" in text:
+    # note のログイン画面には見えない reCAPTCHA が常に入っている（anchor）。画像を選ぶ問題（bframe）が出たときだけ CAPTCHA とみなす
+    if "ご確認ください" in text or "正しくありません" in text:
+        return None, "メールアドレス（note ID）かパスワードが違うと note に言われました（.secrets/note.json を確認）"
+    if "recaptcha/enterprise/bframe" in frames or "recaptcha/api2/bframe" in frames or "ロボットではありません" in text:
         return None, "CAPTCHA（ロボット確認）が出たため自動ログインできませんでした"
     if any(w in text for w in ("認証コード", "確認コード", "二段階", "2段階")):
         return None, "追加認証（認証コード）を求められたため自動ログインできませんでした"
