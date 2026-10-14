@@ -470,5 +470,101 @@
    "landing_url": "https://stocksnap.io/photo/coffee-laptop-67DQTL11QL",
    "openverse_id": "ec679647-e7d6-411e-9e48-bc9ea3c824a3"
   }
+ },
+ "chatgpt-kondate-shijibun": {
+  "eyecatch": {
+   "file": "img/chatgpt-kondate-shijibun/eyecatch.jpg",
+   "query": "meal planning",
+   "title": "Fish cutting, meal preparation",
+   "creator": "U.S. Army",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/8782626/fish-cutting-meal-preparation",
+   "openverse_id": "849f1724-9907-4caa-8d05-48ea2333c329"
+  },
+  "body-1": {
+   "file": "img/chatgpt-kondate-shijibun/body-1.jpg",
+   "query": "grocery list",
+   "title": "Grocery list paper ground",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/4021576/photo-image-background-paper-note",
+   "openverse_id": "cbd3b046-6708-4e3e-9e39-e14a62319ca7"
+  },
+  "body-2": {
+   "file": "img/chatgpt-kondate-shijibun/body-2.jpg",
+   "query": "refrigerator vegetables",
+   "title": "ATLANTIC ERICA Reefer. reefer ship",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/4026031/photo-image-person-water",
+   "openverse_id": "e7acba8b-6501-4278-be5d-91839fbc3331"
+  }
+ },
+ "fashion-rental-30dai-shigotofuku": {
+  "eyecatch": {
+   "file": "img/fashion-rental-30dai-shigotofuku/eyecatch.jpg",
+   "query": "office outfit",
+   "title": "Office Desk",
+   "creator": "Bench Accounting",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/office-desk-N7FUTW0RY5",
+   "openverse_id": "4a2ae3ff-7500-4547-aba0-8daa19691569"
+  },
+  "body-1": {
+   "file": "img/fashion-rental-30dai-shigotofuku/body-1.jpg",
+   "query": "clothes rack",
+   "title": "Minimal clothes rack",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/3283850/free-photo-image-clothes-closet-dressing-room",
+   "openverse_id": "27f490cd-8dfe-476a-a923-6debf68d9fa0"
+  },
+  "body-2": {
+   "file": "img/fashion-rental-30dai-shigotofuku/body-2.jpg",
+   "query": "morning coffee",
+   "title": "Reading book morning coffee",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/6040934/photo-image-book-public-domain-coffee",
+   "openverse_id": "54378a54-6905-48cf-ad0f-0c1e8453120b"
+  }
+ },
+ "ongaku-haishin-erabikata-kaji": {
+  "eyecatch": {
+   "file": "img/ongaku-haishin-erabikata-kaji/eyecatch.jpg",
+   "query": "headphones music",
+   "title": "Headphones Music",
+   "creator": "JESHOOTS.com",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/headphones-music-UXKE7VWPCY",
+   "openverse_id": "606108ed-3375-4f3e-a3d9-a73ad246fa92"
+  },
+  "body-1": {
+   "file": "img/ongaku-haishin-erabikata-kaji/body-1.jpg",
+   "query": "kitchen cooking",
+   "title": "Kitchen Cook",
+   "creator": "Zachary Staines",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/kitchen-cook-BKYKF373YG",
+   "openverse_id": "7b79f7f4-1a2e-436c-a2ac-bf7d803c9bc8"
+  },
+  "body-2": {
+   "file": "img/ongaku-haishin-erabikata-kaji/body-2.jpg",
+   "query": "wireless speaker",
+   "title": "Pink blue wireless portable speakers",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/11524485/pink-and-blue-wireless-portable-speakers",
+   "openverse_id": "ffeeb568-e745-4bd0-b35d-c1154926e6b9"
+  }
  }
 }

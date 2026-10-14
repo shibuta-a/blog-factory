@@ -83,5 +83,67 @@
     "query": "学習 タイマー"
    }
   ]
+ },
+ "chatgpt-kondate-shijibun": {
+  "queries": [
+   "ChatGPT 本",
+   "献立 ノート",
+   "作り置き レシピ本"
+  ],
+  "fetched_at": "2026-10-15",
+  "items": [
+   {
+    "name": "ChatGPT最強の仕事術",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00q072o.iretp105.g00q072o.iretq51b/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbook%2F17550641%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbook%2Fi%2F20998566%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/book/cabinet/2367/9784866802367_1_2.jpg?_ex=300x300",
+    "shop": "楽天ブックス",
+    "query": "ChatGPT 本"
+   },
+   {
+    "name": "レシピ帳 バインダー レシピノート セット 6穴 手書き レシピブック レシピファイル レシピカ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00t9mno.iretp832.g00t9mno.iretq985/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmy-journal%2Fset-0030_031%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmy-journal%2Fi%2F10002619%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_gold/my-journal/img/item/set/set-0030-031/set-0030_031_new.jpg?_ex=300x300",
+    "shop": "PINE BOOK",
+    "query": "献立 ノート"
+   },
+   {
+    "name": "作り置き100品 平日五日ぶんの段取りつき 作り置きレシピ本 平日5日分を週末2時間で作りおく1…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00reb4o.iretp28a.g00reb4o.iretq6c0/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Frakutenkobo-ebooks%2F4152fac39b263cfc82e48411752f5a78%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Frakutenkobo-ebooks%2Fi%2F26842997%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/rakutenkobo-ebooks/cabinet/8379/2000021658379.jpg?_ex=300x300",
+    "shop": "楽天Kobo電子書籍ストア",
+    "query": "作り置き レシピ本"
+   }
+  ]
+ },
+ "ongaku-haishin-erabikata-kaji": {
+  "queries": [
+   "ワイヤレスイヤホン",
+   "Bluetooth スピーカー",
+   "骨伝導イヤホン"
+  ],
+  "fetched_at": "2026-10-15",
+  "items": [
+   {
+    "name": "ソニー SONY フルワイヤレスイヤホン / Bluetooth 対応 ] ブラック WF-C5…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00r8mvo.iretp635.g00r8mvo.iretqb9c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fr-kojima%2F4548736161429%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fr-kojima%2Fi%2F11520316%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/r-kojima/cabinet/n0000001212/4548736161429_1.jpg?_ex=300x300",
+    "shop": "コジマ楽天市場店",
+    "query": "ワイヤレスイヤホン"
+   },
+   {
+    "name": "Anker Soundcore Select 4 Go bluetooth スピーカー【最大20…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00rr09o.iretp834.g00rr09o.iretqc63/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fanker%2Fa31x1%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fanker%2Fi%2F10002132%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/anker/cabinet/deal/202610m2/a31x1_sale.jpg?_ex=300x300",
+    "shop": "アンカー・ダイレクト楽天市場店",
+    "query": "Bluetooth スピーカー"
+   },
+   {
+    "name": "Shokz OpenRun/OpenRun Mini 骨伝導イヤホン ワイヤレス 骨伝導ヘッドホ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00tqouo.iretp79d.g00tqouo.iretq81e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Faftershokz-official%2Fskz-sp-000013%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Faftershokz-official%2Fi%2F10000018%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/aftershokz-official/cabinet/12479442/13998190/imgrc0161032943.jpg?_ex=300x300",
+    "shop": "Shokz Official Store",
+    "query": "骨伝導イヤホン"
+   }
+  ]
  }
 }
