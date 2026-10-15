@@ -566,5 +566,69 @@
    "landing_url": "https://www.rawpixel.com/image/11524485/pink-and-blue-wireless-portable-speakers",
    "openverse_id": "ffeeb568-e745-4bd0-b35d-c1154926e6b9"
   }
+ },
+ "jidouka-01-choubo-seikyusho-kondate": {
+  "eyecatch": {
+   "file": "img/jidouka-01-choubo-seikyusho-kondate/eyecatch.jpg",
+   "query": "office desk",
+   "title": "Office Desk",
+   "creator": "Bench Accounting",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/office-desk-N7FUTW0RY5",
+   "openverse_id": "4a2ae3ff-7500-4547-aba0-8daa19691569"
+  },
+  "body-1": {
+   "file": "img/jidouka-01-choubo-seikyusho-kondate/body-1.jpg",
+   "query": "laptop work",
+   "title": "Laptop Working",
+   "creator": "Burst",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/laptop-working-DOLNAISHLZ",
+   "openverse_id": "6adcab40-54a1-4192-ada8-96968da73762"
+  },
+  "body-2": {
+   "file": "img/jidouka-01-choubo-seikyusho-kondate/body-2.jpg",
+   "query": "kitchen table",
+   "title": "Kitchen Table",
+   "creator": "Patryk Dziejma",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/kitchen-table-B3M57Q3I7H",
+   "openverse_id": "9df57f5b-99fd-4111-9366-40129c8540c0"
+  }
+ },
+ "toushi-sagi-sns-miwakekata": {
+  "eyecatch": {
+   "file": "img/toushi-sagi-sns-miwakekata/eyecatch.jpg",
+   "query": "smartphone warning",
+   "title": "Smartphone Mobile",
+   "creator": "Negative Space",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/smartphone-mobile-IU6HNPC2NT",
+   "openverse_id": "89a7263a-ae30-4970-993d-7a9fd5bcf998"
+  },
+  "body-1": {
+   "file": "img/toushi-sagi-sns-miwakekata/body-1.jpg",
+   "query": "padlock security",
+   "title": "Stainless steel padlock, security protection",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/6021133/photo-image-public-domain-free",
+   "openverse_id": "08a52917-35ad-4d7e-a6af-2de0050cfa4c"
+  },
+  "body-2": {
+   "file": "img/toushi-sagi-sns-miwakekata/body-2.jpg",
+   "query": "family conversation",
+   "title": "Silhouette Family",
+   "creator": "RachelH",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/silhouette-family-Q7UIKF58IR",
+   "openverse_id": "8d6613d0-142b-4fcc-86b7-b1f553decad5"
+  }
  }
 }
