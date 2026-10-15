@@ -18,7 +18,7 @@
      書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る
   3. 公開済み記事の見直し（記事が20本以上・今週3本まで）
   4. note（1日1本）。note の予約投稿はプレミアム限定のため、PC の起動から 0〜90 分のランダムな時刻まで待ってから投稿する
-  5. X: 投稿の仕組みはまだない（X API は 2026-10-15 に中止。note の X 連携では記事が自動で X に出ない）
+  5. X（scripts/x-run.py・X 専用の Chrome プロファイル）。ログインできなければ X だけ見送り、制限の表示ならすべて止める（STATUS.md の先頭）
   6. 翌日の自動化記事の下調べ（道具の公式サイト確認 → data/jidouka-research/<回>.md・制限60分）
   7. STATUS.md・note の記録を GitHub へ → シャットダウンの判定（すべて終わってから。data/power.json の max_uptime_min はこの全部が収まる長さ）
 """
@@ -153,8 +153,14 @@ def main():
             log(f"note への展開が{NOTE_TIMEOUT_MIN}分で終わらなかったため中断")
     stage("note", note)
 
-    # 5. X（投稿の仕組みはまだない）
-    stage("X", lambda: log("X: 投稿の仕組みがまだないため、何もしません（STATUS.md の「X 自動ポスト」）"))
+    # 5. X（ログインの確認・投稿。だめなら X だけ見送り。ブログと note は止めない）
+    def x():
+        try:
+            rx = py("x-run.py", out="x-run.log", timeout=30 * 60)
+            log(f"X が終了（終了コード {rx}・詳しくは logs/x-run.log）")
+        except subprocess.TimeoutExpired:
+            log("X が30分で終わらなかったため中断")
+    stage("X", x)
 
     # 6. 翌日の自動化記事の下調べ（道具の公式サイト確認。朝の執筆はこれを使う）
     def research():

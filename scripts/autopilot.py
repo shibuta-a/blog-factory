@@ -733,9 +733,17 @@ def cmd_status():
     else:
         claude_text = "**長期トークン未設定**（通常のログインで動作。ログインが切れると記事が0本になる）"
         alerts.append("- Claude Code の長期トークンが未設定です。setup-once.bat をダブルクリックして設定してください。")
+    x_st = load_json(ROOT / "state" / "x-status.json", {})
+    if x_st.get("stop_all"):
+        alerts.insert(0, f"- **X: 自動処理をすべて止めています**（{x_st.get('text')}・{x_st.get('at')}）。ブログと note は続けています。"
+                         "制限が解けたのを確かめてから `python scripts/x-run.py resume` で再開します（突破は試みません）。")
+    elif x_st.get("ok") is False:
+        alerts.insert(0, f"- X: {x_st.get('text')}（{x_st.get('at')}）。今日の X だけ見送りました。翌朝また試します。")
     x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x", {})
     x_keys = (ROOT / ".secrets" / "x_api.json").exists()
-    x_text = ("**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
+    x_text = (("**止めています**（" + str(x_st.get("text")) + "）") if x_st.get("stop_all") else
+              ("X 専用のブラウザ: " + str(x_st.get("text")) + "（" + str(x_st.get("at")) + "）") if x_st else
+              "**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
               if x_cfg.get("enabled") and x_cfg.get("worker_url") else
               "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else
               "止めています（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）")
