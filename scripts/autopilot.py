@@ -13,6 +13,7 @@
   python scripts/autopilot.py jidouka-done <回> <slug>  … 自動化記事（毎日1本）のその回を書いた印を data/jidouka-progress.json に付ける
   python scripts/autopilot.py jidouka-add <file.json>   … 自動化ランキングに困りごとを追加する（残りが10個を切ったとき。形は next が表示）
   python scripts/autopilot.py jidouka-sync     … 提携できた広告に合わせて、ランキングの「広告の状況」を「提携済み」に直す（sync のたびにも行う）
+  python scripts/autopilot.py jidouka-research-next  … 次に書く回のうち、下調べ（道具の公式サイト確認）がまだの回を表示（なければ終了コード 2）
   python scripts/autopilot.py review           … 台帳で needs_review（label/catch/table が未整備）の案件を表示
   python scripts/autopilot.py status           … STATUS.md を更新
   python scripts/autopilot.py refresh-next     … 次に見直す公開済み記事を表示（記事が20本未満・今週分済みなら「見直さない」）
@@ -56,7 +57,8 @@ def log(msg):
 
 
 def today():
-    return datetime.date.today().isoformat()
+    # 通し確認（boot-run.py --rehearsal）は、明日の日付として動かす（BLOG_TODAY）。ふだんは今日
+    return __import__("os").environ.get("BLOG_TODAY") or datetime.date.today().isoformat()
 
 
 def load_json(path, default):
@@ -94,6 +96,7 @@ def articles():
         if meta.get("draft", "").lower() in ("true", "yes", "1"):
             continue
         meta["_slug"] = meta.get("slug") or md.stem
+        meta["_path"] = md
         meta["_genre"] = article_genre(meta, text)
         out.append(meta)
     return out
@@ -127,7 +130,13 @@ def read_topics():
 
 def auto_today():
     # 予約公開の記事は date が公開日になるので、書いた日（created）で数える
-    return [a for a in articles() if a.get("generated_by") == "autopilot" and (a.get("created") or a.get("date")) == today()]
+    arts = [a for a in articles() if a.get("generated_by") == "autopilot"]
+    if __import__("os").environ.get("BLOG_REHEARSAL"):
+        # 通し確認（明日の日付で動かす）: 今回書いた記事＝まだ GitHub に送っていない記事を「今日の分」として数える
+        r = subprocess.run(["git", "ls-files", "content"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
+        tracked = set(r.stdout.split())
+        return [a for a in arts if a["_path"].relative_to(ROOT).as_posix() not in tracked]
+    return [a for a in arts if (a.get("created") or a.get("date")) == today()]
 
 
 def weekly_genres():
@@ -147,6 +156,8 @@ JIDOUKA_ADS = DATA / "jidouka-ads.json"
 ACT_URL = "https://maf-group.jp/act/"
 ORISHAN_URL = "https://maf-group.jp/orishanlab.html"
 JIDOUKA_LOW = 10         # 残りの困りごとがこれ未満になったら、調べてランキングに足す
+RESEARCH_DIR = DATA / "jidouka-research"   # 前の日の実行の最後に、次の回の道具を公式サイトで確かめた結果（<回>.md）
+RESEARCH_FRESH_DAYS = 30
 RANK_KEYS = ["困りごと", "分野", "今のやり方", "自動化の方法", "道具の例", "困っている人の多さ", "自動化のしやすさ",
              "案内できる広告・サービス", "広告のジャンル", "広告の状況", "根拠"]
 
@@ -231,6 +242,12 @@ def show_jidouka(genre, done_today):
     log(f"■ 自動化ランキングの第 {rnd} 回（順位 {items[0]['順位']}〜{items[-1]['順位']}）。この{len(items)}つの困りごとを1記事で紹介する")
     log(f"■ 型: {conf['kata']}")
     log(f"■ このジャンルのルール（必ず守る）: {conf['note']}")
+    rf = research_file(rnd)
+    if rf:
+        log(f"■ 下調べ（前の日に公式サイトで確かめた結果）: {rf.relative_to(ROOT).as_posix()} を最初に読み、そこにある事実を使う。"
+            "下調べにない道具・数字を書くときだけ、公式サイトで確かめてから書く")
+    else:
+        log("■ 下調べ: この回はまだありません。書く前に、道具の名前・料金・機能を公式サイトで確かめる")
     rk = False
     for i, it in enumerate(items, 1):
         log(f"\n### {i}. {it['困りごと']}（順位 {it['順位']}・分野: {it['分野']}・根拠: {it['根拠']}）")
@@ -270,6 +287,34 @@ def show_jidouka(genre, done_today):
     for a in articles():
         log(f"  - [{a['_genre']}] {a.get('title', a['_slug'])}  ({a['_slug']})")
     return 0
+
+
+def research_file(rnd):
+    """その回の下調べのファイル（RESEARCH_FRESH_DAYS 日以内に作ったものだけ）。なければ None。"""
+    f = RESEARCH_DIR / f"{rnd}.md"
+    if not f.exists():
+        return None
+    age = (datetime.date.fromisoformat(today()) - datetime.date.fromtimestamp(f.stat().st_mtime)).days
+    return f if age <= RESEARCH_FRESH_DAYS else None
+
+
+def cmd_jidouka_research_next():
+    """まだ書いていない回を前から2つ見て、下調べのない最初の回を表示する（翌日分の下調べ用）。"""
+    ledger = load_json(LEDGER, {})
+    for rnd, items in list(rounds_left().items())[:2]:
+        if research_file(rnd):
+            continue
+        log(f"■ 下調べする回: 第 {rnd} 回 → 保存先 {(RESEARCH_DIR / f'{rnd}.md').relative_to(ROOT).as_posix()}")
+        for i, it in enumerate(items, 1):
+            log(f"\n### {i}. {it['困りごと']}（分野: {it['分野']}）")
+            log(f"  自動化の方法: {it['自動化の方法']}")
+            log(f"  道具の例: {it['道具の例']}")
+            progs = jidouka_programs(it, ledger)
+            if progs:
+                log(f"  提携中の広告（この中の公式サイトも確かめる）: {' / '.join(progs)}")
+        return 0
+    log("下調べが必要な回はありません（次の2回分は下調べ済み）")
+    return 2
 
 
 def cmd_jidouka_done(rnd, slug):
@@ -330,7 +375,7 @@ def cmd_jidouka_add(path):
 
 def weekly_due(topics=None):
     """今日書くべき週1本のジャンル（weekly_day の曜日以降で、今週まだ書いていない・未使用ネタがある）。なければ None。"""
-    d = datetime.date.today()
+    d = datetime.date.fromisoformat(today())
     monday = (d - datetime.timedelta(days=d.weekday())).isoformat()
     topics = topics if topics is not None else [t for t in read_topics() if not t[2]]
     arts = articles()
@@ -951,6 +996,8 @@ def main():
         return cmd_jidouka_add(rest[0])
     if cmd == "jidouka-sync":
         return cmd_jidouka_sync()
+    if cmd == "jidouka-research-next":
+        return cmd_jidouka_research_next()
     if cmd == "topics-check":
         return cmd_topics_check()
     if cmd == "review":

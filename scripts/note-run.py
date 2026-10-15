@@ -19,11 +19,14 @@
   4. note 用の Chrome（ログイン済みプロファイル）で記事を入力して公開 → URL を data/note.json に記録
   5. publish.py でブログ側の記事末尾に note への案内を足す（note に出した記事だけ）
 ログインが切れていたら .secrets/note.json で自動でログインし直す。通らなければ note だけ見送り、STATUS.md の「要対応」に理由を出す。
+通し確認（boot-run.py --rehearsal・環境変数 BLOG_REHEARSAL=1）のときは、note の公開設定の画面（ハッシュタグ入力）まで進めて止める。
+公開はせず（note には下書きが1件残る）、data/note.json にも記録しない。日付は BLOG_TODAY（明日）として数える。
 """
 import argparse
 import datetime
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -42,6 +45,7 @@ PROMPT = ROOT / "scripts" / "note-prompt.md"
 LOG = ROOT / "logs" / "note.log"
 ORISHAN_URL = "https://maf-group.jp/orishanlab.html"
 MAX_RATIO, MAX_RUN = 0.12, 40
+REHEARSAL = bool(os.environ.get("BLOG_REHEARSAL"))
 
 
 def log(msg):
@@ -430,7 +434,7 @@ def main():
         print("note への自動展開はオフです（data/social.json の note.enabled）")
         return 0
 
-    today = datetime.date.today().isoformat()
+    today = os.environ.get("BLOG_TODAY") or datetime.date.today().isoformat()
     if args.slug and args.cmd != "header":
         md = next((p for p in (ROOT / "content" / "ja").glob("*.md") if (read_md(p)[0].get("slug") or p.stem) == args.slug), None)
         if not md:
@@ -508,7 +512,10 @@ def main():
                     log(f"note: {slug} は同じタイトルの記事がすでに note にあるため投稿しません（記録だけ補いました → {same}）")
                     continue
                 url, has_header = post_to_note(page, user, n_meta["title"], to_html(n_body), tags,
-                                   image=header_image(slug, n_meta["title"]))
+                                   image=header_image(slug, n_meta["title"]), publish=not REHEARSAL)
+                if REHEARSAL:
+                    log(f"note:（通し確認）{slug} を公開設定の画面まで入力して止めました（公開していません・下書き {url}）")
+                    continue
             except HeaderError as e:
                 log(f"note: {slug} は{e}。白サムネで出さないよう投稿をやめ、次回に再試行します")
                 continue

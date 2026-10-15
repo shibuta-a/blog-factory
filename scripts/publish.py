@@ -9,9 +9,11 @@
 流れ: (記事を content/<言語>/ に保存) → publish_schedule.py（新しい自動記事に公開予定時刻）→ images.py（写真）→ build.py
        → STATUS.md 更新 → git add/commit → git pull --rebase（GitHub 側の変更を取り込む）→ git push
        → GitHub に届くと Cloudflare Pages が自動でサイトを更新（1〜2分）
+通し確認（boot-run.py --rehearsal・環境変数 BLOG_REHEARSAL=1）のときは、ビルドと STATUS.md までで止め、GitHub に送らない（公開しない）
 """
 import argparse
 import datetime
+import os
 import re
 import shutil
 import subprocess
@@ -86,6 +88,9 @@ def main():
 
     run([sys.executable, str(ROOT / "scripts" / "build.py")])
     subprocess.run([sys.executable, str(ROOT / "scripts" / "autopilot.py"), "status"], cwd=ROOT, capture_output=True)  # STATUS.md
+    if os.environ.get("BLOG_REHEARSAL"):
+        print("（通し確認）ビルドまで行いました。GitHub には送りません（公開しません）。")
+        return
 
     run(["git", "add", "-A"])
     if run(["git", "diff", "--cached", "--quiet"], check=False).returncode != 0:

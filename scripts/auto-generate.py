@@ -10,6 +10,7 @@ scripts/daily-prompt.md の手順（承認の取り込み → ネタ選び → �
   python scripts/auto-generate.py -n 1       … 1本だけ
   python scripts/auto-generate.py --print    … 実行せずに、渡す手順書を表示するだけ
   python scripts/auto-generate.py --refresh  … 新規ではなく、公開済み記事の見直し（scripts/refresh-prompt.md）を1回行う
+  python scripts/auto-generate.py --research … 翌日の自動化記事の下調べ（道具の公式サイト確認 → data/jidouka-research/<回>.md・scripts/research-prompt.md）
 
 ★ 毎日の自動実行は、渋田さんが「毎日の自動投稿をオンにして」と言ったときだけ
   `powershell -ExecutionPolicy Bypass -File scripts\\schedule.ps1 on` で登録する（オフは off）。
@@ -30,6 +31,9 @@ from claude_env import claude_env  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 PROMPT = ROOT / "scripts" / "daily-prompt.md"
 REFRESH_PROMPT = ROOT / "scripts" / "refresh-prompt.md"
+RESEARCH_PROMPT = ROOT / "scripts" / "research-prompt.md"
+# 制限時間（分）。自動化記事は公式サイトを確かめてから書くので長めにとる（確認の手順は省かない）
+TIMEOUT_MIN = {"new": 180, "refresh": 60, "research": 60}
 LOG = ROOT / "logs" / "autopilot.log"
 
 # 自動運転の Claude Code に許す道具（これ以外のコマンドは実行できない）
@@ -55,10 +59,14 @@ def main():
     ap.add_argument("-n", type=int, default=2, help="書く記事の本数（1〜3。1日の上限は autopilot.py が別に守る）")
     ap.add_argument("--print", action="store_true", help="手順書を表示するだけ")
     ap.add_argument("--refresh", action="store_true", help="公開済み記事の見直しを1回行う")
+    ap.add_argument("--research", action="store_true", help="翌日の自動化記事の下調べを行う")
     args = ap.parse_args()
     n = max(1, min(args.n, 3))
-    prompt = (REFRESH_PROMPT if args.refresh else PROMPT).read_text(encoding="utf-8").replace("{N}", str(n))
-    label = "記事の見直し" if args.refresh else f"{n}本"
+    mode = "research" if args.research else "refresh" if args.refresh else "new"
+    prompt = {"new": PROMPT, "refresh": REFRESH_PROMPT, "research": RESEARCH_PROMPT}[mode].read_text(encoding="utf-8").replace("{N}", str(n))
+    label = {"new": f"{n}本", "refresh": "記事の見直し", "research": "自動化記事の下調べ"}[mode]
+    tools = (["Read", "Write", "WebSearch", "WebFetch", "Bash(python scripts/autopilot.py:*)"] if mode == "research"
+             else ALLOWED_TOOLS)
     if args.print:
         print(prompt)
         return 0
@@ -70,16 +78,16 @@ def main():
         if not claude:
             log.write("Claude Code（claude コマンド）が見つかりません。\n")
             return 1
-        cmd = [claude, "-p", prompt, "--permission-mode", "acceptEdits", "--allowedTools", *ALLOWED_TOOLS]
+        cmd = [claude, "-p", prompt, "--permission-mode", "acceptEdits", "--allowedTools", *tools]
         try:
             r = subprocess.run(cmd, cwd=ROOT, text=True, encoding="utf-8", errors="replace",
-                               capture_output=True, timeout=90 * 60, env=claude_env())
+                               capture_output=True, timeout=TIMEOUT_MIN[mode] * 60, env=claude_env())
             log.write(r.stdout)
             if r.stderr.strip():
                 log.write("\n[stderr]\n" + r.stderr[-3000:])
             code = r.returncode
         except subprocess.TimeoutExpired:
-            log.write("90分で終わらなかったため中断しました。\n")
+            log.write(f"{TIMEOUT_MIN[mode]}分で終わらなかったため中断しました。\n")
             code = 1
         log.write(f"\n== {datetime.datetime.now():%Y-%m-%d %H:%M} 自動実行 終了（終了コード {code}） ==\n")
     subprocess.run([sys.executable, str(ROOT / "scripts" / "autopilot.py"), "status"], cwd=ROOT,

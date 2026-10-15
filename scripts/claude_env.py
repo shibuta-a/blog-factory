@@ -20,4 +20,5 @@ def claude_env():
         tok = ""
     if tok:
         env["CLAUDE_CODE_OAUTH_TOKEN"] = tok
+        env.pop("ANTHROPIC_API_KEY", None)  # 従量課金の API キーが環境にあっても、必ず長期トークンで動かす
     return env
