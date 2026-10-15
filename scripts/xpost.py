@@ -150,7 +150,7 @@ def main():
     cmd = sys.argv[1] if len(sys.argv) > 1 else "preview"
     if not social.load_config().get("x", {}).get("enabled"):
         print("X API への自動ポストは中止しました（2026-10-15・data/social.json の x.enabled: false）。"
-              "X へのシェアは note の X 連携で行います。")
+              "note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定。")
         return 0
     if cmd == "test":
         text = sys.argv[sys.argv.index("--text") + 1] if "--text" in sys.argv else None

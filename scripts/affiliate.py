@@ -19,6 +19,10 @@ build.py から呼ばれる（Python標準ライブラリのみ）。
   3. まとめの後（記事末尾） … 申込みボックス
   本文に <!-- AFFILIATE_CTA --> を書くと、3. のボックスは記事末尾ではなくその位置に入る。
 
+■ 1記事で別々の困りごとを紹介する記事（自動化記事 jidouka など）: 本文に次の行を書くと、その位置にその案件の申込みボックスが入る
+    <!-- AFFILIATE: 台帳の案件名 -->
+  この行が1つでもある記事は、自動選択・目次下・比較表・末尾のボックスを出さない（書いた位置だけ）。PR表記は自動で入る。
+
 ■ 比較表の中身は台帳の table（price / storage / days / feature）だけを使う。
   空欄は「公式サイトで確認」と表示し、事実でない数字は出さない（景品表示法）。
   どの列も全社空欄なら、その列ごと出さない。
@@ -207,12 +211,34 @@ def _insert_before_heading(body_html, block):
     return body_html + "\n" + block
 
 
+INLINE = re.compile(r"<!--\s*AFFILIATE:\s*(.+?)\s*-->")
+
+
+def apply_inline(body_html, programs):
+    """<!-- AFFILIATE: 案件名 --> の位置に、その案件の申込みボックスを入れる。(本文HTML, 1件でも入ったか)"""
+    by_name = {p["name"]: p for p in programs}
+    used = []
+
+    def sub(m):
+        p = by_name.get(html.unescape(m.group(1)).strip())
+        if not p:  # 提携が切れた・名前違いの案件は何も出さない
+            return ""
+        used.append(p["name"])
+        return render_cta(p, BTN_END, "この手間を減らすなら", ICON_CHECK, "aff-cta-sub")
+
+    body_html = INLINE.sub(sub, body_html)
+    return body_html.replace("<!-- AFFILIATE_COMPARE -->", "").replace("<!-- AFFILIATE_CTA -->", ""), bool(used)
+
+
 def apply(body_html, meta, title, programs):
     """
     本文HTMLに広告を差し込む。
     戻り値: (本文HTML, 目次下のボックス, 記事末尾のボックス, PR表記HTML)
     合う案件がなければ本文はそのまま・ほかは空。
     """
+    if INLINE.search(body_html):  # 書いた位置だけに入れる記事
+        body_html, used = apply_inline(body_html, programs)
+        return body_html, "", "", PR_NOTICE if used else ""
     plain = re.sub(r"<[^>]+>", " ", body_html)
     chosen = pick(programs, meta, title, plain)
     if not chosen:

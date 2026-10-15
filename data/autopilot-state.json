@@ -1,6 +1,6 @@
 {
- "a8_login_ok": false,
- "a8_checked_at": "2026-10-15T07:53",
+ "a8_login_ok": true,
+ "a8_checked_at": "2026-10-15T21:26",
  "last_genre": "ai",
- "a8_login_fail": ".secrets/a8.json に ID・パスワードがないため自動ログインできません（setup-once.bat で入力）"
+ "a8_login_fail": ""
 }

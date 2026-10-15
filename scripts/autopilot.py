@@ -10,6 +10,9 @@
   python scripts/autopilot.py a8-check         … A8 にログインした Chrome が使えるか確認（なければ起動を試す）
   python scripts/autopilot.py topics-check     … 残りネタが少ないジャンルを表示（自動運転の Claude が補充する）
   python scripts/autopilot.py weekly-due       … 週1本のジャンル（genres.json の weekly_day。オリシャン記事）を今日書く日なら 0、違えば 1
+  python scripts/autopilot.py jidouka-done <回> <slug>  … 自動化記事（毎日1本）のその回を書いた印を data/jidouka-progress.json に付ける
+  python scripts/autopilot.py jidouka-add <file.json>   … 自動化ランキングに困りごとを追加する（残りが10個を切ったとき。形は next が表示）
+  python scripts/autopilot.py jidouka-sync     … 提携できた広告に合わせて、ランキングの「広告の状況」を「提携済み」に直す（sync のたびにも行う）
   python scripts/autopilot.py review           … 台帳で needs_review（label/catch/table が未整備）の案件を表示
   python scripts/autopilot.py status           … STATUS.md を更新
   python scripts/autopilot.py refresh-next     … 次に見直す公開済み記事を表示（記事が20本未満・今週分済みなら「見直さない」）
@@ -18,7 +21,10 @@
   python scripts/autopilot.py refresh-mode auto|on|off          … 見直しを 20本たまったら自動開始 / 今すぐ開始 / 停止
 
 スパム対策: 自動生成の記事（フロントマター generated_by: autopilot）は 1日 MAX_PER_DAY 本まで。
-週1本のジャンル（weekly_day）: その曜日以降でその週にまだ書いていなければ next が最優先で出す。それ以外の日は通常の順番に入らない。
+毎日1本のジャンル（daily: true。自動化記事 jidouka）: その日まだ書いていなければ next が最優先で出す。ネタは topics.txt ではなく
+  data/jidouka-ranking.json の「記事の回」の順（1回で3つの困りごと）。進み具合は data/jidouka-progress.json。
+週1本のジャンル（weekly_day）: その曜日以降でその週にまだ書いていなければ、毎日1本の次に出す。それ以外の日は通常の順番に入らない。
+1日の本数は「自動化記事＋通常ジャンル1本」、週1本の日は「自動化記事＋オリシャン記事」の2本（boot-run.py が n=2 で呼ぶ）。
 """
 import datetime
 import json
@@ -39,7 +45,7 @@ STATUS = ROOT / "STATUS.md"
 LOG = ROOT / "logs" / "autopilot.log"
 TASK_NAME = "BlogFactory-Boot"
 
-MAX_PER_DAY = 3          # 自動生成の記事は1日この本数まで（Google のスパム判定を避ける）
+MAX_PER_DAY = 2          # 自動生成の記事は1日この本数まで（Google のスパム判定を避ける）
 LOW_TOPICS = 5           # 残りネタがこれ未満のジャンルは補充する
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -128,6 +134,200 @@ def weekly_genres():
     return [g for g, c in GENRES.items() if isinstance(c.get("weekly_day"), int)]
 
 
+def daily_genres():
+    return [g for g, c in GENRES.items() if c.get("daily")]
+
+
+# ---------------------------------------------------------------------------
+# 自動化記事（毎日1本・data/jidouka-ranking.json の「記事の回」の順に、1記事で3つの困りごと）
+# ---------------------------------------------------------------------------
+RANKING = DATA / "jidouka-ranking.json"
+PROGRESS = DATA / "jidouka-progress.json"
+JIDOUKA_ADS = DATA / "jidouka-ads.json"
+ACT_URL = "https://maf-group.jp/act/"
+ORISHAN_URL = "https://maf-group.jp/orishanlab.html"
+JIDOUKA_LOW = 10         # 残りの困りごとがこれ未満になったら、調べてランキングに足す
+RANK_KEYS = ["困りごと", "分野", "今のやり方", "自動化の方法", "道具の例", "困っている人の多さ", "自動化のしやすさ",
+             "案内できる広告・サービス", "広告のジャンル", "広告の状況", "根拠"]
+
+
+def ranking():
+    return load_json(RANKING, [])
+
+
+def progress():
+    p = load_json(PROGRESS, {})
+    p.setdefault("done", {})
+    p.setdefault("added", [])
+    return p
+
+
+def rounds_left():
+    """まだ書いていない回 {回: [困りごと, ...]}（回の小さい順）。"""
+    done = progress()["done"]
+    out = {}
+    for it in sorted(ranking(), key=lambda x: x["順位"]):
+        if str(it["記事の回"]) not in done:
+            out.setdefault(it["記事の回"], []).append(it)
+    return dict(sorted(out.items()))
+
+
+def jidouka_due():
+    """今日まだ自動化記事を書いていなくて、書く回が残っていれば、そのジャンル id。"""
+    for g in daily_genres():
+        if any(a["_genre"] == g for a in auto_today()):
+            continue
+        if rounds_left():
+            return g
+    return None
+
+
+def jidouka_programs(item, ledger, any_status=False):
+    """その困りごとに使える提携中の広告（台帳の名前）。「提携済み」の困りごとだけ（any_status なら状況を見ない）。"""
+    if not any_status and item.get("広告の状況") != "提携済み":
+        return []
+    conf = load_json(JIDOUKA_ADS, {})
+    ad = item.get("広告のジャンル", "")
+    genres, words = conf.get("genre_map", {}).get(ad, []), conf.get("words", {}).get(ad, [])
+    out = []
+    for k, v in ledger.items():
+        if not (isinstance(v, dict) and v.get("url") and v.get("enabled") is not False):
+            continue
+        if v.get("genre") in genres or (v.get("genre") in daily_genres() and any(w in k + v.get("label", "") for w in words)):
+            out.append(k)
+    return out
+
+
+def jidouka_sync():
+    """「申請候補」「要確認」の困りごとに使える広告が台帳に入っていたら「提携済み」にする。直した数を返す。"""
+    items = ranking()
+    if not items:
+        return 0
+    ledger = load_json(LEDGER, {})
+    n = 0
+    for it in items:
+        if it.get("広告の状況") in ("申請候補", "要確認") and jidouka_programs(it, ledger, any_status=True):
+            it["広告の状況"] = "提携済み"
+            n += 1
+    if n:
+        save_json(RANKING, items)
+    return n
+
+
+def cmd_jidouka_sync():
+    n = jidouka_sync()
+    log(f"自動化ランキング: 広告の状況を「提携済み」にした困りごと {n} 件")
+    return 0
+
+
+def show_jidouka(genre, done_today):
+    left = rounds_left()
+    rnd, items = next(iter(left.items()))
+    remaining = sum(len(v) for v in left.values())
+    conf = GENRES[genre]
+    ledger = load_json(LEDGER, {})
+    log(f"■ 本日の自動記事: {len(done_today)}/{MAX_PER_DAY} 本")
+    log(f"■ 今日は毎日1本の自動化記事です（ジャンル: {genre}・{conf['label']}）。フロントマターの genre は {genre}")
+    log(f"■ 自動化ランキングの第 {rnd} 回（順位 {items[0]['順位']}〜{items[-1]['順位']}）。この{len(items)}つの困りごとを1記事で紹介する")
+    log(f"■ 型: {conf['kata']}")
+    log(f"■ このジャンルのルール（必ず守る）: {conf['note']}")
+    rk = False
+    for i, it in enumerate(items, 1):
+        log(f"\n### {i}. {it['困りごと']}（順位 {it['順位']}・分野: {it['分野']}・根拠: {it['根拠']}）")
+        log(f"  今のやり方: {it['今のやり方']}")
+        log(f"  自動化の方法: {it['自動化の方法']}")
+        log(f"  道具の例: {it['道具の例']}")
+        st = it["広告の状況"]
+        progs = jidouka_programs(it, ledger)
+        if progs:
+            log(f"  広告: 提携中の {' / '.join(progs)} から、この困りごとに一番合う1件を選び、この困りごとの節の最後に "
+                f"`<!-- AFFILIATE: 案件名 -->` を1行書く（案件名は台帳の名前をそのまま）")
+        elif st == "楽天で可":
+            rk = True
+            log(f"  広告: 楽天の商品リンクを使う（フロントマターの rakuten: に、この困りごとの道具の検索語を1つ入れる。例: {it['道具の例'].split('、')[0]}）")
+        elif st == "自社":
+            log(f"  広告: なし。この節の最後に自社サービスの案内を1行だけ書く: 「名入れの記念品づくりを仕組みにする例として、オリシャン開業の詳細は公式ページへ。」→ {ORISHAN_URL}")
+        else:
+            why = "提携済みの広告がまだない" if st in ("提携済み", "申請候補", "要確認") else "広告なしの困りごと"
+            log(f"  広告: なし（{why}）。広告は入れない")
+    if any(it["広告の状況"] == "—" for it in items):
+        log(f"\n■ 「—（広告なし）」の困りごとがあるので、記事の最後（まとめの後）に次の一文とリンクを1回だけ書く:\n"
+            f"  既製品で合わない作業は、仕組みそのものを作ることもできます。\n  [システム開発の相談はこちら]({ACT_URL})")
+    if rk:
+        log("■ 楽天: フロントマターに `rakuten: 検索語 | 検索語` を書く（上の「楽天の商品リンクを使う」困りごとの道具だけ。商品名・価格は本文に書かない）")
+    else:
+        log("■ 楽天: この回は使わない（rakuten: は書かない）")
+    log(f"■ 書き終えたら `python scripts/autopilot.py jidouka-done {rnd} <slug>` を実行する（topics.txt の done は使わない）")
+    if remaining - len(items) < JIDOUKA_LOW:
+        log(f"\n■ ランキングの残りが {remaining - len(items)} 個になります（{JIDOUKA_LOW} 個未満）。記事を書いたあと、WebSearch で今の「困りごと」と"
+            "新しい自動化（旬のものを優先）を調べ、既存と重ならない困りごとを9個以上 logs/jidouka-new.json に JSON の配列で書き、"
+            "`python scripts/autopilot.py jidouka-add logs/jidouka-new.json` を実行する。1件の形（キーと値の種類）:")
+        log("  " + json.dumps(dict(zip(RANK_KEYS, ["困りごと", "分野", "今のやり方", "自動化の方法", "道具の例", 4, 4, 3,
+                                              "広告のジャンル（data/jidouka-ads.json にある名前。なければ なし）",
+                                              "提携済み|楽天で可|申請候補|—", "推定"])), ensure_ascii=False))
+        log("  点数は1〜5。「根拠」は調べた出典の名前（なければ「推定」）。「自社の実例」は使わない（実際に作ったものだけの印のため）")
+    log("■ 公開済みの記事（切り口・タイトルが重ならないようにする）:")
+    for a in articles():
+        log(f"  - [{a['_genre']}] {a.get('title', a['_slug'])}  ({a['_slug']})")
+    return 0
+
+
+def cmd_jidouka_done(rnd, slug):
+    if not any(str(it["記事の回"]) == str(rnd) for it in ranking()):
+        log(f"自動化ランキングに第 {rnd} 回がありません")
+        return 1
+    p = progress()
+    p["done"][str(rnd)] = {"slug": slug, "date": today()}
+    save_json(PROGRESS, p)
+    log(f"自動化記事: 第 {rnd} 回 → {slug} を記録しました（残り {sum(len(v) for v in rounds_left().values())} 個）")
+    return 0
+
+
+def cmd_jidouka_add(path):
+    try:
+        new = json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception as e:
+        log(f"{path} を読めません（{e.__class__.__name__}）")
+        return 1
+    items = ranking()
+    have = {it["困りごと"] for it in items}
+    left = rounds_left()
+    # 書いていない最後の回が3つに満たなければ、そこから埋める
+    last = max((it["記事の回"] for it in items), default=0)
+    if last in left and len(left[last]) < 3:
+        fill, count_in = last, len(left[last])
+    else:
+        fill, count_in = last + 1, 0
+    added = []
+    for d in new if isinstance(new, list) else []:
+        if not isinstance(d, dict) or any(k not in d for k in RANK_KEYS) or d["困りごと"] in have:
+            continue
+        if d.get("根拠") == "自社の実例" or d.get("広告の状況") not in ("提携済み", "楽天で可", "申請候補", "—"):
+            continue
+        it = {k: d[k] for k in RANK_KEYS}
+        try:
+            it["合計点"] = int(it["困っている人の多さ"]) * 2 + int(it["自動化のしやすさ"]) + int(it["案内できる広告・サービス"])
+        except (TypeError, ValueError):
+            continue
+        if count_in >= 3:
+            fill, count_in = fill + 1, 0
+        it["順位"] = len(items) + 1
+        it["記事の回"] = fill
+        count_in += 1
+        items.append(it)
+        have.add(it["困りごと"])
+        added.append(it["困りごと"])
+    if not added:
+        log("追加できる困りごとがありませんでした（形が違う・既存と同じ）")
+        return 1
+    save_json(RANKING, items)
+    p = progress()
+    p["added"].append({"date": today(), "count": len(added), "items": added})
+    save_json(PROGRESS, p)
+    log(f"自動化ランキングに {len(added)} 個を追加しました: {' / '.join(added)}")
+    return 0
+
+
 def weekly_due(topics=None):
     """今日書くべき週1本のジャンル（weekly_day の曜日以降で、今週まだ書いていない・未使用ネタがある）。なければ None。"""
     d = datetime.date.today()
@@ -159,7 +359,10 @@ def cmd_next():
     if len(done_today) >= MAX_PER_DAY:
         log(f"本日の上限（{MAX_PER_DAY}本）に達しています。今日はこれ以上書かないでください。")
         return 2
-    topics = [t for t in read_topics() if not t[2]]
+    daily = jidouka_due()
+    if daily:  # 毎日1本の自動化記事を最優先
+        return show_jidouka(daily, done_today)
+    topics = [t for t in read_topics() if not t[2] and t[1] not in daily_genres()]
     due = weekly_due(topics)
     # 週1本のジャンルは、書く日だけ最優先。それ以外の日は通常の順番に入れない
     if not due:
@@ -168,7 +371,7 @@ def cmd_next():
         log("未使用のネタがありません。topics-check の手順でネタを補充してください。")
         return 3
     # ジャンルを順番に回す（直近に書いたジャンルの次から）。同じジャンルばかり続けない
-    order = [g for g in GENRES if g not in weekly_genres()]
+    order = [g for g in GENRES if g not in weekly_genres() and g not in daily_genres()]
     state = load_json(STATE, {})
     last = state.get("last_genre")
     start = (order.index(last) + 1) % len(order) if last in order else 0
@@ -233,7 +436,7 @@ def cmd_done(keyword, slug):
 
 
 def cmd_topics_check():
-    rem = {g: 0 for g in GENRES}
+    rem = {g: 0 for g in GENRES if g not in daily_genres()}
     for _, g, used, _ in read_topics():
         if not used and g in rem:
             rem[g] += 1
@@ -404,6 +607,9 @@ def cmd_sync():
     after = {k for k, v in load_json(LEDGER, {}).items() if isinstance(v, dict) and v.get("url")}
     new = sorted(after - before)
     log(f"新しく使えるようになった広告: {len(new)} 件 {' / '.join(new)}")
+    n = jidouka_sync()
+    if n:
+        log(f"自動化ランキング: 広告の状況を「提携済み」にした困りごと {n} 件")
     return 0
 
 
@@ -487,7 +693,7 @@ def cmd_status():
     x_text = ("**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
               if x_cfg.get("enabled") and x_cfg.get("worker_url") else
               "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else
-              "中止（X API は使わない。X へのシェアは note の X 連携）")
+              "止めています（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）")
     note_text = (f"{'**オン**' if load_json(ROOT / 'data' / 'social.json', {}).get('note', {}).get('enabled') else 'オフ'}"
                  f"（投稿済み {len(note_log)} 本・ログイン: {note_st.get('text', '未確認')}）")
     review = [k for k, v in ledger.items() if v.get("needs_review")]
@@ -511,6 +717,12 @@ def cmd_status():
         + ("書いた" if any(a["_genre"] == g and a.get("generated_by") == "autopilot"
                          and week_start <= (a.get("created") or a.get("date") or "") for a in arts) else "まだ")
         + f"・残りネタ {t_by.get(g, 0)} 件 |" for g in weekly_genres())
+    if daily_genres() and ranking():
+        left, prog = rounds_left(), progress()
+        add = prog["added"][-1] if prog["added"] else None
+        weekly_md += (f"\n| 自動化記事（毎日1本） | 今日: {'書いた' if any(a['_genre'] in daily_genres() for a in auto_today()) else 'まだ'}"
+                      f"・書いた回 {len(prog['done'])}・残り {sum(len(v) for v in left.values())} 個（{len(left)} 回分）"
+                      + (f"・ランキングに追加: {add['date']} {add['count']} 個（{' / '.join(add['items'][:3])} など）" if add else "") + " |")
     md = f"""# ブログ工場 STATUS
 
 最終更新: {datetime.datetime.now():%Y-%m-%d %H:%M}（記事の公開・自動実行のたびに自動更新）
@@ -733,6 +945,12 @@ def main():
         return cmd_a8_check()
     if cmd == "weekly-due":
         return cmd_weekly_due()
+    if cmd == "jidouka-done" and len(rest) == 2:
+        return cmd_jidouka_done(*rest)
+    if cmd == "jidouka-add" and rest:
+        return cmd_jidouka_add(rest[0])
+    if cmd == "jidouka-sync":
+        return cmd_jidouka_sync()
     if cmd == "topics-check":
         return cmd_topics_check()
     if cmd == "review":

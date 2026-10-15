@@ -35,6 +35,7 @@ LOG = ROOT / "logs" / "autopilot.log"
 # 自動運転の Claude Code に許す道具（これ以外のコマンドは実行できない）
 ALLOWED_TOOLS = [
     "Read", "Write", "Edit", "Glob", "Grep",
+    "WebSearch", "WebFetch",   # 自動化記事の道具の名前・料金・機能を公式サイトで確かめる・ランキングの補充
     "Bash(python scripts/autopilot.py:*)",
     "Bash(python scripts/publish.py:*)",
     "Bash(python scripts/images.py:*)",

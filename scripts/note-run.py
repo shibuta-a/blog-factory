@@ -11,7 +11,9 @@
   python scripts/note-run.py due        … 今日投稿する記事があるか（あれば終了コード 0）
 
 流れ:
-  1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを新しい順に選ぶ
+  1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを選ぶ。
+     優先の順: オリシャン記事（週1本）→ 自動化記事（毎日1本。3つの困りごとから1つを選んで深掘りする）→ ほかの記事（新しい順）。
+     ほかの記事は、公開済みの自動化記事・オリシャン記事が1本もないときだけ（自動化記事を始めた最初の日など）
   2. Claude Code（claude -p・scripts/note-prompt.md）が note 用の別バージョンを書く → data/note/<slug>.md
   3. 重複チェック: ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し（3回書いてだめなら見送り）
   4. note 用の Chrome（ログイン済みプロファイル）で記事を入力して公開 → URL を data/note.json に記録
@@ -85,7 +87,9 @@ def due_articles(cfg, done):
         if meta.get("genre") in cfg.get("skip_genres", []):
             continue
         out.append((at, slug, md, meta))
-    return sorted(out, reverse=True)
+    out.sort(reverse=True)  # 新しい順
+    rank = {"orishan": 0, "jidouka": 1}
+    return sorted(out, key=lambda x: rank.get(x[3].get("genre"), 2))  # 安定ソート: 同じ優先度の中は新しい順のまま
 
 
 # ---------------------------------------------------------------------------
@@ -103,10 +107,18 @@ def write_version(slug, md, meta, base_url, feedback=""):
     NOTE_DIR.mkdir(parents=True, exist_ok=True)
     blog_url = f"{base_url}/{slug}"
     own = meta.get("genre") == "orishan"
+    jidouka = meta.get("genre") == "jidouka"
+    link_line = (f"ほかの困りごとの自動化のやり方も、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}" if jidouka else
+                 f"もう少し詳しい選び方や比較は、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}")
     prompt = (PROMPT.read_text(encoding="utf-8")
               .replace("{SOURCE}", md.relative_to(ROOT).as_posix())
               .replace("{OUTPUT}", out.relative_to(ROOT).as_posix())
-              .replace("{BLOG_LINK_LINE}", f"もう少し詳しい選び方や比較は、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}")
+              .replace("{BLOG_LINK_LINE}", link_line)
+              .replace("{FOCUS_LINE}", "このブログ記事は自動化記事（1記事で3つの困りごとと、その自動化の方法を紹介）。"
+                                       "3つの困りごとから note の読者に一番響きそうな1つだけを選び、ブログとは別の視点"
+                                       "（その作業がなぜ面倒なのか・始める前に決めておくこと・続かなくなる理由など）で深掘りした短い読み物にする。"
+                                       "ほかの2つは書かない。道具の名前は出してよいが、料金・ランキングは書かない" if jidouka else
+                       "ブログ記事の内容から、下の切り口の例のどれか1つに絞る")
               .replace("{OWN_LINE}", f"ブログ記事の案内の次の行に、自社サービスの公式ページの案内を1回だけ書く: "
                                      f"「オリジナルシャンパンでの開業について、詳しくは MAF GROUP の公式ページへ。\\n{ORISHAN_URL}」"
                        if own else "自社サービス（オリシャン）の案内は書かない"))

@@ -181,10 +181,19 @@ BIOS の時刻起動（毎朝 4:00）→ 自動ログオン → BlogFactory-Boot
 
 ### スパム対策・安全
 
-- 自動生成の記事（`generated_by: autopilot`）は **1日3本まで**（`autopilot.py` の `MAX_PER_DAY`）。何度起動しても超えない
+- 自動生成の記事（`generated_by: autopilot`）は **1日2本まで**（`autopilot.py` の `MAX_PER_DAY`）。何度起動しても超えない
 - ジャンルを順番に回し、公開済みの記事一覧を見せて同じ切り口を避けさせる。各記事に選び方・注意点・Q&A を必須
 - 各社の数字は本文に書かせない（比較表は台帳の事実だけ。分からない項目は「公式サイトで確認」）
 - A8 のログインが切れていたら提携作業だけ飛ばして記事は公開し、STATUS.md の「要対応」に出す
+
+### 自動化記事（毎日1本・2026-10-15〜）
+
+- 毎日2本のうち1本は「自動化記事」（ジャンル `jidouka`）。もう1本は通常のジャンル、水曜（週1本の日）はオリシャン記事
+- ネタは `data/jidouka-ranking.json`（`scripts/make_assets.py` が作る。人が見る表は `data/jidouka-ranking100.xlsx`）の「記事の回」の順に、1記事で3つの困りごと。型は `templates/kata/jidouka.md`
+- 進み具合は `data/jidouka-progress.json`（`autopilot.py jidouka-done <回> <slug>`）。残りが10個を切ったら自動運転の Claude が調べて `jidouka-add` で足す
+- 広告は「提携済み」の困りごとだけ、その節に `<!-- AFFILIATE: 案件名 -->`（その位置だけに申込みボックス）。「楽天で可」は `rakuten:`、「—」の回は末尾に https://maf-group.jp/act/ への案内
+- 「広告のジャンル」と台帳の対応は `data/jidouka-ads.json`。提携が承認されると `sync` がランキングの「広告の状況」を「提携済み」に直す
+- note の毎日1本は、公開済みの自動化記事から（3つのうち1つを深掘り）。オリシャン記事があればそれが先
 
 ### コマンド
 

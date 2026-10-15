@@ -663,7 +663,7 @@ def main():
         {"version": 1, "include": ["/*"], "exclude": ["/assets/*", "/img/*", "/robots.txt"]}, indent=1) + "\n", encoding="utf-8")
     # X への自動ポストの予定表（Cloudflare の workers/x-poster が GitHub から読み、公開時刻が来た記事を1件ずつポストする）
     xc = social_cfg.get("x", {})
-    # 2026-10-15 X API は中止（enabled: false）。予定表は空にする（X へのシェアは note の X 連携で行う）
+    # 2026-10-15 X API は中止（enabled: false）。予定表は空にする（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）
     x_queue = [q for q in x_queue if q["at"] >= xc.get("since", "9999")] if xc.get("enabled") else []
     (PUBLIC / "_x_queue.json").write_text(json.dumps(
         {"enabled": bool(xc.get("enabled")), "since": xc.get("since", ""), "max_per_day": xc.get("max_per_day", 3),

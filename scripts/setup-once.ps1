@@ -33,7 +33,7 @@ function Fill-Json($path, $template, $label, $keys) {
 }
 
 Fill-Json (Join-Path $sec "a8.json") "{`r`n  `"login_id`": `"`",`r`n  `"password`": `"`"`r`n}`r`n" "1/3 A8.net のログインID とパスワード" @("login_id", "password")
-Fill-Json (Join-Path $sec "note.json") "{`r`n  `"email`": `"`",`r`n  `"password`": `"`"`r`n}`r`n" "2/3 note のメールアドレス（または note ID）とパスワード" @("email", "password")
+Fill-Json (Join-Path $sec "note.json") "{`r`n  `"login_id`": `"`",`r`n  `"password`": `"`"`r`n}`r`n" "2/3 note のメールアドレス（または note ID）とパスワード" @("login_id", "password")
 
 Write-Host ""
 Write-Host "== 3/3 Claude Code の長期トークン ==" -ForegroundColor Cyan

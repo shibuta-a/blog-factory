@@ -4,15 +4,17 @@
   ・ログオン時（BIOS の時刻起動 → 自動ログオン）
   ・毎日の bios_wake_time の数分後（その時刻に PC がすでに点いていた日の保険。このときは起動から時間がたっているので落とさない）
 
-本数は 1本15% / 2本70% / 3本15%（1日の上限3本は autopilot.py が別に守る）。
-週1本の自社サービス記事（オリシャン・既定は水曜）を書く日は、それ＋通常1本の計2本。
+本数は毎日2本（スパム判定を避けるため。1日の上限2本は autopilot.py が別に守る）:
+  ・ふだんの日: 自動化記事（自動化ランキングの1回分・毎日1本）＋ 通常のジャンルの記事1本
+  ・週1本の自社サービス記事（オリシャン・既定は水曜）を書く日: 自動化記事 ＋ オリシャン記事
+  どれを書くかは autopilot.py next が順番に出す（自動化記事 → 週1本 → 通常のジャンル）。
 書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る。Cloudflare の門番（functions/_middleware.js）がアクセスのたびに判定し、時刻が来た瞬間から表示する。
 新規記事のあと、公開済み記事の見直し（scripts/refresh-prompt.md）を1本行う（記事が20本以上・今週3本まで）。
 最初に A8 のログインを確かめ、切れていれば保存済みの ID・パスワードで自動でログインし直す（通らなくても記事は書く）。
 最後に、公開済みの記事を note 用の別バージョンにして note に投稿する（scripts/note-run.py・1日1本）。
 note の予約投稿は note プレミアム限定（2026-10-15 確認）のため、PC の起動から 0〜90 分のランダムな時刻まで待ってから投稿する。
 シャットダウンの判定は note の投稿が終わってから行う（data/power.json の max_uptime_min はこの待ち時間を含めた長さ）。
-X API は 2026-10-15 に中止（X へのシェアは note の X 連携で行う）。
+X API は 2026-10-15 に中止（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）。
 """
 import ctypes
 import json
@@ -71,14 +73,11 @@ def main():
     except subprocess.TimeoutExpired:
         log("A8: 確認が10分で終わらなかったため中断（記事は続行）")
 
-    r = random.randrange(100)
-    n = 1 if r < 15 else 2 if r < 85 else 3
-    # 週1本の自社サービス記事（オリシャン）の日は、それ＋通常1本の計2本にする
+    # 毎日2本: 自動化記事 ＋ 通常のジャンル1本（週1本の自社サービス記事の日は、自動化記事 ＋ オリシャン記事）
+    n = 2
     weekly = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "autopilot.py"), "weekly-due"],
                             cwd=ROOT, capture_output=True).returncode == 0
-    if weekly:
-        n = 2
-    log(f"記事を {n} 本書きます" + ("（うち1本は週1本の自社サービス記事）" if weekly else ""))
+    log(f"記事を {n} 本書きます（自動化記事 ＋ " + ("週1本の自社サービス記事）" if weekly else "通常のジャンル1本）"))
     with open(os.path.join(ROOT, "logs", "auto-generate.log"), "a", encoding="utf-8") as out:
         code = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "auto-generate.py"), "-n", str(n)],
                               cwd=ROOT, stdout=out, stderr=subprocess.STDOUT).returncode

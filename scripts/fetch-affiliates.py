@@ -137,12 +137,13 @@ def search_genre(page, genre):
         m = re.search(r"確定率\s*([\d.]+%|-)", c["text"])
         c["decided_rate"] = m.group(1) if m else ""
         c.pop("rows", None)
-        c["genre"] = genre_of(c["name"]) or genre
+        # 自動化記事（daily）用の検索で見つけた案件は、そのジャンルとして台帳に入れる（会計ソフト・予約システムなど既存のジャンルにないもの）
+        c["genre"] = genre if conf.get("daily") else (genre_of(c["name"]) or genre)
     # 既存の候補に追記する（申請の記録 apply_result などは消さない）
     old = {c["program_id"]: c for c in json.loads(CANDIDATES.read_text(encoding="utf-8"))} if CANDIDATES.exists() else {}
     for pid, c in found.items():
         prev = old.get(pid, {})
-        old[pid] = {**c, **{k: prev[k] for k in ("apply_result", "applied_at") if k in prev}}
+        old[pid] = {**c, **{k: prev[k] for k in ("apply_result", "applied_at", "genre") if k in prev}}  # 前に決めたジャンルは変えない
     DATA.mkdir(exist_ok=True)
     out = sorted(found.values(), key=lambda c: (not c["auto_contract"], c["name"]))
     CANDIDATES.write_text(json.dumps(list(old.values()), ensure_ascii=False, indent=1), encoding="utf-8")

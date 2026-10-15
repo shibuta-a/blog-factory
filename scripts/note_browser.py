@@ -2,7 +2,7 @@
 note をブラウザ自動操作するための共通部品（A8 と同じ方式: このPCの Chrome ＋ Playwright で後から接続）。
 
 - ログイン状態などのブラウザのデータは .secrets/note-browser-profile/（GitHub非公開）
-- note はブラウザを閉じてもログインが残る。切れていたら .secrets/note.json（email / password。
+- note はブラウザを閉じてもログインが残る。切れていたら .secrets/note.json（login_id / password。
   渋田さんが setup-once.bat で直接入力）で自動でログインし直す（auto_login）。パスワードは画面にもログにも出さない
 - 自動ログインが通らない（CAPTCHA など）ときだけ、`python scripts/note-login.py` で開いた Chrome から手でログインする
 - 自動投稿のときは同じプロファイルで Chrome を開き（ポート 9334）、Playwright で接続して操作する
@@ -68,7 +68,7 @@ def auto_login(page):
     """保存済みのメールアドレス（または note ID）・パスワードで note にログインする。(ログインできた note ID, 失敗の理由)。"""
     try:
         j = json.loads(CREDS.read_text(encoding="utf-8-sig"))
-        login, pw = j.get("email", "").strip(), j.get("password", "")
+        login, pw = (j.get("login_id") or j.get("email") or "").strip(), j.get("password", "")
     except Exception:
         login = pw = ""
     if not (login and pw):
