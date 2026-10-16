@@ -351,3 +351,16 @@ X（@maf_media_jp）はブラウザ操作をやめ、X API（公式・従量課�
 - **コマンド**：`python scripts/x-plan.py show [日付]`（予定）／`python scripts/x-keys.py check`（認証確認・投稿しない）／`secrets`（GitHub に入れ直す）／`profile`（プロフィールを API で設定）
 - **通し確認**：`BLOG_REHEARSAL=1 python scripts/x-plan.py --date <明日>` → `python scripts/x-actions.py --dry-run --now <明日>T23:59 --queue data/x-queue/rehearsal-<明日>.json`（API に送る直前で止まる）。GitHub 上では Actions → x-post → Run workflow（dry_run=true）
 - 固定投稿は X API に機能がないため設定していない
+
+## note のコメント返信（2026-10-16〜）
+
+毎朝の note の段階（boot-run.py の 4.）で、note の投稿のあとに `scripts/note-comments.py` が動く（note と同じ専用プロファイル・自動ログイン）。
+
+- 対象: 自分の公開記事に付いた、自分以外の人の最初のコメント（返信の往復はしない）で、まだ返信していないもの
+- 判定（Claude Code・`scripts/note-comment-prompt.md`）: reply（感想・質問）/ skip（勧誘・宣伝・外部リンク・意味不明 → 記録だけ）/ review（クレーム・込み入った質問・お金や契約の相談 → 返信せず STATUS.md の先頭に「要確認のコメント」）
+- 返信文の確認: 相手の名前＋さん・150字以内・リンクなし（質問への案内だけ例外）・自動で動いていることに触れない・過去の返信と似ていない。だめなら書き直し、3回だめなら要確認
+- 送信: コメントの吹き出し → 返信欄 → 送信。note の「コメントをするまえに… ちょっと深呼吸」の確認（攻撃的でなく規約の範囲内）にチェックを入れて「送信する」。送れたかは API（is_creator_replied）で確かめる
+- フォロー返し: 返信した相手だけ（ボタンは「フォロー」か「フォローバック」。フォロー済みなら何もしない）
+- 上限: 返信・フォローとも1日10件、返信の間は40〜90秒。制限・警告の表示が出たら返信をすべて止める（`python scripts/note-comments.py resume` で再開）
+- 記録: `data/note-comments.json`（同じコメントは二度扱わない）・ログ `logs/note-comments.log`
+- コマンド: `list` / `reply <key> --text "文"` / `follow <key>` / `resolve <key>`（要確認を確認済みに）/ 通し確認は `BLOG_REHEARSAL=1`（返信欄に入れて送らない）

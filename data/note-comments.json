@@ -1,0 +1,24 @@
+{
+ "_about": "note のコメントの扱いの記録（scripts/note-comments.py）。action: replied / skipped / review。stopped があれば返信を止めている",
+ "comments": {
+  "nccb158611674c": {
+   "note_key": "n664eb87d1c6f",
+   "title": "自分のブランドづくりは「渡す一人」を思い浮かべるところから",
+   "url": "https://note.com/witty_gnu2910/n/n664eb87d1c6f",
+   "nickname": "よし🚀40代からの副業×AI×note",
+   "urlname": "tender_camel986",
+   "text": "mafさん、はじめまして😊\n「誰にでも」ではなく「たった一人に届ける」という考え方、すごく共感します。\n僕もnoteを発信する中で、具体的な一人の悩みを思い浮かべる大切さを感じています。\nフォローさせていただきました。一緒にコツコツ頑張りましょう🙌",
+   "created_at": "2026-10-16T05:16:30.470+09:00",
+   "summary": "",
+   "reason": "指示された文で返信",
+   "handled_at": "2026-10-16 12:33",
+   "action": "replied",
+   "reply": "よしさん、はじめまして。コメントとフォロー、ありがとうございます！\n「たった一人に届ける」を意識すると、書く中身も贈り物の選び方も、ぐっと迷わなくなりますよね。\nAI×noteの発信、こちらも参考にさせていただきます。こちらこそ、コツコツよろしくお願いします。",
+   "replied_at": "2026-10-16 12:33",
+   "reply_key": "ncc7043df31d42",
+   "reply_url": "https://note.com/witty_gnu2910/n/n664eb87d1c6f#note-comment-ncc7043df31d42",
+   "follow": "フォローしました",
+   "followed_at": "2026-10-16 12:34"
+  }
+ }
+}

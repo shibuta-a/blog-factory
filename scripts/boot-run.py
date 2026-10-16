@@ -18,6 +18,7 @@
      書いた記事は publish.py が公開予定時刻（24時間以内のランダム）を付けて GitHub へ送る
   3. 公開済み記事の見直し（記事が20本以上・今週3本まで）
   4. note（1日1本）。note の予約投稿はプレミアム限定のため、PC の起動から 0〜90 分のランダムな時刻まで待ってから投稿する
+     続けて note のコメントへの返信とフォロー返し（scripts/note-comments.py・1日10件まで・要確認のものは STATUS.md の先頭）
   5. X（scripts/x-plan.py）: その日の投稿（本文・カード画像・投稿予定時刻）を作って data/x-queue/ に置き、GitHub へ。
      投稿そのものは GitHub Actions（.github/workflows/x-post.yml）が30分おきに X API で行う（PC が切れていても出る）
   6. 翌日の自動化記事の下調べ（道具の公式サイト確認 → data/jidouka-research/<回>.md・制限60分）
@@ -36,6 +37,7 @@ DONE = os.path.join(ROOT, "state", "boot-done.txt")
 LOG = os.path.join(ROOT, "logs", "boot-run.log")
 NOTE_WAIT_MAX_MIN = 90   # note の投稿は PC の起動から 0〜この分数のランダムな時刻
 NOTE_TIMEOUT_MIN = 60
+COMMENTS_TIMEOUT_MIN = 30   # 10件 × 返信の間隔（40〜90秒）＋判定が収まる長さ
 REHEARSAL = "--rehearsal" in sys.argv
 
 
@@ -152,6 +154,12 @@ def main():
             log(f"note への展開が終了（終了コード {rn}）")
         except subprocess.TimeoutExpired:
             log(f"note への展開が{NOTE_TIMEOUT_MIN}分で終わらなかったため中断")
+        # note のコメントへの返信とフォロー返し（1日10件まで。制限・警告が出たら返信だけ止める。記事の投稿は止めない）
+        try:
+            rc = py("note-comments.py", out="note-comments-run.log", timeout=COMMENTS_TIMEOUT_MIN * 60)
+            log(f"note のコメント返信が終了（終了コード {rc}・詳しくは logs/note-comments.log）")
+        except subprocess.TimeoutExpired:
+            log(f"note のコメント返信が{COMMENTS_TIMEOUT_MIN}分で終わらなかったため中断")
     stage("note", note)
 
     # 5. X（今日の投稿の予定表を作って GitHub へ。投稿は GitHub Actions が X API で行う。だめなら X だけ見送り）
@@ -180,7 +188,7 @@ def main():
             return
         # 最後に更新された STATUS.md と note の原稿・下調べを GitHub に送る（publish.py のあとに書き換わった分が残らないように）
         git = lambda *a: subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
-        git("add", "STATUS.md", "data/note", "data/note.json", "data/jidouka-research")
+        git("add", "STATUS.md", "data/note", "data/note.json", "data/note-comments.json", "data/jidouka-research")
         if git("diff", "--cached", "--quiet").returncode != 0:
             git("commit", "-m", f"status: {today} の自動実行の記録")
             git("pull", "--rebase", "--autostash")

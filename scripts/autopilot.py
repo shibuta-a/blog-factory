@@ -723,6 +723,18 @@ def cmd_status():
     if note_st and not note_st.get("ok"):
         alerts.append(f"- note: {note_st.get('text')}（{note_st.get('at')}）。note への投稿だけ見送っています（ブログ記事は続きます）。"
                       "毎朝自動で再試行します（人のログインは不要）。パスワードを変えた・入力ミスのときだけ setup-once.bat で入れ直してください。")
+    nc = load_json(ROOT / "data" / "note-comments.json", {})
+    if nc.get("stopped"):
+        alerts.insert(0, f"- **note のコメント返信を止めています**（{nc['stopped']['reason'][:120]}・{nc['stopped']['at']}）。記事の投稿は続けています。"
+                         "制限が解けたのを確かめてから `python scripts/note-comments.py resume` で再開します。")
+    nc_review = [c for c in nc.get("comments", {}).values() if c.get("action") == "review" and not c.get("resolved_at")]
+    if nc_review:
+        alerts.insert(0, "- **要確認のコメント**（note・返信していません。確認したら `python scripts/note-comments.py resolve <key>`）:" + "".join(
+            f"\n  - 記事「{c.get('title', '')[:30]}」{c.get('nickname', '')} さん: {c.get('summary') or c.get('text', '')[:40]}（{c.get('reason', '')}）"
+            for c in nc_review))
+    nc_all = list(nc.get("comments", {}).values())
+    note_comment_text = (f"返信 {sum(1 for c in nc_all if c.get('action') == 'replied')} 件・見送り {sum(1 for c in nc_all if c.get('action') == 'skipped')} 件"
+                         f"・要確認 {len(nc_review)} 件" + ("・**止めています**" if nc.get("stopped") else ""))
     claude_tok = load_json(ROOT / ".secrets" / "claude-token.json", {})
     if claude_tok.get("expires"):
         left = (datetime.date.fromisoformat(claude_tok["expires"]) - datetime.date.today()).days
@@ -799,6 +811,7 @@ def cmd_status():
 | A8 ログイン | {a8_text} |
 | X 自動ポスト | {x_text} |
 | note 自動投稿 | {note_text} |
+| note のコメント返信 | {note_comment_text} |
 
 ## ジャンル別
 
