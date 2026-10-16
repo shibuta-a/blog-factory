@@ -440,7 +440,22 @@ def plan(day, force=False, push=True, out=None):
         git("commit", "-m", f"x: {day} の投稿予定（{len(items)} 件）")
         git("pull", "--rebase", "--autostash")
         log("X: 予定表を GitHub に送りました" if git("push").returncode == 0 else "X: 予定表の push に失敗しました")
+        start_waiter()
     return 0
+
+
+def start_waiter():
+    """GitHub Actions の投稿係を1回起動する（今日の投稿の時刻まで待って出す「待ち番」。cron が動かない日の保険）。"""
+    import shutil
+    exe = next((str(c) for c in (shutil.which("gh"), Path(os.environ.get("LOCALAPPDATA", "")) / "gh-cli" / "bin" / "gh.exe")
+                if c and Path(c).exists()), None)
+    if not exe:
+        log("X: gh コマンドが見つからないため投稿係を起動できませんでした（cron の定期実行に任せます）")
+        return
+    r = subprocess.run([exe, "workflow", "run", "x-post.yml", "-R", "shibuta-a/blog-factory", "-f", "dry_run=false"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    log("X: GitHub Actions の投稿係を起動しました（今日の投稿の時刻まで待って出します）" if r.returncode == 0
+        else f"X: 投稿係の起動に失敗（{(r.stderr or r.stdout).strip()[:200]}）→ cron の定期実行に任せます")
 
 
 def show(day):

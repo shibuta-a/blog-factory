@@ -4,6 +4,7 @@ X の投稿係（GitHub Actions の .github/workflows/x-post.yml が30分おき�
 Python 標準ライブラリだけ。キーは GitHub の Secrets（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET）から環境変数で受け取る。
 
   python scripts/x-actions.py                      … 本番: 今日（日本時間）の予定表 data/x-queue/<日付>.json から、時刻が来た投稿を1件出す
+  python scripts/x-actions.py --loop               … Actions の本番: 上を、今日の次の投稿の時刻まで待っては出す、をくり返す（5時間半で自分をもう一度起動して引き継ぐ）
   python scripts/x-actions.py --dry-run [--now 2026-10-17T23:59] [--queue data/x-queue/rehearsal-2026-10-17.json]
         … 通し確認: 認証（GET /2/users/me）まで確かめ、投稿は API に送る直前で止める。記録も書かない
 
@@ -84,9 +85,7 @@ def update_status_alert(xl, cfg):
     return False
 
 
-def main():
-    sys.stdout.reconfigure(encoding="utf-8")
-    args = sys.argv[1:]
+def once(args):
     dry = "--dry-run" in args
     now = (datetime.datetime.strptime(args[args.index("--now") + 1], FMT) if "--now" in args and args[args.index("--now") + 1]
            else datetime.datetime.now(JST).replace(tzinfo=None, second=0, microsecond=0))
@@ -182,6 +181,62 @@ def main():
     update_status_alert(xl, cfg)
     log(f"投稿しました: https://x.com/{cfg.get('account')}/status/{tid}（今月 {m['posts']} 件・概算 ${m['cost']:.2f}）")
     return 0
+
+
+LOOP_LIMIT_SEC = 5.5 * 3600   # 1回の実行で待つのはここまで（Actions の1ジョブは6時間まで）→ 自分をもう一度起動して引き継ぐ
+
+
+def now_jst():
+    return datetime.datetime.now(JST).replace(tzinfo=None, second=0, microsecond=0)
+
+
+def next_wait():
+    """今日まだ出していない投稿までの待ち秒数（なければ None）。時刻が来ているのに出ていない（記事がまだ表示されない・前の投稿から60分たっていない・一時的なエラー）ときは10分後にまた見る。"""
+    now = now_jst()
+    q = load_json(QUEUE / f"{now.date().isoformat()}.json", None)
+    if not q:
+        return None
+    xl = load_json(XLOG, {})
+    done = {p["id"] for p in xl.get("posts", [])}
+    fails = xl.get("failed", {})
+    pend = [it for it in q["items"] if it["id"] not in done and fails.get(it["id"], {}).get("final") is not True]
+    if not pend:
+        return None
+    sec = (datetime.datetime.strptime(min(it["at"] for it in pend), FMT) - now).total_seconds() + 30
+    return sec if sec > 60 else 600
+
+
+def redispatch():
+    import subprocess
+    r = subprocess.run(["gh", "workflow", "run", "x-post.yml", "-R", os.environ.get("GITHUB_REPOSITORY", "shibuta-a/blog-factory"),
+                        "-f", "dry_run=false"], capture_output=True, text=True)
+    log("次の待ち番を起動しました" if r.returncode == 0 else f"次の待ち番を起動できませんでした（{r.stderr.strip()[:200]}）→ cron の保険で続きます")
+
+
+def main():
+    sys.stdout.reconfigure(encoding="utf-8")
+    args = sys.argv[1:]
+    if "--loop" not in args or "--dry-run" in args:
+        return once(args)
+    import subprocess
+    import time
+    start = time.time()
+    while True:
+        rc = once([a for a in args if a != "--loop"])
+        if os.environ.get("GITHUB_ACTIONS"):
+            subprocess.run(["bash", str(ROOT / "scripts" / "x-record.sh")])
+        if rc == 1 and not social.load_x_keys():
+            return 1
+        wait = next_wait()
+        if wait is None:
+            log("今日の投稿はもう残っていません（待ち番を終わります）")
+            return 0
+        if time.time() - start + wait > LOOP_LIMIT_SEC:
+            log(f"次の投稿まで {wait / 60:.0f} 分。ここで区切って次の待ち番に引き継ぎます")
+            redispatch()
+            return 0
+        log(f"次の投稿まで {wait / 60:.0f} 分待ちます（{(now_jst() + datetime.timedelta(seconds=wait)):%H:%M} ごろ）")
+        time.sleep(wait)
 
 
 if __name__ == "__main__":

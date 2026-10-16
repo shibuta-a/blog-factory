@@ -330,8 +330,10 @@ X（@maf_media_jp）はブラウザ操作をやめ、X API（公式・従量課�
      文面は Claude Code（claude -p・scripts/x-prompt.md）が書き、禁止語・長さ・過去との重複をプログラムが確かめる（3回まで書き直し）
      実話として書いてよいのは data/x-facts.md と jidouka-ranking.json の根拠「自社の実例」だけ
 
-30分おき（PC は切れていてよい）
-  GitHub Actions .github/workflows/x-post.yml → scripts/x-actions.py
+日中（PC は切れていてよい）
+  GitHub Actions .github/workflows/x-post.yml → scripts/x-actions.py --loop
+     朝の x-plan.py が予定表を送ったあとに1回起動 →「今日の次の投稿の時刻まで待って出す」をくり返す（5時間半で自分を起動し直して引き継ぐ）
+     cron（30分おき）は保険。GitHub の cron は動き出しが遅れる・動かないことがある（2026-10-16 に作成後1時間以上動かなかった）
      今日の予定表から時刻が来た投稿を1件 → （リンク付きは記事が 200 で表示されるのを確かめて）画像アップロード → 投稿 → data/x.json に記録
 ```
 
