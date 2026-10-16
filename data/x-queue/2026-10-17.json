@@ -1,0 +1,40 @@
+{
+ "date": "2026-10-17",
+ "day_number": 1,
+ "created_at": "2026-10-17T04:49",
+ "cost_note": "今月の概算 $3.24（使った分 $0.01＋残り 15 日分）",
+ "items": [
+  {
+   "kind": "tip",
+   "at": "2026-10-17T07:21",
+   "text": "支払いや入金の通知メールが届くたび、内容を探して表計算ソフトに写していませんか。\nメールソフトの振り分けで専用フォルダに集めておくだけでも、月末に探す手間は減らせます。まずは件名で1つ、ルールを作ってみてください。",
+   "est_cost": 0.015,
+   "id": "2026-10-17-1"
+  },
+  {
+   "kind": "link",
+   "at": "2026-10-17T20:04",
+   "text": "月末になると、ひな形をコピーして日付と金額を書きかえる請求書づくり。\n請求書ソフトに取引先と品目を一度登録し、定期請求を設定すると、毎月の作成を任せられます。選び方も記事にまとめました。\n\nhttps://blog-factory-cf7.pages.dev/jidouka-01-choubo-seikyusho-kondate?utm_source=x",
+   "url": "https://blog-factory-cf7.pages.dev/jidouka-01-choubo-seikyusho-kondate?utm_source=x",
+   "check_url": "https://blog-factory-cf7.pages.dev/jidouka-01-choubo-seikyusho-kondate",
+   "slug": "jidouka-01-choubo-seikyusho-kondate",
+   "image": "data/x-queue/img/2026-10-17-link.png",
+   "card": {
+    "before_title": "毎月の請求書づくり",
+    "before": [
+     "ひな形をコピーして",
+     "日付と金額を書きかえ",
+     "印刷・封入・郵送"
+    ],
+    "after_title": "定期請求に任せる",
+    "after": [
+     "取引先と品目を登録",
+     "決まった時期に自動作成",
+     "メールか郵送を選ぶだけ"
+    ]
+   },
+   "est_cost": 0.2,
+   "id": "2026-10-17-2"
+  }
+ ]
+}
