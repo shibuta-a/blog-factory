@@ -745,7 +745,7 @@ def cmd_status():
     else:
         claude_text = "**長期トークン未設定**（通常のログインで動作。ログインが切れると記事が0本になる）"
         alerts.append("- Claude Code の長期トークンが未設定です。setup-once.bat をダブルクリックして設定してください。")
-    # X は X API（GitHub Actions が投稿・data/x.json に記録）。ブラウザでのログイン（x-run.py）は 2026-10-16 にやめた
+    # X は X API（Cloudflare の x-poster が投稿・朝の x-plan.py が記録を data/x.json に写す）。ブラウザでのログイン（x-run.py）は 2026-10-16 にやめた
     import social
     x_alert = social.x_api_alert()
     if x_alert:
@@ -757,7 +757,7 @@ def cmd_status():
     x_q = load_json(ROOT / "data" / "x-queue" / f"{datetime.date.today().isoformat()}.json", {})
     x_text = ("止めています（data/social.json の x_api.enabled が false）" if not x_cfg.get("enabled") else
               "準備中（X API のキーがまだありません）" if not x_keys else
-              f"**オン**（X API・GitHub Actions が30分おきに投稿。{x_cfg.get('start')} から"
+              f"**オン**（X API・Cloudflare が5分おきに確認して投稿。{x_cfg.get('start')} から"
               f"・今日の予定 {len(x_q.get('items', []))} 件"
               + (f"（{' / '.join(i['at'][11:] for i in x_q['items'])}）" if x_q.get("items") else "")
               + f"・今月 {x_month.get('posts', 0)} 件・概算 ${x_month.get('cost', 0):.2f} / 上限 ${x_cfg.get('budget_usd_month')}）")

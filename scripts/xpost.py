@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 """
-★ 2026-10-15 中止: X API は使わない（data/social.json の x.enabled: false の間、このスクリプトは何もしない）。
-X への自動ポスト（記事の公開と同時に、紹介ポスト＋リンクを X に出す）。
+X の投稿係（Cloudflare Workers の workers/x-poster・5分おきの定期実行）の設置と確認。2026-10-16 から X の投稿はこれが主役。
 
-仕組み: 記事の公開予定時刻には PC が止まっていることが多いので、ポストはクラウド（Cloudflare Workers）で行う。
-  build.py → public/_x_queue.json（記事ごとのポスト文と公開時刻）→ GitHub
-  Cloudflare の workers/x-poster が10分ごとに読み、公開時刻が来た記事を1件ずつポスト（1日 max_per_day 件まで）
+仕組み:
+  朝の scripts/x-plan.py → data/x-queue/<日付>.json（と img/）→ GitHub（公開リポジトリ。Cloudflare は raw.githubusercontent.com から読む）
+  Cloudflare の x-poster が5分おきに今日の予定表を見て、時刻が来た投稿を X API で出す（送る前に KV に「送信中」の印 → 二重投稿しない）
 
-  python scripts/xpost.py keys       … .secrets/x_api.json のひな形を作る（渋田さんがキー4つを貼る）
-  python scripts/xpost.py check      … キーが正しいか（どのアカウントでポストするか）を確かめる
-  python scripts/xpost.py preview    … これからポストする予定の文面と文字数を表示
-  python scripts/xpost.py test       … 実際に1件ポストして確かめる（--text "文面" で文面を指定）
-  python scripts/xpost.py deploy     … Cloudflare にポスト係を設置・更新し、キーを Cloudflare の秘密の設定に入れる
-  python scripts/xpost.py status     … ポスト係の状態（最後の実行・ポスト済み・エラー）
+  python scripts/xpost.py deploy     … Worker を設置・更新し、KV を用意し、キー（.secrets/x-api.json）と ADMIN_TOKEN を Cloudflare の秘密の設定に入れる
+  python scripts/xpost.py status     … 最後の実行・今月の件数と概算費用・クレジット切れ・最近の記録
+  python scripts/xpost.py dry-run [--queue data/x-queue/xxx.json] [--now 2026-10-17T23:59]
+                                     … 本物の Cloudflare 上で、X API に送る直前まで動かす（認証の確認だけ行う）
+  python scripts/xpost.py sync       … Cloudflare の投稿の記録を data/x.json に写す（月ごとの件数と概算費用。朝の x-plan.py が毎回行う）
+  python scripts/xpost.py check      … .secrets/x-api.json のキーで認証だけ確かめる（投稿しない）
 
-設定は data/social.json の x（enabled / since / with_link / max_per_day）。記事ごとに出したくなければフロントマターに x: none。
-ポスト文はフロントマターの x_text（自動執筆の Claude Code が書く）＋ジャンルのハッシュタグ＋記事URL。
+Worker の URL と ADMIN_TOKEN は .secrets/x-worker.json（GitHub には上げない）。
 """
 import json
 import re
+import secrets
 import subprocess
 import sys
 import urllib.request
@@ -29,64 +28,16 @@ import social  # noqa: E402
 
 ROOT = social.ROOT
 WORKER_DIR = ROOT / "workers" / "x-poster"
+WORKER_CFG = ROOT / ".secrets" / "x-worker.json"
 WRANGLER = ["npx.cmd" if sys.platform == "win32" else "npx", "--yes", "wrangler@4.136.3"]
-SECRET_NAMES = {"api_key": "X_API_KEY", "api_secret": "X_API_SECRET",
-                "access_token": "X_ACCESS_TOKEN", "access_token_secret": "X_ACCESS_SECRET"}
+SECRET_NAMES = social.X_ENV_NAMES   # api_key → X_API_KEY など
 
 
-def keys_or_exit():
-    keys = social.load_x_keys()
-    if not keys:
-        sys.exit("X のキーがまだありません。.secrets/x_api.json に4つのキーを入れてください（python scripts/xpost.py keys でひな形）")
-    return keys
-
-
-def cmd_keys():
-    if social.X_KEYS.exists():
-        print(f"もうあります: {social.X_KEYS}")
-        return 0
-    social.X_KEYS.parent.mkdir(exist_ok=True)
-    social.X_KEYS.write_text(json.dumps({k: "ここに貼る" for k in social.X_KEY_NAMES}, indent=2) + "\n", encoding="utf-8")
-    print(f"ひな形を作りました: {social.X_KEYS}")
-    return 0
-
-
-def cmd_check():
-    code, data = social.x_request("GET", "https://api.x.com/2/users/me", keys_or_exit())
-    if code == 200:
-        print(f"OK: @{data['data']['username']}（{data['data']['name']}）としてポストします")
-        return 0
-    print(f"NG（{code}）: {json.dumps(data, ensure_ascii=False)[:500]}")
-    return 1
-
-
-def cmd_preview():
-    q = json.loads((ROOT / "public" / "_x_queue.json").read_text(encoding="utf-8"))
-    print(f"自動ポスト: {'オン' if q['enabled'] else 'オフ'} / {q['since']} 以降に公開の記事 / 1日 {q['max_per_day']} 件まで")
-    for it in q["items"]:
-        print(f"\n--- {it['at'].replace('T', ' ')}  {it['slug']}（{social.x_weight(it['text'])}/280）\n{it['text']}")
-    if not q["items"]:
-        print("（予定なし）")
-    return 0
-
-
-def cmd_test(text=None):
-    keys = keys_or_exit()
-    cfg = social.load_config()
-    if not text:
-        text = ("MAFブログの公式アカウントです。\n忙しい人・家にいる人の「暮らしとお金」を、守って便利にする情報を毎日お届けしています。"
-                "\n\n#暮らしの知恵 #時短\n" + json.loads((ROOT / "site.json").read_text(encoding="utf-8"))["base_url"])
-    print(f"ポストします（{social.x_weight(text)}/280）:\n{text}\n")
-    code, data = social.post_tweet(text, keys)
-    if code == 201:
-        print(f"ポストしました: https://x.com/i/web/status/{data['data']['id']}")
-        return 0
-    print(f"失敗（{code}）: {json.dumps(data, ensure_ascii=False)[:800]}")
-    if code == 402 or "credit" in json.dumps(data).lower():
-        print("→ X API のクレジット（前払い残高）が足りません。console.x.com の Billing で確認してください。")
-    if code == 403 and cfg:
-        print("→ アプリの権限が「Read and write」になっていないか、権限を変えた後に Access Token を作り直していない可能性があります。")
-    return 1
+def worker_cfg():
+    try:
+        return json.loads(WORKER_CFG.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 def wrangler(*args, input_text=None, check=True):
@@ -99,11 +50,12 @@ def wrangler(*args, input_text=None, check=True):
 
 
 def cmd_deploy():
-    keys = keys_or_exit()
-    code, out = wrangler("whoami", check=False)
+    keys = social.load_x_keys()
+    if not keys:
+        sys.exit("X のキーがありません（python scripts/x-keys.py）")
+    _, out = wrangler("whoami", check=False)
     if "not authenticated" in out.lower():
-        print("Cloudflare にログインします。ブラウザが開いたら「Allow（許可）」を押してください。")
-        subprocess.run([*WRANGLER, "login"], cwd=WORKER_DIR)
+        sys.exit("Cloudflare にログインしていません（npx wrangler login）")
     toml = WORKER_DIR / "wrangler.toml"
     text = toml.read_text(encoding="utf-8")
     if 'id = "KV_ID"' in text:
@@ -111,52 +63,115 @@ def cmd_deploy():
         found = [n["id"] for n in json.loads(out[out.index("["):out.rindex("]") + 1]) if n["title"].endswith("x-poster-posted")]
         if not found:
             _, out = wrangler("kv", "namespace", "create", "x-poster-posted")
-            found = re.findall(r'id\s*=\s*"([0-9a-f]{32})"|"id":\s*"([0-9a-f]{32})"', out)
-            found = [a or b for a, b in found]
+            found = [a or b for a, b in re.findall(r'id\s*=\s*"([0-9a-f]{32})"|"id":\s*"([0-9a-f]{32})"', out)]
         if not found:
             sys.exit("KV の作成結果が読めませんでした:\n" + out[-800:])
         toml.write_text(text.replace('id = "KV_ID"', f'id = "{found[0]}"'), encoding="utf-8", newline="\n")
-        print(f"KV（ポスト済みの記録）: {found[0]}")
+        print(f"KV（投稿済みの印・記録）: {found[0]}")
+    seed_kv(re.search(r'id = "([0-9a-f]{32})"', toml.read_text(encoding="utf-8")).group(1))
     _, out = wrangler("deploy")
     m = re.search(r"https://[\w.-]+\.workers\.dev", out)
+    cfg = worker_cfg()
+    if m:
+        cfg["url"] = m.group(0)
+    cfg.setdefault("admin_token", secrets.token_urlsafe(32))
+    WORKER_CFG.write_text(json.dumps(cfg, indent=1) + "\n", encoding="utf-8")
     for k, name in SECRET_NAMES.items():
         wrangler("secret", "put", name, input_text=keys[k])
-    print("X のキーを Cloudflare の秘密の設定に入れました（GitHub には上げていません）")
-    if m:
-        cfg_text = social.CONFIG.read_text(encoding="utf-8")
-        cfg = json.loads(cfg_text)
-        cfg["x"]["worker_url"] = m.group(0)
-        social.CONFIG.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
-        print(f"ポスト係を設置しました: {m.group(0)}（10分ごとに動きます）")
+    wrangler("secret", "put", "ADMIN_TOKEN", input_text=cfg["admin_token"])
+    print(f"投稿係を設置しました: {cfg.get('url')}（5分おき）。キーは Cloudflare の秘密の設定に入れました")
     return 0
 
 
+def seed_kv(kv_id):
+    """定期実行が動き出す前に、これまでの投稿（data/x.json）を KV に入れる（同じ投稿を二度出さないため）。KV に記録があれば何もしない。"""
+    rc, out = wrangler("kv", "key", "get", "items", "--namespace-id", kv_id, "--remote", check=False)
+    if rc == 0 and out.strip().startswith("{") and "posted" in out:
+        return
+    xl = json.loads(social.X_LOG.read_text(encoding="utf-8")) if social.X_LOG.exists() else {}
+    posts = xl.get("posts", [])
+    items = {p["id"]: {"state": "posted", "at": p["posted_at"], "tweet_id": p.get("tweet_id")} for p in posts}
+    vals = {"items": json.dumps(items, ensure_ascii=False), "posts": json.dumps(posts, ensure_ascii=False)}
+    if posts:
+        vals["last_posted_at"] = max(p["posted_at"] for p in posts)
+    tmp = ROOT / "state" / "kv-seed.tmp"
+    tmp.parent.mkdir(exist_ok=True)
+    for k, v in vals.items():   # 値はファイルで渡す（コマンドラインだと引用符・改行が壊れる）
+        tmp.write_text(v, encoding="utf-8", newline="\n")
+        wrangler("kv", "key", "put", k, "--path", str(tmp), "--namespace-id", kv_id, "--remote")
+    tmp.unlink()
+    print(f"これまでの投稿 {len(posts)} 件を KV に入れました（二度出さないため）")
+
+
+def get(path, method="GET", data=None):
+    cfg = worker_cfg()
+    if not cfg.get("url"):
+        sys.exit("投稿係がまだ設置されていません（python scripts/xpost.py deploy）")
+    req = urllib.request.Request(cfg["url"] + path, method=method, data=data,
+                                 headers={"Authorization": f"Bearer {cfg.get('admin_token', '')}", "User-Agent": "blog-factory"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.read().decode("utf-8")
+
+
 def cmd_status():
-    url = social.load_config()["x"].get("worker_url")
-    if not url:
-        print("ポスト係はまだ設置されていません（python scripts/xpost.py deploy）")
-        return 1
-    with urllib.request.urlopen(url + "/status", timeout=20) as r:
-        st = json.loads(r.read().decode("utf-8"))
+    st = json.loads(get("/status"))
     print(f"最後の実行: {st.get('last')}")
-    print(f"ポスト済み: {len(st.get('posted', {}))} 件")
+    print(f"今月（{st['month']}）: {st['month_posts']} 件・概算 ${st['month_cost']}" + ("・**クレジット切れ**" if st["credit"].get("depleted") else ""))
     for line in st.get("log", [])[-10:]:
         print("  " + line)
     return 0
 
 
+def cmd_dry_run(args):
+    qs = "&".join(f"{k}={urllib.request.quote(args[args.index('--' + k) + 1])}" for k in ("queue", "now") if "--" + k in args)
+    print(get("/dry-run" + ("?" + qs if qs else ""), method="POST", data=b""), end="")
+    return 0
+
+
+def sync():
+    """Cloudflare の記録 → data/x.json（posts・months・credit・failed）。取れなければ False（data/x.json はそのまま）。"""
+    try:
+        lg = json.loads(get("/log"))
+    except Exception as e:
+        print(f"Cloudflare の記録を取れませんでした（{type(e).__name__}）")
+        return False
+    old = json.loads(social.X_LOG.read_text(encoding="utf-8")) if social.X_LOG.exists() else {}
+    posts = {p["id"]: p for p in old.get("posts", [])}          # GitHub Actions 時代の記録（10/16 の固定用など）も残す
+    posts.update({p["id"]: p for p in lg.get("posts", [])})
+    months = {}
+    for p in posts.values():
+        m = months.setdefault(p["posted_at"][:7], {"posts": 0, "link_posts": 0, "cost": 0.0})
+        m["posts"] += 1
+        m["link_posts"] += 1 if p.get("kind") == "link" else 0
+        m["cost"] = round(m["cost"] + float(p.get("cost", 0)), 4)
+    new = {"_about": "X API の投稿の記録（Cloudflare の x-poster の記録を scripts/xpost.py sync が写したもの）。cost は概算（data/social.json の x_api の単価）",
+           "posts": sorted(posts.values(), key=lambda p: p["posted_at"]), "months": months,
+           "credit": lg.get("credit") or {}, "failed": lg.get("failed") or {}}
+    social.X_LOG.write_text(json.dumps(new, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    return True
+
+
+def cmd_check():
+    code, data = social.x_request("GET", "https://api.x.com/2/users/me", social.load_x_keys())
+    print(f"OK: @{data['data']['username']}" if code == 200 else f"NG（{code}）: {json.dumps(data, ensure_ascii=False)[:300]}")
+    return 0 if code == 200 else 1
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "preview"
-    if not social.load_config().get("x", {}).get("enabled"):
-        print("X API への自動ポストは中止しました（2026-10-15・data/social.json の x.enabled: false）。"
-              "note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定。")
-        return 0
-    if cmd == "test":
-        text = sys.argv[sys.argv.index("--text") + 1] if "--text" in sys.argv else None
-        return cmd_test(text)
-    return {"keys": cmd_keys, "check": cmd_check, "preview": cmd_preview,
-            "deploy": cmd_deploy, "status": cmd_status}.get(cmd, lambda: sys.exit(__doc__))()
+    a = sys.argv[1:]
+    cmd = a[0] if a else "status"
+    if cmd == "deploy":
+        return cmd_deploy()
+    if cmd == "status":
+        return cmd_status()
+    if cmd == "dry-run":
+        return cmd_dry_run(a)
+    if cmd == "sync":
+        return 0 if sync() else 1
+    if cmd == "check":
+        return cmd_check()
+    sys.exit(__doc__)
 
 
 if __name__ == "__main__":

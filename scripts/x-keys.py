@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-X API のキー（4つ）を受け取り、確かめて、GitHub Actions に渡す。人の操作は最初の1回、窓に4つ貼るだけ。
+X API のキー（4つ）を受け取り、確かめて、Cloudflare の投稿係（workers/x-poster）に渡す。人の操作は最初の1回、窓に4つ貼るだけ。
 
   python scripts/x-keys.py           … 窓を出す → .secrets/x-api.json に保存 → GET /2/users/me で @maf_media_jp か確かめる（投稿しない）
-                                        → GitHub の Secrets に登録（gh コマンド）→ プロフィールを API で設定してみる
+                                        → Cloudflare の秘密の設定に入れる（scripts/xpost.py deploy）→ プロフィールを API で設定してみる
   python scripts/x-keys.py check     … 保存済みのキーで認証だけ確かめる
-  python scripts/x-keys.py secrets   … 保存済みのキーを GitHub の Secrets に入れ直す
+  python scripts/x-keys.py secrets   … 保存済みのキーを Cloudflare の秘密の設定に入れ直す（Worker の更新も行う）
   python scripts/x-keys.py profile   … プロフィール（名前・自己紹介・ウェブサイト・アイコン・ヘッダー）を API で設定してみる
 
 キーの値は画面（●●）・ログ・チャットに出さない。結果は logs/x-setup.log と state/x-api-setup.json。
@@ -24,7 +24,6 @@ import social  # noqa: E402
 ROOT = social.ROOT
 LOG = ROOT / "logs" / "x-setup.log"
 STATE = ROOT / "state" / "x-api-setup.json"
-REPO = "shibuta-a/blog-factory"
 ACCOUNT = "maf_media_jp"
 LABELS = {"api_key": "API Key", "api_secret": "API Key Secret",
           "access_token": "Access Token", "access_token_secret": "Access Token Secret"}
@@ -102,29 +101,6 @@ def check(keys):
     return False
 
 
-def gh():
-    import os
-    for c in (shutil.which("gh"), Path(os.environ.get("LOCALAPPDATA", "")) / "gh-cli" / "bin" / "gh.exe"):
-        if c and Path(c).exists():
-            return str(c)
-    return None
-
-
-def set_secrets(keys):
-    exe = gh()
-    if not exe:
-        log("gh コマンドが見つからないため、GitHub の Secrets に登録できませんでした")
-        return False
-    ok = True
-    for k, name in social.X_ENV_NAMES.items():
-        r = subprocess.run([exe, "secret", "set", name, "--repo", REPO], input=keys[k], text=True,
-                           capture_output=True, encoding="utf-8", errors="replace")
-        ok &= r.returncode == 0
-        log(f"GitHub Secrets {name}: " + ("登録" if r.returncode == 0 else f"失敗（{(r.stderr or r.stdout).strip()[:200]}）"))
-    save_state(secrets_ok=ok)
-    return ok
-
-
 def profile(keys):
     """v1.1 のプロフィール API を試す。できなかったものは理由を残す（ブラウザ操作で代わりにやることはしない）。"""
     results = {}
@@ -168,12 +144,12 @@ def main():
         profile(keys)
         return 0
     if cmd == "secrets":
-        return 0 if set_secrets(keys) else 1
+        return subprocess.run([sys.executable, str(ROOT / "scripts" / "xpost.py"), "deploy"]).returncode
     if not check(keys):
         return 1
     if cmd == "check":
         return 0
-    set_secrets(keys)
+    subprocess.run([sys.executable, str(ROOT / "scripts" / "xpost.py"), "deploy"])
     profile(keys)
     return 0
 

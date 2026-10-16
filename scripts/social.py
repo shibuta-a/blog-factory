@@ -64,7 +64,7 @@ def x_post_text(meta, url, tags, with_link=True):
 # X API（OAuth 1.0a 署名）
 # ---------------------------------------------------------------------------
 def load_x_keys():
-    """.secrets/x-api.json のキー。GitHub Actions では環境変数 X_API_KEY などから読む。"""
+    """.secrets/x-api.json のキー（環境変数 X_API_KEY などがあればそちら）。"""
     import os
     env = {k: os.environ.get(v, "") for k, v in X_ENV_NAMES.items()}
     if all(env.values()):
@@ -158,7 +158,7 @@ def overlap(blog_md, note_md, n=10):
 
 
 # ---------------------------------------------------------------------------
-# X API の費用・クレジット（data/x.json は GitHub Actions の scripts/x-actions.py が書く）
+# X API の費用・クレジット（data/x.json は朝の scripts/x-plan.py が Cloudflare の x-poster の記録から写す）
 # ---------------------------------------------------------------------------
 X_LOG = ROOT / "data" / "x.json"
 
@@ -171,7 +171,7 @@ def x_api_alert(xlog=None, cfg=None):
     cr = xlog.get("credit") or {}
     if cr.get("depleted"):
         return (f"- **X API のクレジットが切れています**（{cr.get('at')} の投稿で「残高不足」）。X の投稿だけ止まっています。"
-                "console.x.com の Billing でクレジットを足すと、次の30分の確認から自動で再開します。")
+                "console.x.com の Billing でクレジットを足すと、次の確認（5分おき）から自動で再開します。")
     if cfg.get("credit_usd"):
         since = cfg.get("credit_set_on") or "2000-01-01"
         used = sum(p.get("cost", 0) for p in xlog.get("posts", []) if p.get("posted_at", "") >= since)

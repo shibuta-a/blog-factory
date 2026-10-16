@@ -2,7 +2,7 @@
   "_about": "note・X への自動展開の設定（scripts/social.py が読む）。キー・ログイン状態は .secrets/ にあり、ここには書かない",
   "x": {
     "enabled": false,
-    "_stopped": "2026-10-15 中止した旧方式（Cloudflare Workers・記事ごとのポスト）。2026-10-16 から X は x_api（GitHub Actions）で投稿する。build.py の _x_queue は空のまま",
+    "_stopped": "2026-10-15 中止した旧方式（Cloudflare Workers・記事ごとのポスト）。2026-10-16 から X は x_api（Cloudflare Workers の x-poster）で投稿する。build.py の _x_queue は空のまま",
     "since": "2026-10-12T18:00",
     "with_link": true,
     "max_per_day": 3,
@@ -10,7 +10,7 @@
     "_note": "since より前に公開された記事はポストしない（過去記事の一斉投稿を防ぐ）。with_link: false にするとURLなし（1件約$0.015。ありは約$0.20）"
   },
   "x_api": {
-    "_about": "X（@maf_media_jp）を X API（公式・従量課金）で投稿する。朝の scripts/x-plan.py が data/x-queue/<日付>.json を作り、GitHub Actions（.github/workflows/x-post.yml → scripts/x-actions.py）が30分おきに時刻の来た投稿を出して data/x.json に記録する。キーは .secrets/x-api.json と GitHub の Secrets（X_API_KEY など）。ブラウザでのログインは使わない",
+    "_about": "X（@maf_media_jp）を X API（公式・従量課金）で投稿する。朝の scripts/x-plan.py が data/x-queue/<日付>.json を作って GitHub へ。Cloudflare Workers の workers/x-poster が5分おきに GitHub の予定表を読み、時刻の来た投稿を出す（KV で二重投稿を防ぐ）。記録は朝に scripts/xpost.py sync が data/x.json に写す。キーは .secrets/x-api.json と Cloudflare の秘密の設定。ブラウザでのログインは使わない",
     "enabled": true,
     "account": "maf_media_jp",
     "start": "2026-10-17",

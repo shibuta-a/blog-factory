@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 X（@maf_media_jp）のその日の投稿を作って予定表（data/x-queue/）に置き、GitHub に送る（毎朝 boot-run.py の「5. X」から呼ばれる）。
-実際の投稿は PC が切れていても出せるように GitHub Actions（.github/workflows/x-post.yml → scripts/x-actions.py）が30分おきに行う。
+実際の投稿は PC が切れていても出せるように Cloudflare Workers（workers/x-poster・5分おき）が GitHub の予定表を読んで行う（scripts/xpost.py）。
 
   python scripts/x-plan.py                 … 今日の分を作って GitHub へ（もうあれば何もしない）
   python scripts/x-plan.py --date 2026-10-17 [--force] [--no-push] [--out data/x-queue/rehearsal-2026-10-17.json]
@@ -380,14 +380,20 @@ def plan(day, force=False, push=True, out=None):
     if n < 1:
         log(f"X: 本番は {c['start']} からです（今日は作りません）")
         return 0
-    # 通し確認では本番の予定表と別の名前にする（GitHub Actions は <日付>.json しか読まない）
+    # 通し確認では本番の予定表と別の名前にする（Cloudflare の投稿係は <日付>.json しか読まない）
     out = Path(out) if out else QUEUE / f"{'rehearsal-' if REHEARSAL else ''}{day.isoformat()}.json"
     out = out if out.is_absolute() else ROOT / out
     if out.exists() and not force:
         log(f"X: {out.relative_to(ROOT).as_posix()} はもうあります（作り直すときは --force）")
         return 0
     if push and not REHEARSAL:
-        git("pull", "--rebase", "--autostash")   # GitHub Actions が書いた data/x.json（費用）を取り込む
+        git("pull", "--rebase", "--autostash")
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("xpost", ROOT / "scripts" / "xpost.py")
+    xpost = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(xpost)
+    if xpost.worker_cfg().get("url"):          # Cloudflare の投稿の記録 → data/x.json（今月の概算費用・クレジット切れ）
+        log("X: Cloudflare の投稿の記録を data/x.json に写しました" if xpost.sync() else "X: Cloudflare の記録を取れず、前回の data/x.json で計算します")
     n_total = c["phase1_per_day"] if n <= c["phase1_days"] else c["phase2_per_day"]
     now = datetime.datetime.now().replace(second=0, microsecond=0)
     earliest = at(day, "00:00") if REHEARSAL or day > now.date() else now + datetime.timedelta(minutes=20)
@@ -436,26 +442,11 @@ def plan(day, force=False, push=True, out=None):
         log(f"X 予定 {it['at'][11:]} [{KIND_LABEL.get(it['kind'], it['kind'])}]（{social.x_weight(it['text'])}/280）"
             + (" 画像あり" if it.get("image") else "") + " " + it["text"].replace("\n", " ")[:80])
     if push and not REHEARSAL:
-        git("add", str(out.relative_to(ROOT)), "data/x-queue/img")
+        git("add", str(out.relative_to(ROOT)), "data/x-queue/img", "data/x.json")
         git("commit", "-m", f"x: {day} の投稿予定（{len(items)} 件）")
         git("pull", "--rebase", "--autostash")
         log("X: 予定表を GitHub に送りました" if git("push").returncode == 0 else "X: 予定表の push に失敗しました")
-        start_waiter()
     return 0
-
-
-def start_waiter():
-    """GitHub Actions の投稿係を1回起動する（今日の投稿の時刻まで待って出す「待ち番」。cron が動かない日の保険）。"""
-    import shutil
-    exe = next((str(c) for c in (shutil.which("gh"), Path(os.environ.get("LOCALAPPDATA", "")) / "gh-cli" / "bin" / "gh.exe")
-                if c and Path(c).exists()), None)
-    if not exe:
-        log("X: gh コマンドが見つからないため投稿係を起動できませんでした（cron の定期実行に任せます）")
-        return
-    r = subprocess.run([exe, "workflow", "run", "x-post.yml", "-R", "shibuta-a/blog-factory", "-f", "dry_run=false"],
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
-    log("X: GitHub Actions の投稿係を起動しました（今日の投稿の時刻まで待って出します）" if r.returncode == 0
-        else f"X: 投稿係の起動に失敗（{(r.stderr or r.stdout).strip()[:200]}）→ cron の定期実行に任せます")
 
 
 def show(day):

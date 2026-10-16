@@ -20,7 +20,7 @@
   4. note（1日1本）。note の予約投稿はプレミアム限定のため、PC の起動から 0〜90 分のランダムな時刻まで待ってから投稿する
      続けて note のコメントへの返信とフォロー返し（scripts/note-comments.py・1日10件まで・要確認のものは STATUS.md の先頭）
   5. X（scripts/x-plan.py）: その日の投稿（本文・カード画像・投稿予定時刻）を作って data/x-queue/ に置き、GitHub へ。
-     投稿そのものは GitHub Actions（.github/workflows/x-post.yml）が30分おきに X API で行う（PC が切れていても出る）
+     投稿そのものは Cloudflare Workers（workers/x-poster）が5分おきに X API で行う（PC が切れていても出る）
   6. 翌日の自動化記事の下調べ（道具の公式サイト確認 → data/jidouka-research/<回>.md・制限60分）
   7. STATUS.md・note の記録を GitHub へ → シャットダウンの判定（すべて終わってから。data/power.json の max_uptime_min はこの全部が収まる長さ）
 """
@@ -162,7 +162,7 @@ def main():
             log(f"note のコメント返信が{COMMENTS_TIMEOUT_MIN}分で終わらなかったため中断")
     stage("note", note)
 
-    # 5. X（今日の投稿の予定表を作って GitHub へ。投稿は GitHub Actions が X API で行う。だめなら X だけ見送り）
+    # 5. X（今日の投稿の予定表を作って GitHub へ。投稿は Cloudflare の x-poster が X API で行う。だめなら X だけ見送り）
     def x():
         try:
             rx = py("x-plan.py", out="x-plan-run.log", timeout=30 * 60)

@@ -145,5 +145,59 @@
     "query": "骨伝導イヤホン"
    }
   ]
+ },
+ "jidouka-02-ryouri-soujiki-saraarai": {
+  "queries": [
+   "ロボット掃除機",
+   "食洗機"
+  ],
+  "fetched_at": "2026-10-17",
+  "items": [
+   {
+    "name": "ロボット掃除機 DEEBOT T80 OMNI エコバックス 公式 ECOVACS お掃除ロボッ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00sun6o.iretpf6a.g00sun6o.iretqc9d/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fstore-ecovacs-japan%2Fdex68-21ee%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fstore-ecovacs-japan%2Fi%2F10000495%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/store-ecovacs-japan/cabinet/campaign/261014/dex68-21ee.jpg?_ex=300x300",
+    "shop": "エコバックスジャパン公式 ストア",
+    "query": "ロボット掃除機"
+   },
+   {
+    "name": "SAMKYO 工事不要 食洗機 1~3人用 食器洗い乾燥機 18点 乾燥のみ機能対応 熱風送風乾…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00twl4o.iretpbb0.g00twl4o.iretq996/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fjimo%2Fskdwt40-plus%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fjimo%2Fi%2F10000220%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/jimo/cabinet/13854150/imgrc0119710767.jpg?_ex=300x300",
+    "shop": "SAMKYO家電専門店",
+    "query": "食洗機"
+   }
+  ]
+ },
+ "pokeca-hokan-shikke": {
+  "queries": [
+   "トレカ スリーブ",
+   "カードファイル トレカ",
+   "除湿剤 クローゼット"
+  ],
+  "fetched_at": "2026-10-17",
+  "items": [
+   {
+    "name": "アクリル本舗 マグネットローダー カードローダー カードスリーブ ポケカ ポケモンカード マグネ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00uhywo.iretp04e.g00uhywo.iretqcd7/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsiba-98%2Fkd-01-10%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fsiba-98%2Fi%2F10000010%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/siba-98/cabinet/09996188/10474505/imgrc0139182811.jpg?_ex=300x300",
+    "shop": "SIBA 楽天市場店",
+    "query": "トレカ スリーブ"
+   },
+   {
+    "name": "ポケモンカード ファイル 収納ケース 大容量 900枚 400枚 入れカードファイル カード フ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00ti7yo.iretp931.g00ti7yo.iretqdae/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fmakisuncome%2Fss-zbkm001%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fmakisuncome%2Fi%2F10001074%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/makisuncome/cabinet/11126180/compass1780308487.jpg?_ex=300x300",
+    "shop": "オンリーワンギフト楽天市場店",
+    "query": "カードファイル トレカ"
+   },
+   {
+    "name": "除湿剤 吊り下げ cararino 10個～40個セット 除湿剤 クローゼット 吊り下げ ハンガ…",
+    "url": "https://hb.afl.rakuten.co.jp/hgc/g00pseuo.iretp308.g00pseuo.iretq88a/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fecojiji%2Fcararino-10%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fecojiji%2Fi%2F10010312%2F&rafcid=wsc_i_is_00b18959-2035-4f5c-83cb-7126076e5072",
+    "image": "https://thumbnail.image.rakuten.co.jp/@0_mall/ecojiji/cabinet/09838201/cararino-main10-.jpg?_ex=300x300",
+    "shop": "トナリの雑貨店",
+    "query": "除湿剤 クローゼット"
+   }
+  ]
  }
 }
