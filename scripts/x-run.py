@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """
+★ 2026-10-16 廃止: X はブラウザ操作をやめ、X API（scripts/x-plan.py ＋ GitHub Actions の scripts/x-actions.py）で投稿する。
+  boot-run.py からは呼ばれない。X がブラウザからのログインを断っているため、このスクリプトでログインを試さないこと。
+
 X（@maf_media_jp）の毎朝の処理（boot-run.py の「5. X」から呼ばれる）。A8・note と同じく、X 専用の Chrome プロファイルを自動操作する。
 
   python scripts/x-run.py          … 毎朝: ログインを確かめ（切れていれば .secrets/x.json で自動ログイン）、投稿する

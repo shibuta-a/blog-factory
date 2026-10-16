@@ -287,6 +287,8 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 
 ## note・X への自動展開（2026-10-12〜・指示書⑨）
 
+> X の部分（x_text・Cloudflare Workers・xpost.py）は 2026-10-15 に中止。いまの X は下の「X（X API・GitHub Actions）」を見る。
+
 ```
 毎朝の自動実行（boot-run.py）
   記事を書く（フロントマターに x_text＝X の紹介文も書く）→ publish.py → build.py が public/_x_queue.json を出力 → GitHub
@@ -300,7 +302,7 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 |---|---|
 | 設定（オン/オフ・1日の本数・ハッシュタグ） | `data/social.json` |
 | X のポスト係（Cloudflare Workers） | `workers/x-poster/`（設置・更新は `python scripts/xpost.py deploy`） |
-| X のキー | `.secrets/x_api.json`（Cloudflare の秘密の設定にもコピー。GitHub には上げない） |
+| X のキー（旧方式） | 今は `.secrets/x-api.json`（下の X の節） |
 | note の別バージョン | `data/note/<slug>.md`（Claude Code が `scripts/note-prompt.md` で書く） |
 | note に投稿済みの記録 | `data/note.json`（ブログの記事末尾の note 案内はここから出る） |
 | note のログイン状態 | `.secrets/note-browser-profile/`（ブラウザを閉じても残る） |
@@ -317,3 +319,33 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 - **相互誘導**：note → ブログは記事末尾に1回だけ。ブログ → note は note に出した記事だけ末尾に1行。X → ブログは記事URL。
   オリシャン（本業）への案内は orishan ジャンルの記事の note 版だけ（ブログ側はトップ固定枠・各記事の誘導ボックスで既に出ている）
 - note の画面が変わって投稿に失敗したら、`logs/note.log` と `.secrets/shots/note-error-*.png` を見て `scripts/note-run.py` の `post_to_note` を直す
+
+## X（X API・GitHub Actions・2026-10-16〜）
+
+X（@maf_media_jp）はブラウザ操作をやめ、X API（公式・従量課金）で投稿する。x_browser.py / x-run.py のログインは使わない（X がブラウザからのログインを断ったため）。
+
+```
+毎朝の自動実行（boot-run.py の 5.）
+  scripts/x-plan.py … その日の投稿（本文・カード画像・投稿予定時刻）を作る → data/x-queue/<日付>.json と data/x-queue/img/ → GitHub
+     文面は Claude Code（claude -p・scripts/x-prompt.md）が書き、禁止語・長さ・過去との重複をプログラムが確かめる（3回まで書き直し）
+     実話として書いてよいのは data/x-facts.md と jidouka-ranking.json の根拠「自社の実例」だけ
+
+30分おき（PC は切れていてよい）
+  GitHub Actions .github/workflows/x-post.yml → scripts/x-actions.py
+     今日の予定表から時刻が来た投稿を1件 → （リンク付きは記事が 200 で表示されるのを確かめて）画像アップロード → 投稿 → data/x.json に記録
+```
+
+| もの | 場所 |
+|---|---|
+| 設定（開始日・件数・時間帯・単価・月の上限） | `data/social.json` の `x_api` |
+| キー | `.secrets/x-api.json`（`python scripts/x-keys.py` の窓で1回だけ貼る）＋ GitHub の Secrets（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET・同じスクリプトが gh で登録） |
+| 予定表 | `data/x-queue/<日付>.json`（通し確認は `rehearsal-<日付>.json`。Actions は読まない） |
+| 投稿の記録・月ごとの件数と概算費用・クレジット切れ | `data/x.json`（Actions だけが書く） |
+| ログ | `logs/x-plan.log`（朝）・GitHub の Actions の x-post の実行記録（投稿） |
+
+- **件数と時刻**：start（1日目）から10日目までは1日2件（7:00〜22:00 のばらばら・3時間以上あける）。11日目から1日3件（朝 7:00〜9:00・昼 11:30〜13:30・夜 18:00〜21:30）
+- **中身**：リンク＋カード画像付きは1日1件（その日の自動化記事の紹介・水曜はオリシャン）。記事の公開予定時刻の20分後以降に置き、間に合わなければ公開済みの最新記事を紹介。残りは文章だけ（小ワザ・ひと言・つまずいた話）。リンクは `?utm_source=x`
+- **費用**：単価は social.json（文章だけ $0.015・リンク付き $0.20）。月の概算が `budget_usd_month`（$10）を超えそうなら朝の x-plan.py が文章だけの投稿を減らす。残高切れ（402）は STATUS.md の先頭に出て、足せば次の回から自動で再開
+- **コマンド**：`python scripts/x-plan.py show [日付]`（予定）／`python scripts/x-keys.py check`（認証確認・投稿しない）／`secrets`（GitHub に入れ直す）／`profile`（プロフィールを API で設定）
+- **通し確認**：`BLOG_REHEARSAL=1 python scripts/x-plan.py --date <明日>` → `python scripts/x-actions.py --dry-run --now <明日>T23:59 --queue data/x-queue/rehearsal-<明日>.json`（API に送る直前で止まる）。GitHub 上では Actions → x-post → Run workflow（dry_run=true）
+- 固定投稿は X API に機能がないため設定していない

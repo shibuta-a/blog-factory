@@ -2,12 +2,50 @@
   "_about": "note・X への自動展開の設定（scripts/social.py が読む）。キー・ログイン状態は .secrets/ にあり、ここには書かない",
   "x": {
     "enabled": false,
-    "_stopped": "2026-10-15 中止（経営判断）。X API は使わない。X へのシェアは note の X 連携（note 標準機能・無料）で行う。build.py は X の予定表を空で出し、xpost.py は動かない",
+    "_stopped": "2026-10-15 中止した旧方式（Cloudflare Workers・記事ごとのポスト）。2026-10-16 から X は x_api（GitHub Actions）で投稿する。build.py の _x_queue は空のまま",
     "since": "2026-10-12T18:00",
     "with_link": true,
     "max_per_day": 3,
     "worker_url": "",
     "_note": "since より前に公開された記事はポストしない（過去記事の一斉投稿を防ぐ）。with_link: false にするとURLなし（1件約$0.015。ありは約$0.20）"
+  },
+  "x_api": {
+    "_about": "X（@maf_media_jp）を X API（公式・従量課金）で投稿する。朝の scripts/x-plan.py が data/x-queue/<日付>.json を作り、GitHub Actions（.github/workflows/x-post.yml → scripts/x-actions.py）が30分おきに時刻の来た投稿を出して data/x.json に記録する。キーは .secrets/x-api.json と GitHub の Secrets（X_API_KEY など）。ブラウザでのログインは使わない",
+    "enabled": true,
+    "account": "maf_media_jp",
+    "start": "2026-10-17",
+    "phase1_days": 10,
+    "phase1_per_day": 2,
+    "phase1_window": [
+      "07:00",
+      "22:00"
+    ],
+    "phase1_min_gap_hours": 3,
+    "phase2_per_day": 3,
+    "phase2_windows": [
+      [
+        "07:00",
+        "09:00"
+      ],
+      [
+        "11:30",
+        "13:30"
+      ],
+      [
+        "18:00",
+        "21:30"
+      ]
+    ],
+    "min_gap_minutes": 60,
+    "budget_usd_month": 10,
+    "price_text_post": 0.015,
+    "price_link_post": 0.2,
+    "price_media": 0.0,
+    "_price_note": "2026-10 時点の公開情報の単価（文章だけ $0.015・URL付き $0.20。画像のアップロードの単価は公表なし→0で計算）。Developer Console の請求が正。変わったらここを直す",
+    "credit_usd": null,
+    "credit_set_on": null,
+    "credit_low_usd": 2,
+    "_credit_note": "クレジットを買ったら、その額と日付を credit_usd / credit_set_on に入れると、残りの見込みが credit_low_usd を切ったときに STATUS.md の先頭に出す。入れなくても、残高切れ（402）は検知して先頭に出す"
   },
   "note": {
     "enabled": true,
@@ -18,18 +56,56 @@
     "_note": "公開済みのブログ記事を、毎朝の自動実行で max_per_day 本ずつ note 用の別バージョンにして投稿する（新しい記事から）"
   },
   "x_tags": {
-    "cleaning": ["#宅配クリーニング", "#暮らしの知恵"],
-    "kaji": ["#家事代行", "#家事の時短"],
-    "food": ["#宅配食", "#ミールキット"],
-    "kaitori": ["#宅配買取", "#断捨離"],
-    "jitan": ["#時短料理", "#献立"],
-    "vod": ["#動画配信", "#サブスク"],
-    "shikaku": ["#資格勉強", "#通信講座"],
-    "rental": ["#ファッションレンタル", "#サブスク"],
-    "music": ["#音楽サブスク"],
-    "ai": ["#AI活用", "#生成AI"],
-    "mamoru": ["#詐欺対策", "#お金の守り方"],
-    "pokeca": ["#ポケカ", "#トレカ"],
-    "orishan": ["#オリジナルシャンパン", "#開業"]
+    "cleaning": [
+      "#宅配クリーニング",
+      "#暮らしの知恵"
+    ],
+    "kaji": [
+      "#家事代行",
+      "#家事の時短"
+    ],
+    "food": [
+      "#宅配食",
+      "#ミールキット"
+    ],
+    "kaitori": [
+      "#宅配買取",
+      "#断捨離"
+    ],
+    "jitan": [
+      "#時短料理",
+      "#献立"
+    ],
+    "vod": [
+      "#動画配信",
+      "#サブスク"
+    ],
+    "shikaku": [
+      "#資格勉強",
+      "#通信講座"
+    ],
+    "rental": [
+      "#ファッションレンタル",
+      "#サブスク"
+    ],
+    "music": [
+      "#音楽サブスク"
+    ],
+    "ai": [
+      "#AI活用",
+      "#生成AI"
+    ],
+    "mamoru": [
+      "#詐欺対策",
+      "#お金の守り方"
+    ],
+    "pokeca": [
+      "#ポケカ",
+      "#トレカ"
+    ],
+    "orishan": [
+      "#オリジナルシャンパン",
+      "#開業"
+    ]
   }
 }

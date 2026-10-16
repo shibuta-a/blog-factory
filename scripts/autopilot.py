@@ -733,20 +733,22 @@ def cmd_status():
     else:
         claude_text = "**長期トークン未設定**（通常のログインで動作。ログインが切れると記事が0本になる）"
         alerts.append("- Claude Code の長期トークンが未設定です。setup-once.bat をダブルクリックして設定してください。")
-    x_st = load_json(ROOT / "state" / "x-status.json", {})
-    if x_st.get("stop_all"):
-        alerts.insert(0, f"- **X: 自動処理をすべて止めています**（{x_st.get('text')}・{x_st.get('at')}）。ブログと note は続けています。"
-                         "制限が解けたのを確かめてから `python scripts/x-run.py resume` で再開します（突破は試みません）。")
-    elif x_st.get("ok") is False:
-        alerts.insert(0, f"- X: {x_st.get('text')}（{x_st.get('at')}）。今日の X だけ見送りました。翌朝また試します。")
-    x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x", {})
-    x_keys = (ROOT / ".secrets" / "x_api.json").exists()
-    x_text = (("**止めています**（" + str(x_st.get("text")) + "）") if x_st.get("stop_all") else
-              ("X 専用のブラウザ: " + str(x_st.get("text")) + "（" + str(x_st.get("at")) + "）") if x_st else
-              "**オン**（記事の公開時刻に Cloudflare から自動ポスト・1日 " + str(x_cfg.get("max_per_day")) + " 件まで）"
-              if x_cfg.get("enabled") and x_cfg.get("worker_url") else
-              "準備中（X API のキーと Cloudflare の設定待ち）" if x_cfg.get("enabled") else
-              "止めています（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）")
+    # X は X API（GitHub Actions が投稿・data/x.json に記録）。ブラウザでのログイン（x-run.py）は 2026-10-16 にやめた
+    import social
+    x_alert = social.x_api_alert()
+    if x_alert:
+        alerts.insert(0, x_alert)
+    x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x_api", {})
+    x_log = load_json(ROOT / "data" / "x.json", {})
+    x_month = x_log.get("months", {}).get(datetime.date.today().strftime("%Y-%m"), {})
+    x_keys = social.load_x_keys()
+    x_q = load_json(ROOT / "data" / "x-queue" / f"{datetime.date.today().isoformat()}.json", {})
+    x_text = ("止めています（data/social.json の x_api.enabled が false）" if not x_cfg.get("enabled") else
+              "準備中（X API のキーがまだありません）" if not x_keys else
+              f"**オン**（X API・GitHub Actions が30分おきに投稿。{x_cfg.get('start')} から"
+              f"・今日の予定 {len(x_q.get('items', []))} 件"
+              + (f"（{' / '.join(i['at'][11:] for i in x_q['items'])}）" if x_q.get("items") else "")
+              + f"・今月 {x_month.get('posts', 0)} 件・概算 ${x_month.get('cost', 0):.2f} / 上限 ${x_cfg.get('budget_usd_month')}）")
     note_text = (f"{'**オン**' if load_json(ROOT / 'data' / 'social.json', {}).get('note', {}).get('enabled') else 'オフ'}"
                  f"（投稿済み {len(note_log)} 本・ログイン: {note_st.get('text', '未確認')}）")
     review = [k for k, v in ledger.items() if v.get("needs_review")]

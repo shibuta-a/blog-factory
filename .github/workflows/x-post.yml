@@ -1,0 +1,70 @@
+# X（@maf_media_jp）の投稿係。30分おきに data/x-queue/<今日>.json を見て、時刻が来た投稿を X API で出す（scripts/x-actions.py）。
+# PC が切れていても動く。キーはリポジトリの Secrets（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET）。
+# 手で動かすとき（通し確認）: Actions → x-post → Run workflow（dry_run=true なら API に送る直前で止める）
+name: x-post
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true なら投稿しない（認証の確認まで）"
+        default: "true"
+      now:
+        description: "日本時間の現在時刻として扱う時刻（例 2026-10-17T23:59・空なら今）"
+        default: ""
+      queue:
+        description: "予定表のファイル（空なら data/x-queue/<今日>.json）"
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: x-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: 時刻が来た投稿を出す
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run != 'false' }}
+          NOW: ${{ inputs.now }}
+          QUEUE: ${{ inputs.queue }}
+        run: |
+          args=""
+          [ "$DRY" = "true" ] && args="$args --dry-run"
+          [ -n "$NOW" ] && args="$args --now $NOW"
+          [ -n "$QUEUE" ] && args="$args --queue $QUEUE"
+          python3 scripts/x-actions.py $args
+      - name: 記録を GitHub に残す
+        if: always()
+        run: |
+          git config user.name "x-post (GitHub Actions)"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -f data/x.json ] || exit 0
+          git add data/x.json STATUS.md
+          if git diff --cached --quiet; then exit 0; fi
+          # data/x.json を書くのはこの投稿係だけ（同時には動かない）。送れないときは最新に合わせてから x.json を載せ直す
+          cp data/x.json "$RUNNER_TEMP/x.json"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset -q --hard origin/main
+            cp "$RUNNER_TEMP/x.json" data/x.json
+            python3 scripts/x-actions.py --status-only
+            git add data/x.json STATUS.md
+            git diff --cached --quiet && exit 0
+            git commit -q -m "x: 投稿の記録 [CI Skip]"
+            git push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
