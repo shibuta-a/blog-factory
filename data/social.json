@@ -42,8 +42,8 @@
     "price_link_post": 0.2,
     "price_media": 0.0,
     "_price_note": "2026-10 時点の公開情報の単価（文章だけ $0.015・URL付き $0.20。画像のアップロードの単価は公表なし→0で計算）。Developer Console の請求が正。変わったらここを直す",
-    "credit_usd": null,
-    "credit_set_on": null,
+    "credit_usd": 120,
+    "credit_set_on": "2026-10-16",
     "credit_low_usd": 2,
     "_credit_note": "クレジットを買ったら、その額と日付を credit_usd / credit_set_on に入れると、残りの見込みが credit_low_usd を切ったときに STATUS.md の先頭に出す。入れなくても、残高切れ（402）は検知して先頭に出す"
   },
