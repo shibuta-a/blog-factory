@@ -630,5 +630,37 @@
    "landing_url": "https://stocksnap.io/photo/silhouette-family-Q7UIKF58IR",
    "openverse_id": "8d6613d0-142b-4fcc-86b7-b1f553decad5"
   }
+ },
+ "jidouka-02-ryouri-soujiki-saraarai": {
+  "eyecatch": {
+   "file": "img/jidouka-02-ryouri-soujiki-saraarai/eyecatch.jpg",
+   "query": "kitchen cooking",
+   "title": "Kitchen Cook",
+   "creator": "Zachary Staines",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/kitchen-cook-BKYKF373YG",
+   "openverse_id": "7b79f7f4-1a2e-436c-a2ac-bf7d803c9bc8"
+  },
+  "body-1": {
+   "file": "img/jidouka-02-ryouri-soujiki-saraarai/body-1.jpg",
+   "query": "robot vacuum",
+   "title": "Robot Vacuum",
+   "creator": "Jens Mahnke",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/robot-vacuum-VJCXHQGRVO",
+   "openverse_id": "e8c7c5aa-b13c-4596-a4be-a0ca317d0ba8"
+  },
+  "body-2": {
+   "file": "img/jidouka-02-ryouri-soujiki-saraarai/body-2.jpg",
+   "query": "dishwasher",
+   "title": "Blue Dishwasher",
+   "creator": "WDnet Studio",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/blue-dishwasher-D0L4ZG5KZI",
+   "openverse_id": "b222c7c5-2450-4271-9199-e2d06bb668c4"
+  }
  }
 }
