@@ -9,39 +9,39 @@
                                                  … 朝 7:30 の見張りを今すぐ（--test: 件名に【テスト】・--dry: 送らずに中身を表示）
   python scripts/guard.py expect pc1-mail on|off … 朝の見張りでその合図を待つか（PC① の営業メールは今は off。data/guard-pc1-howto.md）
   python scripts/guard.py notify "件名" "本文"     …メールを1通（見張り番から。だめなら PC から直接 maf-group.jp の送信サーバーで）
-  python scripts/guard.py backup                 … .secrets を暗号化して Cloudflare へ（合言葉は要らない。毎週月曜の朝に自動）
-  python scripts/guard.py restore [--to DIR]     … バックアップを取り出して合言葉で開き、.secrets に書き戻す（新しい PC で復元するとき）
+  python scripts/guard.py backup                 … .secrets の小さいファイルを見張り番へ送り、見張り番が暗号にして R2（無ければ KV）に置く（毎週月曜の朝に自動）
+  python scripts/guard.py restore [--to DIR]     … 見張り番が暗号を解いて返したものを .secrets に書き戻す（新しい PC では先に deploy で合言葉を作り直す）
   python scripts/guard.py weekly-check           … 週1回の点検（ディスクの空き・ログの大きさ・トークンの期限・X のクレジット・バックアップ）
   python scripts/guard.py summary [--date D]     … 合図の中身（まとめに載る行）を表示するだけ
 
 合図は送れなかったら state/guard-pending.json にためて、次に送るときに一緒に送る。
-キー: .secrets/guard.json（見張り番の URL と合言葉）・.secrets/mail.json（送信元。scripts/guard-setup.py の窓で入れる）
+知らせ方: 見張り番が GitHub の非公開リポジトリ shibuta-a/blog-factory-guard に Issue を作らせる → GitHub の通知メールが登録メールに届く。
+  見張り番に届かないときは、PC から gh で同じ Issue を作らせる（repository_dispatch）。人の入力は要らない。
+キー: .secrets/guard.json（見張り番の URL と合言葉。deploy が自動で作る）。バックアップの暗号の鍵は Cloudflare の秘密の設定にだけある
 """
 import json
 import re
 import shutil
-import smtplib
 import ssl
 import subprocess
 import sys
 import urllib.request
 from datetime import date, datetime, timedelta
-from email.header import Header
-from email.mime.text import MIMEText
-from email.utils import formataddr, formatdate, make_msgid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 WORKER_DIR = ROOT / "workers" / "guard"
 CFG = ROOT / ".secrets" / "guard.json"
-MAIL = ROOT / ".secrets" / "mail.json"
 PENDING = ROOT / "state" / "guard-pending.json"
 CLAUDE_LIMIT = ROOT / "state" / "claude-limit.json"
 WEEKLY = ROOT / "state" / "weekly-check.json"
 LOG = ROOT / "logs" / "guard.log"
 WRANGLER = ["npx.cmd" if sys.platform == "win32" else "npx", "--yes", "wrangler@4.136.3"]
-TO = "asoutobata@gmail.com"
+NOTIFY_REPO = "shibuta-a/blog-factory-guard"   # 知らせの Issue を作る非公開リポジトリ（.github/workflows/notify.yml）
+GH = Path.home() / "AppData" / "Local" / "gh-cli" / "bin" / "gh.exe"
+BACKUP_MAX_FILE = 1024 * 1024
+BACKUP_SKIP_EXT = {".png", ".jpg", ".jpeg", ".log"}
 
 
 def log(msg):
@@ -103,30 +103,24 @@ def beat(name, ok=True, lines=None, warn=None, error="", day=None):
     return not left
 
 
-def smtp_send(subject, body):
-    """PC から直接、maf-group.jp の送信サーバーで送る（見張り番に届かないときの予備）。"""
-    m = jload(MAIL, {})
-    if not m.get("password"):
-        raise RuntimeError("送信元が未設定です（scripts/guard-setup.py）")
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = Header(subject, "utf-8")
-    msg["From"] = formataddr((str(Header("ブログ工場の見張り番", "utf-8")), m["from"]))
-    msg["To"] = m.get("to", TO)
-    msg["Date"] = formatdate(localtime=True)
-    msg["Message-ID"] = make_msgid(domain=m["from"].split("@")[1])
-    ctx = ssl.create_default_context()
-    if int(m["port"]) == 465:
-        s = smtplib.SMTP_SSL(m["host"], 465, timeout=30, context=ctx)
-    else:
-        s = smtplib.SMTP(m["host"], int(m["port"]), timeout=30)
-        s.starttls(context=ctx)
-    s.login(m["user"], m["password"])
-    s.sendmail(m["from"], [m.get("to", TO)], msg.as_string())
-    s.quit()
+def gh_cmd():
+    return str(GH) if GH.exists() else (shutil.which("gh") or "gh")
+
+
+def gh_dispatch(subject, body):
+    """PC から直接、知らせの Issue を作らせる（見張り番に届かないときの予備）。"""
+    label = "テスト" if "【テスト】" in subject else next((x for x in ("要対応", "回復", "週報") if f"【{x}】" in subject),
+                                                          "ok" if "【OK】" in subject else "info")
+    payload = json.dumps({"event_type": "guard-notify", "client_payload": {"title": subject, "body": body[:60000], "label": label}},
+                         ensure_ascii=False)
+    r = subprocess.run([gh_cmd(), "api", f"repos/{NOTIFY_REPO}/dispatches", "--input", "-"], input=payload, text=True,
+                       encoding="utf-8", capture_output=True, timeout=60)
+    if r.returncode != 0:
+        raise RuntimeError((r.stderr or r.stdout).strip()[:200])
 
 
 def notify(subject, body):
-    """メールを1通。まず見張り番（Cloudflare）から、だめなら PC から直接。"""
+    """知らせを1通（GitHub の Issue → 通知メール）。まず見張り番（Cloudflare）から、だめなら PC から直接。"""
     import os
     if os.environ.get("BLOG_REHEARSAL"):
         log(f"（通し確認）通知は送りません: {subject}")
@@ -140,8 +134,8 @@ def notify(subject, body):
     except Exception as e:
         err = f"{type(e).__name__}: {e}"
     try:
-        smtp_send(subject, body)
-        log(f"通知（PC から直接。見張り番からは送れず: {err}）: {subject}")
+        gh_dispatch(subject, body)
+        log(f"通知（PC から直接 GitHub へ。見張り番からは送れず: {err}）: {subject}")
         return True
     except Exception as e:
         log(f"通知を送れませんでした: {subject}（見張り番: {err} / PC: {type(e).__name__}: {e}）")
@@ -329,13 +323,15 @@ def weekly_check():
             warn.append(f"Claude のトークンの期限が近い（{tok['expires'][:10]}・あと {left} 日）。setup-once.bat の 3/3 で作り直してください")
     else:
         warn.append("Claude の長期トークン（.secrets/claude-token.json）の期限が分かりません")
-    gsc = jload(ROOT / ".secrets" / "gsc-service-account.json")
-    lines.append("Search Console の鍵: " + ("あり（期限なし）" if gsc else "なし"))
     rc, out = wrangler("whoami", cwd=WORKER_DIR, check=False)
     cf_ok = rc == 0 and "not authenticated" not in out.lower()
     lines.append("Cloudflare のログイン（PC）: " + ("OK" if cf_ok else "切れています"))
     if not cf_ok:
         warn.append("PC の Cloudflare のログイン（wrangler）が切れています。見張り番・X の投稿係は動き続けますが、更新と閲覧数の取り込みができません")
+    r = subprocess.run([gh_cmd(), "auth", "status"], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    lines.append("GitHub のログイン（PC）: " + ("OK" if r.returncode == 0 else "切れています"))
+    if r.returncode != 0:
+        warn.append("PC の GitHub のログイン（gh）が切れています。記事の公開（git push）と予備の知らせができません")
     left = x_credit_left()
     if left is not None:
         lines.append(f"X のクレジット残高の見込み: ${left}")
@@ -345,8 +341,6 @@ def weekly_check():
     lines.append(f"バックアップ: {bk.get('at', 'まだ')}" + (f"（{bk.get('files')} ファイル）" if bk.get("files") else ""))
     if not bk.get("at") or bk["at"][:10] < (date.today() - timedelta(days=8)).isoformat():
         warn.append("鍵のバックアップが8日以上できていません（python scripts/guard.py backup）")
-    wu = jload(ROOT / "state" / "winupdate.json", {})
-    lines.append("Windows Update: " + (f"アクティブ時間 {wu.get('active_hours')}" if wu.get("ok") else "未設定"))
     res = {"date": today(), "lines": lines, "warn": warn}
     WEEKLY.parent.mkdir(exist_ok=True)
     WEEKLY.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -356,39 +350,36 @@ def weekly_check():
 # ---------------------------------------------------------------------------
 # バックアップ
 # ---------------------------------------------------------------------------
+def backup_files():
+    sec = ROOT / ".secrets"
+    return [p for p in sorted(sec.iterdir()) if p.is_file() and p.suffix.lower() not in BACKUP_SKIP_EXT
+            and p.stat().st_size <= BACKUP_MAX_FILE]
+
+
 def backup():
-    import guard_backup
-    if not guard_backup.has_keys():
-        log("バックアップ: 鍵の組がありません（scripts/guard-setup.py の窓で合言葉を決める）")
-        return False
-    blob = guard_backup.make_blob()
-    r = call("/backup", blob.encode("utf-8"), timeout=120)
-    n = len(json.loads(blob)["files"])
-    st = {"at": datetime.now().strftime("%Y-%m-%d %H:%M"), "files": n, "size_kb": round(len(blob) / 1024)}
+    """.secrets の小さいファイル（*.json など。ブラウザのログイン状態と画面写真は除く）を見張り番へ。
+    暗号にするのは見張り番（鍵 BACKUP_KEY は Cloudflare の秘密の設定にだけある）。置き場所は R2（未有効なら KV）。"""
+    import base64
+    files = {p.name: base64.b64encode(p.read_bytes()).decode() for p in backup_files()}
+    r = call("/backup", {"files": files}, timeout=120)
+    st = {"at": datetime.now().strftime("%Y-%m-%d %H:%M"), "files": len(files), "store": r.get("store"), "size_kb": round(r.get("size", 0) / 1024)}
+    (ROOT / "state").mkdir(exist_ok=True)
     (ROOT / "state" / "backup.json").write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
-    log(f"バックアップ: {n} ファイルを暗号化して Cloudflare へ（{st['size_kb']} KB）")
+    log(f"バックアップ: {len(files)} ファイルを見張り番で暗号にして {r.get('store')} へ（{st['size_kb']} KB）")
     return bool(r.get("ok"))
 
 
 def restore(args):
-    """バックアップを開いて書き戻す。見張り番の合言葉が無い新しい PC では、wrangler（Cloudflare のログイン）で KV から取る。"""
-    import getpass
-    import guard_backup
+    """見張り番に暗号を解かせて、.secrets（--to で別の場所）に書き戻す。
+    新しい PC では: clone → npx wrangler login → python scripts/guard.py deploy（合言葉を作り直す。暗号の鍵はそのまま）→ restore"""
+    import base64
     to = Path(args[args.index("--to") + 1]) if "--to" in args else ROOT / ".secrets"
-    try:
-        blob = call("/backup?key=backup:latest", raw=True)
-    except Exception:
-        toml = (WORKER_DIR / "wrangler.toml").read_text(encoding="utf-8")
-        kv = re.search(r'id = "([0-9a-f]{32})"', toml).group(1)
-        rc, blob = wrangler("kv", "key", "get", "backup:latest", "--namespace-id", kv, "--remote", cwd=WORKER_DIR)
-        blob = blob[blob.index("{"):blob.rindex("}") + 1]
-    print(f"バックアップ（{json.loads(blob)['created']}・{len(json.loads(blob)['files'])} ファイル）を開きます")
-    files = guard_backup.open_blob(blob, getpass.getpass("合言葉: "))
+    d = call("/backup/restore" + (f"?key={args[args.index('--key') + 1]}" if "--key" in args else ""), b"", timeout=120)
     to.mkdir(parents=True, exist_ok=True)
-    for name, data in files.items():
-        (to / name).write_bytes(data)
+    for name, b64 in d["files"].items():
+        (to / name).write_bytes(base64.b64decode(b64))
         print(f"  {to / name}")
-    print("復元しました")
+    print(f"復元しました（{d['created']} のバックアップ・{len(d['files'])} ファイル）")
     return 0
 
 
@@ -405,25 +396,42 @@ def wrangler(*args, cwd=WORKER_DIR, input_text=None, check=True):
 
 
 def deploy():
+    """見張り番を設置・更新する。秘密の設定: GUARD_TOKEN（無ければ作る）・GH_TOKEN（gh のログインのトークン）・
+    BACKUP_KEY（無いときだけ作る。作り直すと古いバックアップが開けなくなるので、ある限り触らない。値は PC に残さない）。
+    R2 が使えるようになっていれば、バケット maf-guard-backup を作ってバックアップの置き場所を R2 にする。"""
+    import base64
+    import os
     import secrets as pysecrets
     cfg = jload(CFG, {})
     cfg.setdefault("token", pysecrets.token_urlsafe(32))
+    toml = WORKER_DIR / "wrangler.toml"
+    text = toml.read_text(encoding="utf-8")
+    if "BACKUP_R2" not in text:
+        rc, out = wrangler("r2", "bucket", "create", "maf-guard-backup", check=False)
+        if rc == 0 or "already exists" in out.lower():
+            text += '\n# バックアップの置き場所（R2）\n[[r2_buckets]]\nbinding = "BACKUP_R2"\nbucket_name = "maf-guard-backup"\n'
+            toml.write_text(text, encoding="utf-8", newline="\n")
+            print("R2 のバケット maf-guard-backup を使います")
+        else:
+            print("R2 はまだ使えません（Cloudflare の管理画面で R2 を有効にするまで、バックアップは KV に置きます）")
     _, out = wrangler("deploy")
     m = re.search(r"https://[\w.-]+\.workers\.dev", out)
     if m:
         cfg["url"] = m.group(0)
     CFG.write_text(json.dumps(cfg, indent=1) + "\n", encoding="utf-8")
+    _, names = wrangler("secret", "list", check=False)
     wrangler("secret", "put", "GUARD_TOKEN", input_text=cfg["token"])
-    mail = jload(MAIL, {})
-    if mail.get("password"):
-        for name, val in {"SMTP_HOST": mail["host"], "SMTP_PORT": str(mail["port"]), "SMTP_USER": mail["user"],
-                          "SMTP_PASS": mail["password"], "MAIL_FROM": mail["from"], "MAIL_TO": mail.get("to", TO)}.items():
-            wrangler("secret", "put", name, input_text=val)
-        print("メールの送信元を Cloudflare の秘密の設定に入れました")
+    tok = subprocess.run([gh_cmd(), "auth", "token"], capture_output=True, text=True).stdout.strip()
+    if tok:
+        wrangler("secret", "put", "GH_TOKEN", input_text=tok)
     else:
-        print("メールの送信元がまだありません（scripts/guard-setup.py の窓で入れたら、もう一度 deploy）")
+        print("gh のログインのトークンが取れませんでした（GH_TOKEN は前のまま）")
+    if '"BACKUP_KEY"' not in names:
+        wrangler("secret", "put", "BACKUP_KEY", input_text=base64.b64encode(os.urandom(32)).decode())
+        print("バックアップの暗号の鍵を作り、Cloudflare の秘密の設定にだけ入れました（PC には残していません）")
     # X の投稿係にも同じ合言葉を渡す（投稿の結果を見張り番に送るため）
     wrangler("secret", "put", "GUARD_TOKEN", cwd=ROOT / "workers" / "x-poster", input_text=cfg["token"])
+    shutil.rmtree(WORKER_DIR / ".wrangler", ignore_errors=True)
     print(f"見張り番を設置しました: {cfg.get('url')}（毎朝 7:30）")
     return 0
 
@@ -450,7 +458,7 @@ def main():
         print(r["subject"])
         print(r["body"])
         if r.get("mail"):
-            print("\n送信:", r["mail"])
+            print("\n知らせ:", r["mail"])
         return 0
     if cmd == "expect":   # 待つ合図の切り替え（例: expect pc1-mail on）
         print(call("/config", {"expect": {a[1]: a[2] == "on"}}))

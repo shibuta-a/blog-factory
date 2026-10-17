@@ -4,22 +4,26 @@
 //     boot-start / blog / note / xplan / boot-end … PC② の朝の実行（scripts/boot-run.py → scripts/guard.py）
 //     xpost                                       … X の各投稿（Cloudflare の maf-x-poster がサービス連携で送る）
 //     pc1-mail                                    … PC① の営業メール（今は待たない。KV の config.expect で切り替え）
-//   見張り: 毎朝 7:30（日本時間）にその日の合図がそろっているか確かめ、Gmail に1通送る
+//   見張り: 毎朝 7:30（日本時間）にその日の合図がそろっているか確かめ、1通知らせる
 //     そろっていれば「【OK】今朝のまとめ」、1つでも足りない・失敗があれば「【要対応】…」（要対応を先頭に、まとめも後ろに付ける）
 //     要対応を送った日に、あとから朝の実行が終わったら「【回復】」を送る
-//   X の投稿に失敗したら、その場で通知する（同じ投稿・同じ状態では1回だけ）
+//   X の投稿に失敗したら、その場で知らせる（同じ投稿・同じ状態では1回だけ）
 //
-// メールは maf-group.jp の送信サーバー（SMTP・465）から送る（PC① の営業メールと同じ送信元）。値は Cloudflare の秘密の設定:
-//   SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS / MAIL_FROM / MAIL_TO / GUARD_TOKEN（scripts/guard.py deploy が .secrets から入れる）
+// 知らせ方: GitHub の非公開リポジトリ shibuta-a/blog-factory-guard に repository_dispatch（guard-notify）を送る
+//   → そのリポジトリの Actions が Issue を作り @shibuta-a に割り当てる → GitHub の通知メールが登録メール（Gmail）に届く
+//   （自分のアカウントで作った Issue は自分に通知されないので、ボットに作らせる）
+// 秘密の設定（scripts/guard.py deploy が入れる）: GUARD_TOKEN（受け口の合言葉）/ GH_TOKEN（dispatch を送る GitHub のトークン）/
+//   BACKUP_KEY（.secrets のバックアップを暗号にする鍵。Cloudflare にだけある。PC には置かない）
 //
 //   POST /beat     {name, date?, ok, lines?, error?}        合図
-//   POST /notify   {subject, body}                          すぐにメール（PC からの通知・週の成績表）
+//   POST /notify   {subject, body}                          すぐに知らせる（PC からの通知・週の成績表）
 //   POST /check?date=YYYY-MM-DD&test=1&send=0              朝の見張りを今すぐ（test=1 は件名に【テスト】・send=0 は送らず中身を返す）
-//   POST /backup   （本文 = 暗号化済みバックアップ）        .secrets のバックアップを保存（最新＋日付ごとに4つ）
-//   GET  /backup?key=backup:latest                         バックアップを取り出す（復元用。中身は合言葉がないと開けない）
+//   POST /backup   {files: {名前: base64}}                   .secrets のバックアップ（ここで AES-256-GCM で暗号にして R2、R2 が無ければ KV に。最新＋日付ごとに4つ）
+//   GET  /backup/list                                       バックアップの一覧
+//   POST /backup/restore?key=backup:latest                  暗号を解いて {files} を返す（復元用）
 //   POST /config   {expect: {pc1-mail: true, ...}}          待つ合図の切り替え
 //   GET  /status                                            今日の合図・設定・最近の通知（合言葉が要る）
-import { connect } from "cloudflare:sockets";
+const NOTIFY_REPO = "shibuta-a/blog-factory-guard";
 
 const EXPECT_DEFAULT = { "boot-start": true, blog: true, note: true, xplan: true, "boot-end": true, "pc1-mail": false };
 const DAY_TTL = 60 * 60 * 24 * 45;
@@ -66,99 +70,28 @@ function authed(request, env) {
 }
 
 // ---------------------------------------------------------------------------
-// メール（SMTP over TLS）
+// 知らせ（GitHub の Issue → 通知メール）
 // ---------------------------------------------------------------------------
-function b64utf8(s) {
-  const u8 = new TextEncoder().encode(s);
-  let bin = "";
-  for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode(...u8.subarray(i, i + 0x8000));
-  return btoa(bin);
-}
-// 件名などのヘッダー用（RFC 2047。文字の途中で切らないように、40バイトずつの塊にする）
-function encodeWord(s) {
-  const parts = [];
-  let cur = "";
-  for (const ch of s) {
-    if (new TextEncoder().encode(cur + ch).length > 40) { parts.push(cur); cur = ""; }
-    cur += ch;
-  }
-  if (cur) parts.push(cur);
-  return parts.map((p) => `=?UTF-8?B?${b64utf8(p)}?=`).join("\r\n ");
-}
-function buildMessage(env, subject, body) {
-  const from = env.MAIL_FROM || env.SMTP_USER;
-  const b = b64utf8(body.replace(/\r?\n/g, "\r\n")).replace(/.{1,76}/g, "$&\r\n");
-  return [
-    `From: ${encodeWord("ブログ工場の見張り番")} <${from}>`,
-    `To: <${env.MAIL_TO}>`,
-    `Subject: ${encodeWord(subject)}`,
-    `Date: ${new Date().toUTCString().replace("GMT", "+0000")}`,
-    `Message-ID: <${crypto.randomUUID()}@${from.split("@")[1]}>`,
-    "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
-    "Content-Transfer-Encoding: base64",
-    "",
-    b,
-  ].join("\r\n");
+function labelOf(subject) {
+  if (subject.includes("【テスト】")) return "テスト";
+  const m = subject.match(/【(OK|要対応|回復|週報)】/);
+  return m ? m[1].replace("OK", "ok") : "info";
 }
 
-async function sendMail(env, subject, body) {
-  if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS || !env.MAIL_TO) throw new Error("メールの送信元が未設定です");
-  const port = Number(env.SMTP_PORT || 465);
-  const sock = connect({ hostname: env.SMTP_HOST, port }, { secureTransport: port === 465 ? "on" : "starttls", allowHalfOpen: false });
-  let s = sock;
-  let writer = s.writable.getWriter();
-  let reader = s.readable.getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  const read = async () => {           // 1つの応答（複数行なら最後の "NNN " まで）を読む
-    for (;;) {
-      const lines = buf.split("\r\n");
-      for (let i = 0; i < lines.length - 1; i++) {
-        if (/^\d{3} /.test(lines[i])) {
-          const resp = lines.slice(0, i + 1).join("\n");
-          buf = lines.slice(i + 1).join("\r\n");
-          return { code: Number(lines[i].slice(0, 3)), text: resp };
-        }
-      }
-      const { value, done } = await reader.read();
-      if (done) throw new Error("送信サーバーとの接続が切れました");
-      buf += dec.decode(value, { stream: true });
-    }
-  };
-  const cmd = async (line, ok) => {
-    if (line !== null) await writer.write(new TextEncoder().encode(line + "\r\n"));
-    const r = await read();
-    if (!ok.includes(r.code)) throw new Error(`SMTP ${line === null ? "接続" : line.split(" ")[0]}: ${r.text.slice(0, 200)}`);
-    return r;
-  };
-  try {
-    await cmd(null, [220]);
-    await cmd("EHLO maf-guard.workers.dev", [250]);
-    if (port !== 465) {
-      await cmd("STARTTLS", [220]);
-      writer.releaseLock();
-      reader.releaseLock();
-      s = s.startTls();
-      writer = s.writable.getWriter();
-      reader = s.readable.getReader();
-      await cmd("EHLO maf-guard.workers.dev", [250]);
-    }
-    await cmd("AUTH PLAIN " + b64utf8(`\0${env.SMTP_USER}\0${env.SMTP_PASS}`), [235]);
-    await cmd(`MAIL FROM:<${env.MAIL_FROM || env.SMTP_USER}>`, [250]);
-    await cmd(`RCPT TO:<${env.MAIL_TO}>`, [250, 251]);
-    await cmd("DATA", [354]);
-    const msg = buildMessage(env, subject, body).replace(/\r\n\./g, "\r\n..");
-    await cmd(msg + "\r\n.", [250]);
-    await cmd("QUIT", [221]).catch(() => {});
-  } finally {
-    try { await s.close(); } catch {}
-  }
+async function sendIssue(env, subject, body) {
+  if (!env.GH_TOKEN) throw new Error("GH_TOKEN が未設定です");
+  const r = await fetch(`https://api.github.com/repos/${NOTIFY_REPO}/dispatches`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.GH_TOKEN}`, Accept: "application/vnd.github+json", "User-Agent": "maf-guard",
+               "Content-Type": "application/json" },
+    body: JSON.stringify({ event_type: "guard-notify", client_payload: { title: subject, body: body.slice(0, 60000), label: labelOf(subject) } }),
+  });
+  if (r.status !== 204) throw new Error(`GitHub ${r.status}: ${(await r.text()).slice(0, 200)}`);
 }
 
 async function notify(env, subject, body) {
   try {
-    await sendMail(env, subject, body);
+    await sendIssue(env, subject, body);
     await addLog(env, `送信 ${subject}`);
     await env.GUARD.put("mail_last", JSON.stringify({ ok: true, at: jst(), subject }));
     return { ok: true };
@@ -168,6 +101,61 @@ async function notify(env, subject, body) {
     await env.GUARD.put("mail_last", JSON.stringify({ ok: false, at: jst(), subject, error: err }));
     return { ok: false, error: err };
   }
+}
+
+// ---------------------------------------------------------------------------
+// バックアップ（鍵 BACKUP_KEY は Cloudflare の秘密の設定にだけある）
+// ---------------------------------------------------------------------------
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+function bytesToB64(u8) {
+  let bin = "";
+  for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode(...u8.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+async function backupKey(env) {
+  if (!env.BACKUP_KEY) throw new Error("BACKUP_KEY が未設定です");
+  return crypto.subtle.importKey("raw", b64ToBytes(env.BACKUP_KEY), "AES-GCM", false, ["encrypt", "decrypt"]);
+}
+async function storePut(env, key, text) {
+  if (env.BACKUP_R2) await env.BACKUP_R2.put(key, text);
+  else await env.GUARD.put(key, text);
+}
+async function storeGet(env, key) {
+  if (env.BACKUP_R2) { const o = await env.BACKUP_R2.get(key); return o ? o.text() : null; }
+  return env.GUARD.get(key);
+}
+async function storeList(env) {
+  if (env.BACKUP_R2) return (await env.BACKUP_R2.list({ prefix: "backup:" })).objects.map((o) => o.key);
+  return (await env.GUARD.list({ prefix: "backup:" })).keys.map((k) => k.name);
+}
+async function storeDelete(env, key) {
+  if (env.BACKUP_R2) await env.BACKUP_R2.delete(key);
+  else await env.GUARD.delete(key);
+}
+async function backupSave(env, payload) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plain = new TextEncoder().encode(JSON.stringify(payload));
+  const enc = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await backupKey(env), plain));
+  const n = Object.keys(payload.files || {}).length;
+  const text = JSON.stringify({ v: 2, created: jst(), files: Object.keys(payload.files || {}), iv: bytesToB64(iv), data: bytesToB64(enc) });
+  await storePut(env, "backup:latest", text);
+  await storePut(env, `backup:${today()}`, text);
+  const dated = (await storeList(env)).filter((k) => /^backup:\d/.test(k)).sort();
+  for (const k of dated.slice(0, Math.max(0, dated.length - 4))) await storeDelete(env, k);
+  await addLog(env, `バックアップを保存（${n} ファイル・${env.BACKUP_R2 ? "R2" : "KV"}）`);
+  return { ok: true, store: env.BACKUP_R2 ? "R2" : "KV", files: n, size: text.length };
+}
+async function backupOpen(env, key) {
+  const text = await storeGet(env, key);
+  if (!text) return null;
+  const d = JSON.parse(text);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBytes(d.iv) }, await backupKey(env), b64ToBytes(d.data));
+  return { created: d.created, ...JSON.parse(new TextDecoder().decode(plain)) };
 }
 
 // ---------------------------------------------------------------------------
@@ -324,18 +312,14 @@ export default {
         return Response.json(r);
       }
       if (url.pathname === "/backup" && request.method === "POST") {
-        const text = await request.text();
-        const day = today();
-        await env.GUARD.put("backup:latest", text);
-        await env.GUARD.put(`backup:${day}`, text);
-        const old = (await env.GUARD.list({ prefix: "backup:2" })).keys.map((k) => k.name).sort();
-        for (const k of old.slice(0, Math.max(0, old.length - 4))) await env.GUARD.delete(k);
-        await addLog(env, `バックアップを保存（${Math.round(text.length / 1024)} KB）`);
-        return Response.json({ ok: true, size: text.length, kept: old.slice(-4) });
+        return Response.json(await backupSave(env, await request.json()));
       }
-      if (url.pathname === "/backup" && request.method === "GET") {
-        const v = await env.GUARD.get(url.searchParams.get("key") || "backup:latest");
-        return v ? new Response(v, { headers: { "Content-Type": "application/json" } }) : new Response("not found", { status: 404 });
+      if (url.pathname === "/backup/list") {
+        return Response.json({ store: env.BACKUP_R2 ? "R2" : "KV", keys: await storeList(env) });
+      }
+      if (url.pathname === "/backup/restore" && request.method === "POST") {
+        const d = await backupOpen(env, url.searchParams.get("key") || "backup:latest");
+        return d ? Response.json(d) : new Response("not found", { status: 404 });
       }
       if (url.pathname === "/config" && request.method === "POST") {
         const b = await request.json();
@@ -366,7 +350,7 @@ export default {
         const day = today();
         const [cfg, b, log, mail, rep] = await Promise.all([config(env), beats(env, day), kvJson(env, "log", []),
           kvJson(env, "mail_last", null), kvJson(env, `report:${day}`, null)]);
-        const bk = (await env.GUARD.list({ prefix: "backup:" })).keys.map((k) => k.name);
+        const bk = await storeList(env);
         return Response.json({ now: jst(), config: cfg, beats: b, report: rep, mail_last: mail, backups: bk, log: log.slice(-30) });
       }
     } catch (e) {

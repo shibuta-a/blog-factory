@@ -5,16 +5,16 @@
   python scripts/report.py collect        … 毎朝（boot-run.py の 6.5）: 取り込んで state/report/ に1日分ずつ保存
         ・A8（自動ログイン済み）: プログラム別（今月の imp・click・発生件数・発生金額・未確定）・確定（承認）・
           パラメータ計測（記事別。広告リンクの &id1=<記事の目印> は build.py が付ける）
-        ・閲覧数: Cloudflare Web Analytics（Pages の Web Analytics。GraphQL を wrangler のログインで読む）の前日分
-          （記事別・どこから来たか）＋ ?utm_source（ブログの門番 functions/_middleware.js が見張り番の KV に数える）
-        ・Search Console（.secrets/gsc-service-account.json のサービスアカウント）: 記事別の表示回数・クリック・順位・検索語
+        ・閲覧数: ブログの門番 functions/_middleware.js が Cloudflare の D1（maf-blog-stats の pv）に数えたものの前日分
+          （記事別・参照元・?utm_source）。Cloudflare Web Analytics は有効にするのに管理画面の操作が要るため、同じことを Cloudflare 側で数えている
+        ・Search Console（.secrets/gsc-service-account.json があるときだけ。2026-10-17 時点では外している）: 記事別の表示回数・クリック・順位・検索語
   python scripts/report.py weekly [--dry]  … 月曜の朝: 先週（月〜日）の成績表を Gmail へ（--dry は送らずに表示）
         ＋ 閲覧数の多い記事を data/ad-focus.json に書き、広告の見直しの優先に入れる（6-3）
   python scripts/report.py ctr-fix [--dry] … 月曜の朝: 表示が多いのにクリック率が低い記事を3本まで選び、タイトルと説明文を書き直して公開（6-2）
         記録は data/ctr-log.json。4週間後にクリック率を比べて成績表に載せる
   python scripts/report.py show [日付]     … 取り込んだ1日分を表示
 
-取り込めなかったもの（A8 のログイン切れ・Web Analytics が未設定・Search Console の鍵がない）は飛ばし、理由を logs/report.log に残す。
+取り込めなかったもの（A8 のログイン切れ・Search Console の鍵がない など）は飛ばし、理由を logs/report.log に残す。
 売上の数字は公開リポジトリ（GitHub）に上げない（state/ は .gitignore）。data/ に置くのは記事名・広告名・クリック率の記録だけ。
 """
 import base64
@@ -40,8 +40,6 @@ LOG = ROOT / "logs" / "report.log"
 SITE = json.loads((ROOT / "site.json").read_text(encoding="utf-8"))
 BASE_URL = SITE["base_url"].rstrip("/") + "/"
 HOST = urllib.parse.urlparse(BASE_URL).netloc
-ACCOUNT_ID = "b667b01130a77455fe8349c9982a969b"
-WRANGLER_CFG = Path.home() / "AppData" / "Roaming" / "xdg.config" / ".wrangler" / "config" / "default.toml"
 GSC_KEY = ROOT / ".secrets" / "gsc-service-account.json"
 CTR_LOG = ROOT / "data" / "ctr-log.json"
 AD_FOCUS = ROOT / "data" / "ad-focus.json"
@@ -152,46 +150,35 @@ def a8_collect():
 
 
 # ---------------------------------------------------------------------------
-# 閲覧数（Cloudflare Web Analytics）と ?utm_source
+# 閲覧数（Cloudflare の D1・maf-blog-stats。ブログの門番が数える）
 # ---------------------------------------------------------------------------
-def cf_token():
-    """wrangler のログイン（OAuth）のトークン。期限が近ければ wrangler に更新させる。"""
-    def read():
-        t = WRANGLER_CFG.read_text(encoding="utf-8")
-        tok = re.search(r'oauth_token\s*=\s*"([^"]+)"', t).group(1)
-        exp = re.search(r'expiration_time\s*=\s*"([^"]+)"', t).group(1)
-        return tok, datetime.fromisoformat(exp.replace("Z", "+00:00"))
-    tok, exp = read()
-    if (exp - datetime.now(exp.tzinfo)).total_seconds() < 300:
-        guard.wrangler("whoami", check=False)
-        tok, exp = read()
-    return tok
+STATS_DB = "maf-blog-stats"
 
 
-def cf_graphql(query):
-    req = urllib.request.Request("https://api.cloudflare.com/client/v4/graphql",
-                                 data=json.dumps({"query": query}).encode("utf-8"),
-                                 headers={"Authorization": f"Bearer {cf_token()}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        d = json.loads(r.read().decode("utf-8"))
-    if d.get("errors"):
-        raise RuntimeError(json.dumps(d["errors"], ensure_ascii=False)[:300])
-    return d["data"]["viewer"]["accounts"][0]
+def d1(sql):
+    rc, out = guard.wrangler("d1", "execute", STATS_DB, "--remote", "--json", "--command", sql, check=False)
+    shutil_rm()
+    if rc != 0:
+        raise RuntimeError(out.strip()[-300:])
+    return json.loads(out[out.index("["):])[0]["results"]
+
+
+def shutil_rm():
+    import shutil
+    shutil.rmtree(guard.WORKER_DIR / ".wrangler", ignore_errors=True)
 
 
 def views_collect(day):
-    """day（1日分）の閲覧数: 記事別と、どこから来たか（参照元のホスト）。"""
-    def q(dim):
-        return cf_graphql(f'''{{viewer{{accounts(filter:{{accountTag:"{ACCOUNT_ID}"}}){{
-          rumPageloadEventsAdaptiveGroups(limit:1000, filter:{{date:"{day}", requestHost:"{HOST}", bot:0}}){{
-            count sum{{visits}} dimensions{{{dim}}} }} }} }} }}''')["rumPageloadEventsAdaptiveGroups"]
-    pages = {g["dimensions"]["requestPath"]: {"views": g["count"], "visits": g["sum"]["visits"]} for g in q("requestPath")}
-    refs = {g["dimensions"]["refererHost"] or "（直接・不明）": g["count"] for g in q("refererHost")}
-    try:
-        utm = guard.call(f"/utm?from={day}&to={day}")
-    except Exception as e:
-        utm = {"_error": str(e)[:200]}
-    return {"pages": pages, "referers": refs, "utm": utm}
+    """day（1日分）の閲覧数: 記事別・参照元のホスト別・utm_source 別。"""
+    rows = d1(f"SELECT path, ref, src, n FROM pv WHERE day = '{day}'")
+    pages, refs, utm = defaultdict(lambda: {"views": 0}), defaultdict(int), {}
+    for r in rows:
+        pages[r["path"]]["views"] += r["n"]
+        refs[r["ref"] or "（直接・不明）"] += r["n"]
+        if r["src"]:
+            k = f"utm:{day}:{r['src']}:{r['path']}"
+            utm[k] = utm.get(k, 0) + r["n"]
+    return {"pages": dict(pages), "referers": dict(refs), "utm": utm}
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +249,7 @@ def collect():
     try:
         snap["views"] = {"date": str(yday), **views_collect(yday)}
         n = sum(v["views"] for v in snap["views"]["pages"].values())
-        log(f"閲覧数（{yday}）: {n} 回" + ("（Web Analytics にまだデータがありません。Cloudflare で Web Analytics を有効にしたか確認）" if n == 0 else ""))
+        log(f"閲覧数（{yday}）: {n} 回")
     except Exception as e:
         snap["views"] = {"error": f"{type(e).__name__}: {str(e)[:200]}"}
         log(f"閲覧数の取り込みに失敗: {snap['views']['error']}")
@@ -350,7 +337,7 @@ def weekly(dry=False):
     ppages, _, _, pdays = week_views(start - timedelta(days=7), end - timedelta(days=7))
     L.append(f"■ 閲覧数の多い記事 トップ5（合計 {sum(pages.values())} 回・{vdays} 日分）")
     top = [(s, n) for s, n in sorted(pages.items(), key=lambda x: -x[1]) if s in arts][:5]
-    L += [f"  {i}. {title(s)}　{n} 回" for i, (s, n) in enumerate(top, 1)] or ["  データなし（Cloudflare の Web Analytics が有効になると、翌日から入ります）"]
+    L += [f"  {i}. {title(s)}　{n} 回" for i, (s, n) in enumerate(top, 1)] or ["  データなし（閲覧数は 2026-10-17 から数え始めました）"]
 
     progs, how = a8_week(start, end)
     L += ["", f"■ クリック・発生の多い広告 トップ5（A8・{how}）"]
@@ -397,7 +384,7 @@ def weekly(dry=False):
         L += [f"  ・{title(slug_of_path(urllib.parse.urlparse(r['keys'][0]).path))[:34]}　表示 {int(r['impr'])}・クリック {int(r['clicks'])}・順位 {r['pos']:.1f}"
               for r in rows]
     else:
-        L.append("  データなし（Search Console の鍵を入れると、翌朝から入ります）")
+        L.append("  今は取り込んでいません（Search Console は外しています）")
 
     clog = jload(CTR_LOG, [])
     L += ["", "■ 検索結果のタイトル・説明文の書き直し"]
@@ -409,7 +396,7 @@ def weekly(dry=False):
     focus = jload(AD_FOCUS, {})
     if focus.get("slugs"):
         L += ["", "■ 報酬の高い広告を寄せた、読まれている記事", *[f"  ・{title(s)[:40]}" for s in focus["slugs"]]]
-    body = "\n".join(L) + "\n\n（ブログ工場・毎週月曜の朝に自動で送っています。数字の元: A8・Cloudflare Web Analytics・Search Console）"
+    body = "\n".join(L) + "\n\n（ブログ工場・毎週月曜の朝に自動で送っています。数字の元: A8・ブログの閲覧数（Cloudflare）・X/note のリンクの印）"
     subject = f"【週報】先週の成績表（{start:%m/%d}〜{end:%m/%d}）"
     if dry:
         print(subject + "\n\n" + body)

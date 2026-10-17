@@ -25,21 +25,9 @@ function notFound() {
     { status: 404, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } });
 }
 
-export async function onRequest(context) {
+async function handle(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
-
-  // どこから来たか（?utm_source=x / note）を数える。KV（見張り番と同じ maf-guard の KV・バインド名 STATS）の
-  // utm:<日付>:<来た所>:<パス> に足す。ロボットは数えない。scripts/report.py が見張り番の /utm から読んで成績表に載せる
-  const src = (url.searchParams.get("utm_source") || "").replace(/[^\w-]/g, "").slice(0, 20);
-  const ua = context.request.headers.get("user-agent") || "";
-  if (src && context.env.STATS && context.request.method === "GET" && !/bot|crawl|spider|preview|fetch|curl|python/i.test(ua)) {
-    const key = `utm:${nowJst().slice(0, 10)}:${src}:${path.replace(/\.html$/, "").slice(0, 80)}`;
-    context.waitUntil((async () => {
-      const n = Number((await context.env.STATS.get(key)) || 0);
-      await context.env.STATS.put(key, String(n + 1), { expirationTtl: 60 * 60 * 24 * 120 });
-    })().catch(() => {}));
-  }
 
   // 予約の一覧そのものは見せない
   if (path === "/_schedule.json" || path === "/_x_queue.json") return notFound();
@@ -78,5 +66,35 @@ export async function onRequest(context) {
     headers.set("cache-control", "no-store");
     return new Response(out.body, { status: out.status, headers });
   }
+  return res;
+}
+
+// 閲覧数を数える（Cloudflare Web Analytics の代わり。Web Analytics の有効化は管理画面の操作が要るため）。
+// D1（maf-blog-stats・バインド名 STATS_DB）の pv に、日付（日本時間）・パス・参照元のホスト・utm_source ごとに足す。
+// 数えるのは、表示できたページ（200 の HTML）を人のブラウザで開いたときだけ（ロボット・先読みは数えない）。
+// scripts/report.py が wrangler で読んで、週の成績表（閲覧数トップ5・X/note から来た人数・伸びているジャンル）にする
+const BOT = /bot|crawl|spider|slurp|preview|fetch|curl|wget|python|httpx|go-http|headless|lighthouse|monitor|facebookexternalhit|embedly|quora|pinterest|vkshare|whatsapp|discord|telegram|line-poker/i;
+
+function countView(context, res) {
+  const req = context.request;
+  const db = context.env.STATS_DB;
+  if (!db || req.method !== "GET" || res.status !== 200) return;
+  if (!(res.headers.get("content-type") || "").includes("text/html")) return;
+  const ua = req.headers.get("user-agent") || "";
+  if (!ua || BOT.test(ua) || /prefetch|prerender/i.test(req.headers.get("sec-purpose") || req.headers.get("purpose") || "")) return;
+  const url = new URL(req.url);
+  const path = (url.pathname.replace(/\.html$/, "").replace(/\/index$/, "/") || "/").slice(0, 120);
+  let ref = "";
+  try { ref = new URL(req.headers.get("referer") || "").hostname; } catch {}
+  if (ref === url.hostname) ref = "(site)";
+  const src = (url.searchParams.get("utm_source") || "").replace(/[^\w-]/g, "").slice(0, 20);
+  context.waitUntil(db.prepare(
+    "INSERT INTO pv (day, path, ref, src, n) VALUES (?1, ?2, ?3, ?4, 1) ON CONFLICT(day, path, ref, src) DO UPDATE SET n = n + 1"
+  ).bind(nowJst().slice(0, 10), path, ref.slice(0, 80), src).run().catch(() => {}));
+}
+
+export async function onRequest(context) {
+  const res = await handle(context);
+  try { countView(context, res); } catch {}
   return res;
 }
