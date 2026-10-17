@@ -69,16 +69,19 @@ edition: 2026-10
 - 分野：お金
 - 自動化の方法：家計簿アプリに口座とカードをつないで自動記帳
 - 道具の例：家計簿アプリ（例：マネーフォワード ME、Zaim。公式サイトで確認：2026-10-15）
+- 詳しく：ブログの記事で、道具の選び方までまとめています https://blog-factory-cf7.pages.dev/jidouka-03-kakeibo-gijiroku-keihi?utm_source=note-rank
 
 ### 8位　会議の議事録
 - 分野：会社員
 - 自動化の方法：文字起こしAIで録音から議事録まで自動作成
 - 道具の例：文字起こしAI（例：Notta、Plaud（Plaud Note / Plaud NotePin など）、Zenchord 1（Notta 搭載AI議事録イヤホン）。公式サイトで確認：2026-10-15）
+- 詳しく：ブログの記事で、道具の選び方までまとめています https://blog-factory-cf7.pages.dev/jidouka-03-kakeibo-gijiroku-keihi?utm_source=note-rank
 
 ### 9位　経費精算
 - 分野：会社員
 - 自動化の方法：領収書をスマホで撮るだけで読み取り・申請
 - 道具の例：経費精算ソフト（例：マネーフォワード クラウド経費、freee会計（個人事業主向け）。公式サイトで確認：2026-10-15）
+- 詳しく：ブログの記事で、道具の選び方までまとめています https://blog-factory-cf7.pages.dev/jidouka-03-kakeibo-gijiroku-keihi?utm_source=note-rank
 
 ### 10位　確定申告（事業）
 - 分野：個人事業主

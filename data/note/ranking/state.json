@@ -1,17 +1,16 @@
 {
  "edition": "2026-10",
  "title": "自動化ランキング100 完全版（2026年10月版）",
- "free_chars": 2838,
+ "free_chars": 3186,
  "paid_chars": 12264,
  "price": 300,
  "price_log": [],
  "draft_key": "nddd2c76b3cd6",
  "draft_url": "https://editor.note.com/notes/nddd2c76b3cd6/edit/",
- "draft_saved_at": "2026-10-17 19:59",
+ "draft_saved_at": "2026-10-18 04:31",
  "draft_edition": "2026-10",
- "draft_digest": "fe63e9809d0825c351917d12061343990b558c9c",
- "last_error": "2026-10-17 20:00 TimeoutError: Locator.click: Timeout 30000ms exceeded.\nCall log:\nwaiting for locator(\"[role=\\\"dialog\\\"]\").get_by_role(\"button\", name=\"キャンセル\").first\n",
+ "draft_digest": "57761a92ed9d1a95392bf64a4e8d964dbf85eed9",
  "status": "draft",
  "reason": "note で有料記事を売るには、最初に本人情報（氏名・住所）の登録が必要です（公開設定で「有料」を選ぶと「本人情報の入力」が出ます）。勝手に入力しないため、下書きで止めています",
- "checked_at": "2026-10-17 20:00"
+ "checked_at": "2026-10-18 04:31"
 }
