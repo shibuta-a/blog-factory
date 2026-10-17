@@ -287,7 +287,7 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
 
 ## note・X への自動展開（2026-10-12〜・指示書⑨）
 
-> X の部分（x_text・Cloudflare Workers・xpost.py）は 2026-10-15 に中止。いまの X は下の「X（X API・GitHub Actions）」を見る。
+> この節の X の部分（x_text・_x_queue.json）は 2026-10-15 に中止。いまの X は下の「X（X API・Cloudflare Workers）」を見る。
 
 ```
 毎朝の自動実行（boot-run.py）
@@ -320,36 +320,40 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
   オリシャン（本業）への案内は orishan ジャンルの記事の note 版だけ（ブログ側はトップ固定枠・各記事の誘導ボックスで既に出ている）
 - note の画面が変わって投稿に失敗したら、`logs/note.log` と `.secrets/shots/note-error-*.png` を見て `scripts/note-run.py` の `post_to_note` を直す
 
-## X（X API・GitHub Actions・2026-10-16〜）
+## X（X API・Cloudflare Workers・2026-10-17〜）
 
-X（@maf_media_jp）はブラウザ操作をやめ、X API（公式・従量課金）で投稿する。x_browser.py / x-run.py のログインは使わない（X がブラウザからのログインを断ったため）。
+X（@maf_media_jp）は X API（公式・従量課金）で投稿する。投稿の主役は Cloudflare Workers の定期実行（5分おき）。
+GitHub Actions の待ち番（x-post.yml / x-actions.py）は 2026-10-17 にやめた（GitHub の cron が動かない日があったため）。ブラウザでの X ログインも使わない。
 
 ```
 毎朝の自動実行（boot-run.py の 5.）
   scripts/x-plan.py … その日の投稿（本文・カード画像・投稿予定時刻）を作る → data/x-queue/<日付>.json と data/x-queue/img/ → GitHub
      文面は Claude Code（claude -p・scripts/x-prompt.md）が書き、禁止語・長さ・過去との重複をプログラムが確かめる（3回まで書き直し）
      実話として書いてよいのは data/x-facts.md と jidouka-ranking.json の根拠「自社の実例」だけ
+     作る前に Cloudflare の投稿の記録を data/x.json に写す（xpost.py sync → 今月の概算費用・クレジット切れ）
 
 日中（PC は切れていてよい）
-  GitHub Actions .github/workflows/x-post.yml → scripts/x-actions.py --loop
-     朝の x-plan.py が予定表を送ったあとに1回起動 →「今日の次の投稿の時刻まで待って出す」をくり返す（5時間半で自分を起動し直して引き継ぐ）
-     cron（30分おき）は保険。GitHub の cron は動き出しが遅れる・動かないことがある（2026-10-16 に作成後1時間以上動かなかった）
-     今日の予定表から時刻が来た投稿を1件 → （リンク付きは記事が 200 で表示されるのを確かめて）画像アップロード → 投稿 → data/x.json に記録
+  Cloudflare Workers の maf-x-poster（workers/x-poster/worker.js・cron */5）
+     GitHub（raw.githubusercontent.com）の今日の予定表を読む → 時刻が来た未投稿を1件（前の投稿から60分あける）
+     → リンク付きは記事が 200 で表示されるのを確かめる → KV に「送信中」の印 → 画像アップロード → 投稿 → KV に記録
 ```
 
 | もの | 場所 |
 |---|---|
 | 設定（開始日・件数・時間帯・単価・月の上限） | `data/social.json` の `x_api` |
-| キー | `.secrets/x-api.json`（`python scripts/x-keys.py` の窓で1回だけ貼る）＋ GitHub の Secrets（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET・同じスクリプトが gh で登録） |
-| 予定表 | `data/x-queue/<日付>.json`（通し確認は `rehearsal-<日付>.json`。Actions は読まない） |
-| 投稿の記録・月ごとの件数と概算費用・クレジット切れ | `data/x.json`（Actions だけが書く） |
-| ログ | `logs/x-plan.log`（朝）・GitHub の Actions の x-post の実行記録（投稿） |
+| キー | `.secrets/x-api.json`（`python scripts/x-keys.py` の窓で1回だけ貼る）→ Cloudflare の秘密の設定（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET・ADMIN_TOKEN）。GitHub には置かない |
+| 投稿係 | `workers/x-poster/`（設置・更新・キーの入れ直しは `python scripts/xpost.py deploy`）。URL と ADMIN_TOKEN は `.secrets/x-worker.json` |
+| 予定表 | `data/x-queue/<日付>.json`（投稿係が読むのはこの名前だけ。通し確認用の `rehearsal-*`・`test-*` は読まない） |
+| 二重投稿の防止 | KV（x-poster-posted）の items：送る前に「送信中」を書き、印のある投稿は二度と送らない（送信中のまま残ったものも、出たか分からないので送らない）。data/x.json に載っている投稿も投稿済み扱い |
+| 投稿の記録・月ごとの件数と概算費用・クレジット切れ | Cloudflare の KV → 朝に `data/x.json` に写す |
+| ログ | `logs/x-plan.log`（朝）・`python scripts/xpost.py status`（投稿係の最後の実行と最近の記録） |
 
 - **件数と時刻**：start（1日目）から10日目までは1日2件（7:00〜22:00 のばらばら・3時間以上あける）。11日目から1日3件（朝 7:00〜9:00・昼 11:30〜13:30・夜 18:00〜21:30）
 - **中身**：リンク＋カード画像付きは1日1件（その日の自動化記事の紹介・水曜はオリシャン）。記事の公開予定時刻の20分後以降に置き、間に合わなければ公開済みの最新記事を紹介。残りは文章だけ（小ワザ・ひと言・つまずいた話）。リンクは `?utm_source=x`
-- **費用**：単価は social.json（文章だけ $0.015・リンク付き $0.20）。月の概算が `budget_usd_month`（$10）を超えそうなら朝の x-plan.py が文章だけの投稿を減らす。残高切れ（402）は STATUS.md の先頭に出て、足せば次の回から自動で再開
-- **コマンド**：`python scripts/x-plan.py show [日付]`（予定）／`python scripts/x-keys.py check`（認証確認・投稿しない）／`secrets`（GitHub に入れ直す）／`profile`（プロフィールを API で設定）
-- **通し確認**：`BLOG_REHEARSAL=1 python scripts/x-plan.py --date <明日>` → `python scripts/x-actions.py --dry-run --now <明日>T23:59 --queue data/x-queue/rehearsal-<明日>.json`（API に送る直前で止まる）。GitHub 上では Actions → x-post → Run workflow（dry_run=true）
+- **失敗したとき**：混雑・一時的なエラー（429・5xx・通信）と残高切れ（402）は次の回に再試行（6回まで）。それ以外はその投稿をやめる。残高切れは朝の sync で STATUS.md の先頭に出る
+- **費用**：単価は social.json（文章だけ $0.015・リンク付き $0.20）。月の概算が `budget_usd_month`（$10）を超えそうなら朝の x-plan.py が文章だけの投稿を減らす。Cloudflare は無料枠内（cron 288回/日・KV 書き込み 約300回/日）
+- **コマンド**：`python scripts/x-plan.py show [日付]`（予定）／`python scripts/xpost.py status`（投稿係）／`sync`（記録を data/x.json へ）／`check`（認証確認・投稿しない）／`python scripts/x-keys.py secrets`（キーを Cloudflare に入れ直す）／`profile`（プロフィールを API で設定）
+- **通し確認**：予定表（例 `data/x-queue/test-2026-10-17.json`）を GitHub に置いて `python scripts/xpost.py dry-run --queue data/x-queue/test-2026-10-17.json --now 2026-10-17T23:59`。本物の Cloudflare 上で、予定表と画像の読み込み・記事の 200 確認・認証・KV の印の書き込み・送る中身と署名づくりまで行い、X API に送る直前で止まる
 - 固定投稿は X API に機能がないため設定していない
 
 ## note のコメント返信（2026-10-16〜）

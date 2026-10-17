@@ -4,7 +4,8 @@
 //   2. 時刻が来ていて、まだ出していない投稿を1件だけ選ぶ（前の投稿から60分はあける）
 //   3. リンク付きは記事のページが表示される（200）ことを確かめる
 //   4. 二重投稿を防ぐため、X に送る前に KV（POSTED）に「送信中」の印を付ける。印がある投稿は二度と送らない
-//   5. 画像があれば /2/media/upload（multipart）→ /2/tweets → 結果を KV に記録
+//      GitHub の data/x.json（GitHub Actions 時代の記録・朝に写した記録）に載っている投稿も「投稿済み」として扱う
+//   5. 画像があれば /2/media/upload（JSON・base64。10/16 に実績のある形）→ /2/tweets → 結果を KV に記録
 //
 // キーは Cloudflare の秘密の設定（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET / ADMIN_TOKEN）。GitHub には置かない。
 //   GET  /status                        … 最後の実行・今月の件数と概算費用・クレジット切れ・最近の記録（だれでも見られる。キーは出ない）
@@ -82,9 +83,22 @@ async function loadQueue(path) {
   return await r.json();
 }
 
+// GitHub の data/x.json に記録済みの投稿（id → posted_at）。読めなければ空（KV の印だけで判定する）
+async function githubPosted() {
+  try {
+    const r = await fetch(`${REPO_RAW}data/x.json?t=${Date.now()}`, { cf: { cacheTtl: 0 } });
+    if (!r.ok) return {};
+    return Object.fromEntries(((await r.json()).posts || []).map((p) => [p.id, p.posted_at]));
+  } catch {
+    return {};
+  }
+}
+
 // 本番と通し確認で共通の判定。投稿する1件（なければ null）と説明を返す
 async function pick(env, queue, now) {
   const states = await kvJson(env, "items", {});      // id → {state: posting|posted|failed|retry, ...}
+  const gh = await githubPosted();
+  for (const [id, at] of Object.entries(gh)) if (!states[id]) states[id] = { state: "posted", at, from: "data/x.json" };
   const lines = [];
   for (const it of queue.items || []) {
     const st = states[it.id]?.state;
@@ -93,7 +107,7 @@ async function pick(env, queue, now) {
   const due = (queue.items || []).filter((it) => it.at <= now && (!states[it.id] || states[it.id].state === "retry"))
     .sort((a, b) => (a.at < b.at ? -1 : 1));
   if (!due.length) return { it: null, msg: "時刻が来た未投稿の投稿はありません", lines };
-  const last = await env.POSTED.get("last_posted_at");
+  const last = [await env.POSTED.get("last_posted_at"), ...Object.values(gh)].filter(Boolean).sort().pop();
   if (last && minutesBetween(last, now) < MIN_GAP_MIN) return { it: null, msg: `前の投稿（${last}）から${MIN_GAP_MIN}分たっていないので次の回に`, lines };
   const it = due[0];
   if (it.check_url) {
@@ -108,6 +122,17 @@ async function loadImage(it) {
   const r = await fetch(`${REPO_RAW}${it.image}?t=${Date.now()}`);
   if (!r.ok) throw new Error(`画像を読めません（${r.status} ${it.image}）`);
   return await r.arrayBuffer();
+}
+
+function toBase64(buf) {
+  const u8 = new Uint8Array(buf);
+  let s = "";
+  for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode(...u8.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+function uploadBody(img) {
+  return JSON.stringify({ media: toBase64(img), media_category: "tweet_image" });
 }
 
 async function run(env, nowOverride) {
@@ -136,11 +161,7 @@ async function run(env, nowOverride) {
   let mediaIds;
   const img = await loadImage(it);
   if (img) {
-    const url = "https://api.x.com/2/media/upload";
-    const form = new FormData();
-    form.append("media", new Blob([img], { type: "image/png" }), "card.png");
-    form.append("media_category", "tweet_image");
-    const r = await xFetch(env, "POST", url, form);        // multipart の中身は OAuth 1.0a の署名に含めない
+    const r = await xFetch(env, "POST", "https://api.x.com/2/media/upload", uploadBody(img), "application/json");
     const id = r.data?.data?.id;
     if (!id) return await fail("画像のアップロード", r);
     mediaIds = [id];
@@ -178,7 +199,22 @@ async function dryRun(env, url) {
   if (img) out.push(`画像: ${it.image}（${Math.round(img.byteLength / 1024)} KB）を GitHub から読み込みました`);
   const me = await xFetch(env, "GET", "https://api.x.com/2/users/me");
   out.push(`認証の確認: ${me.code === 200 ? "OK @" + me.data.data.username : "NG " + me.code + " " + JSON.stringify(me.data).slice(0, 200)}`);
-  out.push(`通し確認のため、ここで止めます（本番はこの次に KV に「送信中」を書き、${img ? "POST /2/media/upload → " : ""}POST /2/tweets を送ります）`);
+  // 「送信中」の印を書けるか（本番の印とは別のキーに書いて読み戻し、消す）
+  const mark = JSON.stringify({ state: "posting", at: now, id: it.id });
+  await env.POSTED.put("dry_run_mark", mark);
+  const back = await env.POSTED.get("dry_run_mark");
+  await env.POSTED.delete("dry_run_mark");
+  out.push(`KV に「送信中」の印を書いて読み戻せました: ${back === mark ? "OK" : "NG"}`);
+  // X に送る中身と署名を作る（送らない）
+  if (img) {
+    const b = uploadBody(img);
+    await oauthHeader("POST", "https://api.x.com/2/media/upload", env);
+    out.push(`送る直前: POST /2/media/upload（JSON ${Math.round(b.length / 1024)} KB・署名済み）`);
+  }
+  const tb = JSON.stringify({ text: it.text, ...(img ? { media: { media_ids: ["<画像のID>"] } } : {}) });
+  await oauthHeader("POST", "https://api.x.com/2/tweets", env);
+  out.push(`送る直前: POST /2/tweets（${tb.length} 文字の JSON・署名済み）`);
+  out.push("通し確認のため、ここで止めます（X には送っていません）");
   return out;
 }
 
