@@ -662,5 +662,37 @@
    "landing_url": "https://stocksnap.io/photo/blue-dishwasher-D0L4ZG5KZI",
    "openverse_id": "b222c7c5-2450-4271-9199-e2d06bb668c4"
   }
+ },
+ "jidouka-03-kakeibo-gijiroku-keihi": {
+  "eyecatch": {
+   "file": "img/jidouka-03-kakeibo-gijiroku-keihi/eyecatch.jpg",
+   "query": "receipt notebook",
+   "title": "Receipt Ticket",
+   "creator": "",
+   "license": "CC0",
+   "source": "rawpixel",
+   "landing_url": "https://www.rawpixel.com/image/9492426/receipt-ticket",
+   "openverse_id": "8b1a11f7-d082-4d45-ad76-c66d3e04b203"
+  },
+  "body-1": {
+   "file": "img/jidouka-03-kakeibo-gijiroku-keihi/body-1.jpg",
+   "query": "smartphone finance",
+   "title": "Business Office",
+   "creator": "Wilfred Iven",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/business-office-FY58O0P400",
+   "openverse_id": "4945c3ad-d60c-451c-a557-5d1daf0331e2"
+  },
+  "body-2": {
+   "file": "img/jidouka-03-kakeibo-gijiroku-keihi/body-2.jpg",
+   "query": "meeting room",
+   "title": "Meeting Room",
+   "creator": "Raphael Schaller",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/meeting-room-NEB7S4QC8G",
+   "openverse_id": "67d4d50e-858c-4243-9af9-f8335ebe4f4d"
+  }
  }
 }
