@@ -1,0 +1,10 @@
+# 自動化いきもの診断の「出た数」を数える係（診断専用。scripts/shindan.py deploy が設置する）
+name = "maf-shindan"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "maf-shindan"
+database_id = "f1c29c49-b89f-4eec-90f4-3366bf46af58"

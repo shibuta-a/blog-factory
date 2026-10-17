@@ -31,6 +31,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import affiliate  # noqa: E402  記事の内容に合わせた広告の自動差し込み
+import shindan  # noqa: E402  自動化いきもの診断（/shindan/）
 import social  # noqa: E402  note・X への自動展開（X のポスト文・note 記事へのリンク）
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -422,6 +423,11 @@ CONSULT_BOX = (
     '</ul><p>お金を払う前、個人情報を伝える前に、ひとりで決めずに相談してください。</p></div>')
 
 
+SHINDAN_NAV = '<a class="shindan-nav" href="{root}shindan/">自動化いきもの診断</a>'
+SHINDAN_BOX = ('\n<p class="shindan-link"><a href="/shindan/">自動化いきもの診断をやってみる</a>'
+               '<span>12問で、あなたの「自動化のクセ」に似た生き物がわかります（実在する約100種から）。</span></p>')
+
+
 def load_genres():
     f = ROOT / "data" / "genres.json"
     g = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
@@ -562,6 +568,8 @@ def main():
             if note_url:
                 body += ('\n<p class="note-link">この記事の要点を、別の切り口で短くまとめたものを '
                          f'<a href="{html.escape(note_url, quote=True)}" target="_blank" rel="noopener">note</a> にも載せています。</p>')
+            if meta.get("genre") == "jidouka" and is_default:  # 自動化記事の最後に、自動化いきもの診断への案内
+                body += SHINDAN_BOX
             if own and gconf.get("disclaimer"):
                 body += f'\n<p class="pr-notice own-disclaimer">{html.escape(gconf["disclaimer"])}</p>'
             # 楽天市場の商品リンク（注意喚起・自社サービスのジャンルには入れない。images: none のジャンルは商品画像も出さない）
@@ -595,7 +603,7 @@ def main():
                 "title": html.escape(title), "description": html.escape(description),
                 "date": html.escape(date), "updated": updated_html, "toc": build_toc(headings), "body": body,
                 "eyecatch": eyecatch, "cta_top": cta_top, "og_image": og_tags, "photo_credit": photo_credit(imgs),
-                "featured_nav": feat.get("featured_nav", ""),
+                "featured_nav": SHINDAN_NAV.format(root=root) + feat.get("featured_nav", ""),
                 "featured_box": "" if slug == feat.get("slug") or caution or own else feat.get("featured_box", ""),
             })
             (out_dir / f"{slug}.html").write_text(page, encoding="utf-8")
@@ -637,11 +645,18 @@ def main():
             **L, **slots,
             "lang": lang, "root": root, "lang_path": lang_path, "year": year,
             "posts": items, "lang_switch": switch,
-            "featured_nav": feat.get("featured_nav", ""), "featured_hero": feat.get("featured_hero", ""),
+            "featured_nav": SHINDAN_NAV.format(root=root) + feat.get("featured_nav", ""),
+            "featured_hero": feat.get("featured_hero", ""),
         })
         (out_dir / "index.html").write_text(index, encoding="utf-8")
         sitemap_urls.append((url_prefix, max([p["date"] for p in posts if p["slug"] not in schedule] or [today])))
         print(f"[{lang}] {len(posts)} 記事")
+
+    # 自動化いきもの診断（/shindan/）
+    try:
+        sitemap_urls += shindan.build(PUBLIC, programs, base_url)
+    except Exception as e:  # 診断が作れなくても、ブログの公開は止めない
+        print(f"診断のページを作れませんでした: {e}")
 
     if base_url:
         xml = ['<?xml version="1.0" encoding="UTF-8"?>',
@@ -662,7 +677,8 @@ def main():
     # 予約公開の一覧と、門番（functions/_middleware.js）を動かすURLの範囲（Cloudflare Pages が読む）
     (PUBLIC / "_schedule.json").write_text(json.dumps(schedule, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     (PUBLIC / "_routes.json").write_text(json.dumps(
-        {"version": 1, "include": ["/*"], "exclude": ["/assets/*", "/img/*", "/robots.txt"]}, indent=1) + "\n", encoding="utf-8")
+        {"version": 1, "include": ["/*"], "exclude": ["/assets/*", "/img/*", "/robots.txt", "/shindan/img/*", "/shindan/share/*",
+                                         "/shindan/*.js", "/shindan/*.css"]}, indent=1) + "\n", encoding="utf-8")
     # X への自動ポストの予定表（Cloudflare の workers/x-poster が GitHub から読み、公開時刻が来た記事を1件ずつポストする）
     xc = social_cfg.get("x", {})
     # 2026-10-15 X API は中止（enabled: false）。予定表は空にする（note の X 連携では記事が自動で X に出ないことを 2026-10-15 に確認。X の投稿方式は未定）

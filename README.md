@@ -433,3 +433,22 @@ X の投稿係 maf-x-poster ── 各投稿の結果 ──> 見張り番（失
 - **読まれている記事に稼げる広告を寄せる**: 成績表のとき閲覧数トップ5を `data/ad-focus.json` へ → `affiliate.pick` がその記事では「よく合う広告（いちばん合う広告の半分以上の点）」の中で報酬の目安（`reward_yen`）の高い順に出す。合わない広告（点0）は入れない。本文の印や `affiliates:` で広告を決めている記事は見直しの優先（`data/refresh-priority.json`）に入れて Claude が置き直す
 - **新しく承認された広告**: 広告を自動で選ぶ記事はビルドで自動的に入る。印・`affiliates:` で決めている記事（自動化記事など）は、`autopilot.py sync` が合う記事を見直しの優先に入れる
 - **選び方と比較のまとめ記事**（月2本まで・10日以上あけて・同じジャンルは半年に1回）: 提携中の広告が3つ以上あるジャンルから、個別記事が多いジャンルを選び、その日の通常記事と入れ替えて書く（`autopilot.py next` が案内・型 `templates/kata/matome.md`・公式サイトで確かめたことだけ・関連記事へ内部リンク・記録 `data/matome.json`）
+
+## 自動化いきもの診断（/shindan/・2026-10-17〜）
+
+https://blog-factory-cf7.pages.dev/shindan/ 。12問に答えると、その人の「自動化のクセ」に合う実在の生き物（100種）が出るお遊びの診断。個人の情報は集めない。
+
+| もの | 場所 |
+|---|---|
+| ページを作る（build.py が毎回呼ぶ・標準ライブラリだけ） | `scripts/shindan.py`（質問・8つの型・ハマる自動化の選び方）・`templates/shindan/`（app.js・app.css） |
+| 生き物 100種 | `data/shindan-species.json`（特徴ごとに出典 URL と本文の引用・写真の撮影者/ライセンス/元の URL） |
+| 写真・シェア画像 | `static/shindan/img/`（Wikimedia Commons の PD・CC0・CC BY・CC BY-SA だけ。縮小）・`static/shindan/share/`（1200×630） |
+| レア度を数える係 | 診断専用の Worker `workers/shindan`（maf-shindan）と D1 `maf-shindan`。送るのは出た生き物の id だけ |
+| 楽天の商品 | `data/shindan-rakuten.json`（「楽天で可」の自動化ごとに1つ） |
+
+- 型: 自分でやる/任せる × 計画/その場 × 慎重/新しもの好き。型の中は 面倒くさがり度（3段）× 仕事/暮らし × ひとり/みんな の12マスに1種。面倒くさがり度がとても高い人には、4つの型でレア枠の種
+- 結果ページ `/shindan/r/<id>.html?a=<回答>`: 回答の計算はブラウザの中だけ。面倒くさがり度・多い面倒（自動化ランキングの順位）は回答から出す。レア度は実際の結果が 300 人に届くまでは、ランダム1万回の割合
+- 図鑑 `/shindan/zukan.html`: 出会った生き物は、そのブラウザの localStorage にだけ記録
+- 広告は「提携済み」（A8・id1 は shindan）と「楽天で可」だけ・PR表記つき。note の有料記事は公開されたら自動で案内に入る
+- 入口: ブログのヘッダー・自動化記事（genre: jidouka）の最後
+- 作り直し: `python scripts/shindan_tools.py check`（引用が出典の本文にあるか・ライセンス）→ `python scripts/shindan.py sim`・`share`・`deploy`・`licenses`

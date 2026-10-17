@@ -1,0 +1,4797 @@
+{
+ "_about": "自動化いきもの診断（/shindan/）の生き物。facts の quote は source（百科事典）の本文にある文。photo は Wikimedia Commons の写真（PD・CC0・CC BY・CC BY-SA だけ）。scripts/shindan.py・scripts/shindan_tools.py",
+ "updated": "2026-10-17",
+ "replaced": [
+  {
+   "from": "ハキリアリ",
+   "to": "ブチハイエナ",
+   "reason": "ハキリアリはハキリアリ属・ヒメハキリアリ属の2属約32種の総称で、具体的な1種の和名・学名にできないため（日本語版の記事も総称の記事）。予備の先頭のブチハイエナにし、単独やペアでも暮らす地域がある種として solo のマスに置いた。",
+   "type": "MPN"
+  },
+  {
+   "from": "タツノオトシゴ",
+   "to": "ウミイグアナ",
+   "reason": "種タツノオトシゴ（Hippocampus coronatus）そのものがはっきり写った、ライセンス条件に合う生きた個体の写真が見つからなかった（候補は別種か論文の標本図のみ）ため、予備のウミイグアナに入れ替えた。",
+   "type": "SIC"
+  },
+  {
+   "from": "コガラ",
+   "to": "ヤマガラ",
+   "reason": "コガラは出典本文（日本語版・英語版とも）で食べ物をためる習性を確かめられず、準備ためこみ屋の特徴が書けないため。ヤマガラは日本語版で貯食が確かめられる。",
+   "type": "SPC"
+  },
+  {
+   "from": "アズマモグラ",
+   "to": "イワツバメ",
+   "reason": "条件に合う写真が博物館の展示（標本）しかなく、生きている個体の写真が見つからなかったため。",
+   "type": "SPN"
+  }
+ ],
+ "species": [
+  {
+   "id": "siberian-chipmunk",
+   "name": "シベリアシマリス",
+   "sci": "Eutamias sibiricus",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "地下の巣穴は、寝る部屋と食料庫、トイレ用の小さな部屋に分かれていることが多い。",
+     "quote": "通常、巣穴は巣と食料庫の2つの大きな部屋と、トイレとして使用される小さな部屋で構成される。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%99%E3%83%AA%E3%82%A2%E3%82%B7%E3%83%9E%E3%83%AA%E3%82%B9"
+    },
+    {
+     "text": "8月を過ぎると冬に備えて食べ物をため始め、その量はふつう3〜4kgにもなる。",
+     "quote": "8月以降は冬に備えて食料を蓄え、貯蔵量は通常3～4kgになる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%99%E3%83%AA%E3%82%A2%E3%82%B7%E3%83%9E%E3%83%AA%E3%82%B9"
+    },
+    {
+     "text": "冬は冬眠しながら数週間ごとに目を覚まし、巣穴にためておいた食べ物を食べる。",
+     "quote": "冬には冬眠状態に入り、数週間ごとに目を覚まして巣穴に蓄えた食料を食べる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%99%E3%83%AA%E3%82%A2%E3%82%B7%E3%83%9E%E3%83%AA%E3%82%B9"
+    }
+   ],
+   "likeness": "巣穴の中を寝室と食料庫に分けておくように、ファイルやひな形を置き場ごとにきちんと整理して、必要なときにすぐ取り出せるようにしておくのが得意。",
+   "aruaru": [
+    "フォルダ分けが細かくて、自分だけは絶対に迷わない",
+    "「いつか使う」ひな形が、気づけば数十個ある",
+    "忙しくなる前に、こっそり準備を済ませている"
+   ],
+   "catch": "食料庫つきの巣穴で、冬もあわてない",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/siberian-chipmunk.jpg",
+    "commons": "File:Tamias sibiricus (eating a4).JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Tamias_sibiricus_(eating_a4).JPG",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%99%E3%83%AA%E3%82%A2%E3%82%B7%E3%83%9E%E3%83%AA%E3%82%B9"
+   ]
+  },
+  {
+   "id": "eurasian-jay",
+   "name": "カケス",
+   "sci": "Garrulus glandarius",
+   "group": "鳥類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "カシやナラ、クリの実を、地面や樹皮のすき間など決まった場所にためておく習性がある。",
+     "quote": "カシ、ナラ、クリの実を地面や樹皮の間等の一定の場所に蓄える習性がある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%B1%E3%82%B9"
+    },
+    {
+     "text": "ためた場所に戻らないこともあり、そのおかげで森がよみがえる助けになっている。",
+     "quote": "しかし貯蓄場所に戻らないこともあり、それが森の再生に重要な役割を果たしている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%B1%E3%82%B9"
+    },
+    {
+     "text": "ほかの鳥の声や物音のまねが上手で、林業のチェーンソーの音を再現することもある。",
+     "quote": "林業のチェーンソーや枝打ち、木を倒す時の作業音を「ジェージェー」の間奏を入れつつ再現することもある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%B1%E3%82%B9"
+    }
+   ],
+   "likeness": "あちこちに木の実を隠しておくように、便利なメモやテンプレをいろいろな場所に保存しておく。置き忘れた分も、いつか誰かの役に立つおおらかな備え方。",
+   "aruaru": [
+    "保存した場所を忘れて、同じひな形をまた作る",
+    "共有フォルダに置いたメモが、知らない人に感謝される",
+    "人の作業のコツを見て、すぐ自分のものにする"
+   ],
+   "catch": "隠した備えが、いつか森を育てる",
+   "pos": "50% 30%",
+   "photo": {
+    "file": "shindan/img/eurasian-jay.jpg",
+    "commons": "File:Garrulus glandarius B Luc Viatour.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Garrulus_glandarius_B_Luc_Viatour.jpg",
+    "author": "Luc Viatour",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%B1%E3%82%B9"
+   ]
+  },
+  {
+   "id": "acorn-woodpecker",
+   "name": "ドングリキツツキ",
+   "sci": "Melanerpes formicivorus",
+   "group": "鳥類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "木に穴を開けたり樹皮の間にはさんだりして、ドングリを大量にためておく習性がある。",
+     "quote": "木に穴を開けたり、樹皮の間に挟むなどしてドングリを大量に貯蔵する習性がある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%B3%E3%82%B0%E3%83%AA%E3%82%AD%E3%83%84%E3%83%84%E3%82%AD"
+    },
+    {
+     "text": "ためる穴は群れの仲間で代々使い続け、1本の木に5万個ものドングリがためられた例もある。",
+     "quote": "貯蔵用の穴は、群れの仲間で代々使い続けられるため、1本の木に5万個ものドングリが貯蔵されていた例も報告されている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%B3%E3%82%B0%E3%83%AA%E3%82%AD%E3%83%84%E3%83%84%E3%82%AD"
+    },
+    {
+     "text": "ドングリが乾いて縮むと、ためた場所をこまめに点検して、ゆるんだ実を小さな穴へ移しかえる。",
+     "quote": "As the acorns dry and shrink, the woodpeckers continually check their stores and will move loose acorns to smaller holes.",
+     "source": "https://en.wikipedia.org/wiki/Acorn_woodpecker"
+    }
+   ],
+   "likeness": "仲間と代々使う貯蔵庫を守るように、チームで共有するテンプレや手順書をこまめに点検し、ずれたところを直して使いやすく保ち続けるのが得意。",
+   "aruaru": [
+    "共有テンプレの「最新版」を管理しているのは、だいたい自分",
+    "古くなった手順書を見つけると、つい直したくなる",
+    "引き継ぎ資料が分厚くて、後任の人に驚かれる"
+   ],
+   "catch": "みんなの貯蔵庫を、毎日点検する番人",
+   "pos": "55% 35%",
+   "photo": {
+    "file": "shindan/img/acorn-woodpecker.jpg",
+    "commons": "File:Acorn woodpeckers on Angel Island (40109).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Acorn_woodpeckers_on_Angel_Island_(40109).jpg",
+    "author": "Rhododendrites",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%89%E3%83%B3%E3%82%B0%E3%83%AA%E3%82%AD%E3%83%84%E3%83%84%E3%82%AD",
+    "https://en.wikipedia.org/wiki/Acorn_woodpecker"
+   ]
+  },
+  {
+   "id": "spotted-nutcracker",
+   "name": "ホシガラス",
+   "sci": "Nucifraga caryocatactes",
+   "group": "鳥類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "余ったマツの種子をあとで使うためにためておき、それが結果的にマツを植えることにもなる。",
+     "quote": "本種は余った種子を後の利用のため貯蔵するが、このことにより本種が嗜好するマツ類が植え付けられる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%82%AC%E3%83%A9%E3%82%B9"
+    },
+    {
+     "text": "前の年の秋にためた種子を使って、すむ地域のどの鳥よりも早い時期に巣作りを始める。",
+     "quote": "本種はその生息する地域で最も早い時期に巣作りをする鳥類であり、そのために前年の秋に貯蔵されたマツの種子を活用する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%82%AC%E3%83%A9%E3%82%B9"
+    },
+    {
+     "text": "ヒナは巣立ったあとも2〜3か月ほど親のもとに残り、食べ物のため方を学ぶ。",
+     "quote": "さらに2-3ヶ月両親の元にとどまって、厳しい環境での生存に必須の貯食の仕方を学ぶ。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%82%AC%E3%83%A9%E3%82%B9"
+    }
+   ],
+   "likeness": "去年の秋の蓄えで春いちばんに巣作りを始めるように、前の年の記録や準備を生かして先回りする。そのやり方を家族にしっかり伝えるのも上手。",
+   "aruaru": [
+    "年末のうちに、来年の段取りまで決めてしまう",
+    "「去年のあのメモ」を出すと、家族にとても感謝される",
+    "季節ごとのチェックリストが、家で代々受け継がれている"
+   ],
+   "catch": "去年の備えで、だれより早く春を始める",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/spotted-nutcracker.jpg",
+    "commons": "File:Nucifraga caryocatactes Davos 1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Nucifraga_caryocatactes_Davos_1.jpg",
+    "author": "kuhnmi",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%82%AC%E3%83%A9%E3%82%B9"
+   ]
+  },
+  {
+   "id": "ezo-pika",
+   "name": "エゾナキウサギ",
+   "sci": "Ochotona hyperborea yesoensis",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "冬眠はしないかわりに、夏から秋にかけて葉などを岩の間にため込み、冬の保存食を作る。",
+     "quote": "冬眠はしないが、夏から秋にかけて葉などを岩の間にため込み、冬の保存食を作る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%BE%E3%83%8A%E3%82%AD%E3%82%A6%E3%82%B5%E3%82%AE"
+    },
+    {
+     "text": "集団で穴の中に暮らし、外敵に対して協力して守るなど、仲間と助け合う社会性をもつ。",
+     "quote": "集団性の穴居生活を行い、外敵に対して協力して防衛を行うなどの社会性を持つ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%BE%E3%83%8A%E3%82%AD%E3%82%A6%E3%82%B5%E3%82%AE"
+    },
+    {
+     "text": "名前のとおり甲高い声でよく鳴き、オスとメスとでは鳴き声がちがう。",
+     "quote": "甲高い鳴き声でよく鳴く。オスとメスとでは鳴き声が異なる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%BE%E3%83%8A%E3%82%AD%E3%82%A6%E3%82%B5%E3%82%AE"
+    }
+   ],
+   "likeness": "冬眠せずに冬じゅう動けるよう、夏のうちから保存食をためておく。止まらない仕事に備えて、ひな形や在庫をこつこつ積み上げておくタイプ。",
+   "aruaru": [
+    "ひまな時期に、忙しい時期用の下ごしらえをしている",
+    "チームのちょっとした異変には、まっさきに声を上げる",
+    "「それ、前に作っておいたよ」が、ついつい口ぐせ"
+   ],
+   "catch": "冬眠しない分、夏のうちに仕込んでおく",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/ezo-pika.jpg",
+    "commons": "File:Ochotona hyperborea yesoensis in Mount Nipesotsu.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ochotona_hyperborea_yesoensis_in_Mount_Nipesotsu.jpg",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%82%BE%E3%83%8A%E3%82%AD%E3%82%A6%E3%82%B5%E3%82%AE"
+   ]
+  },
+  {
+   "id": "golden-hamster",
+   "name": "ゴールデンハムスター",
+   "sci": "Mesocricetus auratus",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "食べ物をほお袋に詰めていったん巣に持ち帰り、そこで吐き出してためておく。",
+     "quote": "一度食物をほお袋に詰めたのち、巣に持って帰って吐き出して貯蔵する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%87%E3%83%B3%E3%83%8F%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%BC"
+    },
+    {
+     "text": "夜行性で、昼間はほとんど寝ているが、夜になると活発に動き出す。",
+     "quote": "夜行性の動物であり、昼間はほとんど寝ているが、夜になると活発に動き出す。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%87%E3%83%B3%E3%83%8F%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%BC"
+    },
+    {
+     "text": "おとなになると縄張り意識が強く、基本的にはひとりきりで行動する。",
+     "quote": "成体は縄張り意識が強く、基本的に単独行動を行なう。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%87%E3%83%B3%E3%83%8F%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%BC"
+    }
+   ],
+   "likeness": "ほお袋いっぱいに集めてまとめて持ち帰るように、使えそうな情報や素材をひとまず全部取り込んでおく。動くときは一気に、休むときはしっかり休む。",
+   "aruaru": [
+    "ブックマークの「あとで読む」が、いつもぱんぱん",
+    "昼はぼんやり、夜になると急に作業がはかどる",
+    "自分の作業スペースには、あまり人を入れたくない"
+   ],
+   "catch": "ほお袋いっぱいに、とりあえず持ち帰る",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/golden-hamster.jpg",
+    "commons": "File:Cheeks.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Cheeks.JPG",
+    "author": "Raining128",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%87%E3%83%B3%E3%83%8F%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%BC"
+   ]
+  },
+  {
+   "id": "japanese-squirrel",
+   "name": "ニホンリス",
+   "sci": "Sciurus lis",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "木の実などの食べ物を、枝の間や地面の中に埋めてためておくことがある。",
+     "quote": "食物を枝の間や地中に埋めて貯蔵することもある（貯食）",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9"
+    },
+    {
+     "text": "木の上に、木の枝や樹皮などを組み合わせた丸い形の巣を自分でつくる。",
+     "quote": "樹上に木の枝や樹皮などを組み合わせた球形の巣をつくる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9"
+    },
+    {
+     "text": "物置の軒下に干してあった新巻鮭を、約1週間かけて食べつくした例も報告されている。",
+     "quote": "物置の軒下に干されていた新巻鮭を約1週間かけて食べ尽くした事例も報告されている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9"
+    }
+   ],
+   "likeness": "食べ物をあちこちに埋めておくように、日用品のストックや暮らしの段取りをこっそり用意しておく。自分の巣は、自分の手で組み立てる派。",
+   "aruaru": [
+    "ストック棚をながめるだけで、ちょっと安心する",
+    "買い置きを忘れて、同じものがまたひとつ増える",
+    "家の「どこに何があるか」は自分しか知らない"
+   ],
+   "catch": "あちこちに埋めた備えで、毎日を安心に",
+   "pos": "35% 45%",
+   "photo": {
+    "file": "shindan/img/japanese-squirrel.jpg",
+    "commons": "File:Sciurus lis on a branch 20160710.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Sciurus_lis_on_a_branch_20160710.jpg",
+    "author": "Nesnad",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9"
+   ]
+  },
+  {
+   "id": "bull-headed-shrike",
+   "name": "モズ",
+   "sci": "Lanius bucephalus",
+   "group": "鳥類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "捕まえた獲物を木の枝などに突き刺したりはさんだりする「はやにえ」という習性がある。",
+     "quote": "モズは捕らえた獲物を木の枝等に突き刺したり、木の枝股に挟む習性をもつ。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%82%BA"
+    },
+    {
+     "text": "はやにえのほとんどはあとで食べられ、冬の保存食の役割をもつと考えられている。",
+     "quote": "はやにえは冬の保存食の役割をもつと考えられている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%82%BA"
+    },
+    {
+     "text": "秋に「高鳴き」で縄張りを争い、縄張りを確保した個体はそこでひとりで冬を越す。",
+     "quote": "縄張りを確保した個体は縄張りで単独で越冬する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%82%BA"
+    }
+   ],
+   "likeness": "見つけた獲物をとりあえず枝に刺しておくように、気づいた作業はすぐに手を打って「とっておき」を仕込んでおく。冬の自分を助ける仕込み上手。",
+   "aruaru": [
+    "思いついた案は、とりあえず下書きに刺しておく",
+    "自分の担当範囲だけは、最後まできっちり守りぬく",
+    "寒い時期ほど、むかしの仕込みが効いてくる"
+   ],
+   "catch": "見つけたらすぐ刺す、仕込みの名人",
+   "pos": "62% 40%",
+   "photo": {
+    "file": "shindan/img/bull-headed-shrike.jpg",
+    "commons": "File:Lanius bucephalus (male).JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Lanius_bucephalus_(male).JPG",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%82%BA"
+   ]
+  },
+  {
+   "id": "japanese-dormouse",
+   "name": "ニホンヤマネ",
+   "sci": "Glirulus japonicus",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "冬眠中は食事をとらず、秋までに体にためた脂肪を使って冬を過ごす。",
+     "quote": "冬眠中は食事を取らず秋季まで蓄えた体内の脂肪を消費し",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8D"
+    },
+    {
+     "text": "夏は14〜20グラムほどの体重が、冬眠前には34〜40グラムに達する個体もいる。",
+     "quote": "体重は夏季には14 - 20グラムだが、冬眠前には34 - 40グラムに達する個体もいる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8D"
+    },
+    {
+     "text": "何匹かで集まって冬眠することが多く、山小屋の布団の中で冬眠することもある。",
+     "quote": "複数個体が集まって冬眠することが多い。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8D"
+    }
+   ],
+   "likeness": "秋のうちに体にたっぷり蓄えて、冬は仲間と丸まって眠るように、先に準備を済ませたら、あとは安心してしっかり休む。休むための備えに抜かりがない。",
+   "aruaru": [
+    "準備を終えたその日の夜は、ぐっすり眠れる",
+    "家族の予定をまとめて入れて、あとはのんびり",
+    "冬になると、ふとんから出ない理由を探している"
+   ],
+   "catch": "たっぷり蓄えて、みんなでぐっすり",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/japanese-dormouse.jpg",
+    "commons": "File:ヤマネのアップ.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:%E3%83%A4%E3%83%9E%E3%83%8D%E3%81%AE%E3%82%A2%E3%83%83%E3%83%97.JPG",
+    "author": "Yamaneseisokubunpuiki",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%83%8D"
+   ]
+  },
+  {
+   "id": "brown-bear",
+   "name": "ヒグマ",
+   "sci": "Ursus arctos",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "秋にたくさん食べて体重を増やし、冬眠に備える。春がいちばん軽く、秋の終わりがいちばん重い。",
+     "quote": "after a period of hyperphagia to put on additional weight to prepare for hibernation",
+     "source": "https://en.wikipedia.org/wiki/Brown_bear"
+    },
+    {
+     "text": "冬は巣穴にこもって冬眠し、冬眠中は脈拍や呼吸の数が大きく減る。",
+     "quote": "冬季には巣穴で冬眠をする。冬眠中には脈拍、呼吸数が大幅に減少する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%92%E3%82%B0%E3%83%9E"
+    },
+    {
+     "text": "肩の盛り上がりはすべて筋肉で、掘る力を生み、冬眠前の巣穴づくりにも役立つと考えられている。",
+     "quote": "This feature developed presumably to impart more force in digging, which helps during foraging and facilitates den construction prior to hibernation.",
+     "source": "https://en.wikipedia.org/wiki/Brown_bear"
+    }
+   ],
+   "likeness": "秋にしっかり食べて冬眠に備えるように、大事な時期の前にまとめて準備をして、あとはどっしり構える。自分の巣穴は自分で掘る、頼もしいひとり仕事派。",
+   "aruaru": [
+    "大型連休の前に、作り置きを一気にこしらえる",
+    "準備が終わると、しばらく動かなくていい安心感",
+    "家の大仕事は、だれにも頼まずひとりで黙々と片付ける"
+   ],
+   "catch": "秋にまとめて備えて、冬はどっしり",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/brown-bear.jpg",
+    "commons": "File:Eurasian brown bear (Ursus arctos arctos) female 1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Eurasian_brown_bear_(Ursus_arctos_arctos)_female_1.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Brown_bear",
+    "https://ja.wikipedia.org/wiki/%E3%83%92%E3%82%B0%E3%83%9E"
+   ]
+  },
+  {
+   "id": "varied-tit",
+   "name": "ヤマガラ",
+   "sci": "Sittiparus varius",
+   "group": "鳥類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "地面の中や樹皮のすき間などに果実をためておくことがある。冬は主に果実を食べる。",
+     "quote": "また地中や樹皮の隙間などに果実を蓄える事（貯食）もある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%82%AC%E3%83%A9"
+    },
+    {
+     "text": "同じシジュウカラ科のほかの鳥といっしょに、混ざった群れをつくることもある。",
+     "quote": "同科他種と混群を形成する事もある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%82%AC%E3%83%A9"
+    },
+    {
+     "text": "学習能力が高く、むかしはおみくじを引くなどの芸を覚えることでも知られていた。",
+     "quote": "学習能力が高いため芸を仕込む事もでき",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%82%AC%E3%83%A9"
+    }
+   ],
+   "likeness": "木の実をあちこちにためつつ、ほかの鳥とも仲よく群れるように、暮らしの備えを家族やご近所と分け合うのが得意。一度覚えた手順はしっかり身につける。",
+   "aruaru": [
+    "自分の分だけでなく、おすそ分け用のストックまである",
+    "一度覚えた家事の手順は、考えなくても体が勝手に動く",
+    "ご近所の「あれある？」に、だいたい応えられる"
+   ],
+   "catch": "ためて、覚えて、みんなと分け合う",
+   "pos": "55% 50%",
+   "photo": {
+    "file": "shindan/img/varied-tit.jpg",
+    "commons": "File:Varied tit at Tennōji Park in Osaka, January 2016.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Varied_tit_at_Tenn%C5%8Dji_Park_in_Osaka,_January_2016.jpg",
+    "author": "Laitche",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A4%E3%83%9E%E3%82%AC%E3%83%A9"
+   ]
+  },
+  {
+   "id": "large-japanese-field-mouse",
+   "name": "アカネズミ",
+   "sci": "Apodemus speciosus",
+   "group": "哺乳類",
+   "type": "SPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "秋にはドングリやクルミを、巣穴や岩陰などのせまい場所や地面の中にためる習性がある。",
+     "quote": "秋にはドングリやクルミを巣穴や岩陰などの狭い空間や、地中に貯蔵する習性がある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AB%E3%83%8D%E3%82%BA%E3%83%9F"
+    },
+    {
+     "text": "ひとりで行動し、地面の中に自分で巣穴を掘る。夜行性で、地表を中心に活動する。",
+     "quote": "単独で行動し地中に巣穴を掘る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AB%E3%83%8D%E3%82%BA%E3%83%9F"
+    },
+    {
+     "text": "後ろ足の筋肉が発達していて、行動範囲は1日に数kmにわたる。",
+     "quote": "後足の筋肉が発達していて、行動範囲は1日あたり数kmにわたる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AB%E3%83%8D%E3%82%BA%E3%83%9F"
+    }
+   ],
+   "likeness": "一日に何キロも歩き回って秋の実を集めるように、暮らしの用事をこまめに自分の足で片付けて、ストックも自分の手で確保しておく働き者。",
+   "aruaru": [
+    "特売の日は、何軒もお店をはしごしてしまう",
+    "家の中に、自分専用のかくしストックがある",
+    "人に頼むより、自分で行ったほうが早いと思う"
+   ],
+   "catch": "自分の足で集めて、自分の巣にためる",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/large-japanese-field-mouse.jpg",
+    "commons": "File:Apodemus speciosus - りなべる - 444217887.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File:Apodemus_speciosus_-_%E3%82%8A%E3%81%AA%E3%81%B9%E3%82%8B_-_444217887.jpeg",
+    "author": "りなべる",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AB%E3%83%8D%E3%82%BA%E3%83%9F"
+   ]
+  },
+  {
+   "id": "american-beaver",
+   "name": "アメリカビーバー",
+   "sci": "Castor canadensis",
+   "group": "哺乳類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "木や枝、石、泥を使ってダムを作る。冬に備えて、秋にダムを作ったり直したりすることが多い。",
+     "quote": "冬に備えるため大抵の場合秋にビーバーはダムを作ったり、修理を行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%93%E3%83%BC%E3%83%90%E3%83%BC"
+    },
+    {
+     "text": "動物園で夜のうちに巣材を元に戻されても、次の日には直してしまうことが多い。",
+     "quote": "翌日には修復されるケースが多い",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%93%E3%83%BC%E3%83%90%E3%83%BC"
+    },
+    {
+     "text": "晩秋に枝を水底の泥にさしておき、冬の食べ物として水の中に保存する。",
+     "quote": "枝を水底の泥にさすようにして水中で保存（貯食行動）を行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%93%E3%83%BC%E3%83%90%E3%83%BC"
+    }
+   ],
+   "likeness": "崩れても次の日には直すダムのように、作った仕組みを家族やチームで手入れし続けるのが得意。新しい道具も材料のひとつとして積み上げていく。",
+   "aruaru": [
+    "仕組みが止まると、なぜか少しうれしそうに直しはじめる",
+    "「とりあえず作った」ものが、いつのまにか本番の土台になっている",
+    "季節の前になると、仕組みの点検をしたくなる"
+   ],
+   "catch": "毎日ちょっとずつ、仕組みを積み上げる",
+   "pos": "45% 45%",
+   "photo": {
+    "file": "shindan/img/american-beaver.jpg",
+    "commons": "File:North American Beaver, Humber River near Kleinburg, Ontario (39637607974).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:North_American_Beaver,_Humber_River_near_Kleinburg,_Ontario_(39637607974).jpg",
+    "author": "Vlad Podvorny",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%A1%E3%83%AA%E3%82%AB%E3%83%93%E3%83%BC%E3%83%90%E3%83%BC"
+   ]
+  },
+  {
+   "id": "sociable-weaver",
+   "name": "シャカイハタオリ",
+   "sci": "Philetairus socius",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "木などに大きな集団の巣を作る。100つがいを超える数が入れるほど大きく、何世代も使われる。",
+     "quote": "優に100つがいを超える個体を収納できるほど巨大で、数世代にわたって使用される",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%82%AB%E3%82%A4%E3%83%8F%E3%82%BF%E3%82%AA%E3%83%AA"
+    },
+    {
+     "text": "巣の中の部屋は、外の気温が大きく変わっても、温度の変化が小さく保たれる。",
+     "quote": "部屋内部の温度変化を7-8℃で維持する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%82%AB%E3%82%A4%E3%83%8F%E3%82%BF%E3%82%AA%E3%83%AA"
+    },
+    {
+     "text": "大きな巣は何世代にもわたって使われ、100年を超えることもめずらしくない。",
+     "quote": "大きなコロニーは何世代にもわたって活用され、100年を超えることも珍しくない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%82%AB%E3%82%A4%E3%83%8F%E3%82%BF%E3%82%AA%E3%83%AA"
+    }
+   ],
+   "likeness": "みんなで少しずつ足して100年もつ巣にするように、家族や仲間が使う暮らしの仕組みを、計画を立てて大きく育てていくタイプ。",
+   "aruaru": [
+    "家族の共有カレンダーを作ったのは、たいていこの人",
+    "「これ、みんなで使えるようにしておいたよ」が口ぐせ",
+    "仕組みが大きくなりすぎて、全体図を描きたくなる"
+   ],
+   "catch": "みんなの暮らしを、大きな仕組みで支える",
+   "pos": "45% 35%",
+   "photo": {
+    "file": "shindan/img/sociable-weaver.jpg",
+    "commons": "File:Sociable weaver (Philetairus socius).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Sociable_weaver_(Philetairus_socius).jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%82%AB%E3%82%A4%E3%83%8F%E3%82%BF%E3%82%AA%E3%83%AA"
+   ]
+  },
+  {
+   "id": "white-spotted-pufferfish",
+   "name": "アマミホシゾラフグ",
+   "sci": "Torquigener albomaculosus",
+   "group": "魚類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "オスは胸びれや尾びれを使って、海底に直径2mほどの幾何学的な円形の巣を作る。",
+     "quote": "オスは胸鰭や尾鰭を使って、直径2mの印象的（幾何学的）なデザインの円形の巣を作り",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%83%9F%E3%83%9B%E3%82%B7%E3%82%BE%E3%83%A9%E3%83%95%E3%82%B0"
+    },
+    {
+     "text": "海底の模様は長い間だれが作ったのか謎で、ミステリーサークルとも呼ばれていた。",
+     "quote": "模様はミステリーサークルとも呼ばれていた",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%83%9F%E3%83%9B%E3%82%B7%E3%82%BE%E3%83%A9%E3%83%95%E3%82%B0"
+    },
+    {
+     "text": "2012年に発見された新しいフグで、「新種トップ10」の2015年版に選ばれている。",
+     "quote": "アマミホシゾラフグは2012年に発見された",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%83%9F%E3%83%9B%E3%82%B7%E3%82%BE%E3%83%A9%E3%83%95%E3%82%B0"
+    }
+   ],
+   "likeness": "ひれだけで海底に大きな模様を描くように、ひとりで手間をかけて、きれいに整った仕組みを作り上げる。仕上がりの美しさにもこだわる。",
+   "aruaru": [
+    "作った仕組みの図を、つい誰かに見せたくなる",
+    "見た目まで整えないと、完成した気がしない",
+    "ひとりで黙々と作って、ある日いきなり完成品を出してくる"
+   ],
+   "catch": "ひとりで描き上げる、きれいな仕組み",
+   "pos": "40% 50%",
+   "photo": {
+    "file": "shindan/img/white-spotted-pufferfish.jpg",
+    "commons": "File:Torquigener albomaculosus.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Torquigener_albomaculosus.jpg",
+    "author": "タウナギ",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%83%9F%E3%83%9B%E3%82%B7%E3%82%BE%E3%83%A9%E3%83%95%E3%82%B0"
+   ]
+  },
+  {
+   "id": "rufous-hornero",
+   "name": "セアカカマドドリ",
+   "sci": "Furnarius rufus",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "粘土でかまどのような形の、大きくて厚い巣を作る。木の上や電柱、建物の上にも作る。",
+     "quote": "a large thick clay \"oven\" placed on a tree, or man-made structures such as fence posts, telephone poles, or buildings",
+     "source": "https://en.wikipedia.org/wiki/Rufous_hornero"
+    },
+    {
+     "text": "巣は5日ほどでできることもあるが、ふつうはもっとかかり、何か月もかかることもある。",
+     "quote": "nests can be constructed in as little as 5 days but usually take longer, occasionally months, to complete",
+     "source": "https://en.wikipedia.org/wiki/Rufous_hornero"
+    },
+    {
+     "text": "しばらく使わなかった古い巣を、次の繁殖の季節に直して使うこともある。",
+     "quote": "a formerly unused nest may be repaired for a new breeding season",
+     "source": "https://en.wikipedia.org/wiki/Rufous_hornero"
+    }
+   ],
+   "likeness": "何か月もかけて土のかまどを仕上げるように、暮らしの仕組みをじっくり手作りする。古い仕組みも捨てずに直して使い回すのが上手。",
+   "aruaru": [
+    "家のことを、気づけば半年かけて仕組み化している",
+    "前に作った仕組みを掘り出して、直してまた使う",
+    "道具は新しくしても、土台は自分で作りたい"
+   ],
+   "catch": "時間をかけて、暮らしの土台を手作り",
+   "pos": "55% 45%",
+   "photo": {
+    "file": "shindan/img/rufous-hornero.jpg",
+    "commons": "File:Hornero y su casa.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Hornero_y_su_casa.jpg",
+    "author": "Ezequiel Ignacio Vera",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Rufous_hornero"
+   ]
+  },
+  {
+   "id": "satin-bowerbird",
+   "name": "アオアズマヤドリ",
+   "sci": "Ptilonorhynchus violaceus",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "オスは小枝を並べた「あずまや」を作り、そのまわりを青いもので飾る。",
+     "quote": "小枝等を平行に組み合わせた構造物（あずまや）を作り、その周囲を青い物で装飾する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A2%E3%82%BA%E3%83%9E%E3%83%A4%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "飾りには花びらや羽だけでなく、ペットボトルのキャップやボールペンなどの人工物も使う。",
+     "quote": "ペットボトルのキャップ、ボールペン、ビニールテープ、紙切れ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A2%E3%82%BA%E3%83%9E%E3%83%A4%E3%83%89%E3%83%AA"
+    }
+   ],
+   "likeness": "身のまわりの青いものを集めて舞台を作るように、新しいツールや小さな部品を見つけてきては、自分の仕事場の仕組みに取り入れていく。",
+   "aruaru": [
+    "新しいツールを見つけると、まず自分の道具箱に入れてみる",
+    "ツールの色やアイコンまで、きれいにそろえたくなる",
+    "画面の並びにこだわりがあり、勝手に動かされると気づく"
+   ],
+   "catch": "集めた道具で、自分の舞台を組み立てる",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/satin-bowerbird.jpg",
+    "commons": "File:Satin Bowerbird at his bower JCB.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Satin_Bowerbird_at_his_bower_JCB.jpg",
+    "author": "Joseph C Boone",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A2%E3%82%BA%E3%83%9E%E3%83%A4%E3%83%89%E3%83%AA"
+   ]
+  },
+  {
+   "id": "eurasian-harvest-mouse",
+   "name": "カヤネズミ",
+   "sci": "Micromys minutus",
+   "group": "哺乳類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "日本でいちばん小さなネズミ。ススキなどの葉を使って、地面から1mほどの高さに丸い巣を作る。",
+     "quote": "地表から約1mの高さに直径10cmほどの小さな球形の巣を作る",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%A4%E3%83%8D%E3%82%BA%E3%83%9F"
+    },
+    {
+     "text": "葉を使って巣を作るので、まわりの植物と同じ色になって目立たない。",
+     "quote": "葉を利用して巣を作ることで、周りの植物と同じ色となって同化することができる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%A4%E3%83%8D%E3%82%BA%E3%83%9F"
+    },
+    {
+     "text": "この小さな巣の中で、出産や子育てをしたり、ゆっくり休んだりしている。",
+     "quote": "この巣において出産や育児、休憩を取っている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%A4%E3%83%8D%E3%82%BA%E3%83%9F"
+    }
+   ],
+   "likeness": "身近な葉っぱで小さな丸い巣を編むように、手元にあるものを使って、暮らしにすっとなじむ小さな仕組みを自分でこつこつ作るのが得意。",
+   "aruaru": [
+    "大げさな仕組みより、ちょうどいい小さな仕組みが好き",
+    "作った仕組みが暮らしになじみすぎて、家族に気づかれない",
+    "スマホのショートカットが、いつのまにか増えている"
+   ],
+   "catch": "小さな仕組みを、暮らしにそっと編み込む",
+   "pos": "45% 35%",
+   "photo": {
+    "file": "shindan/img/eurasian-harvest-mouse.jpg",
+    "commons": "File:Harvest Mouse in British Wildlife Centre.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Harvest_Mouse_in_British_Wildlife_Centre.jpg",
+    "author": "Andy Morffew from Itchen Abbas, Hampshire, UK",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%A4%E3%83%8D%E3%82%BA%E3%83%9F"
+   ]
+  },
+  {
+   "id": "chinese-penduline-tit",
+   "name": "ツリスガラ",
+   "sci": "Remiz consobrinus",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "繁殖地では、木の枝に主に草を使って袋の形の吊り巣を作る。これが名前の由来になっている。",
+     "quote": "主に草を使って袋状の吊り巣を作る。これが、和名の由来である。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%AA%E3%82%B9%E3%82%AC%E3%83%A9"
+    },
+    {
+     "text": "群れで暮らし、ヨシの茎の鞘をくちばしではいで、中にいる虫を食べる。",
+     "quote": "ヨシの茎の鞘を嘴ではいで中にいる昆虫類を食べる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%AA%E3%82%B9%E3%82%AC%E3%83%A9"
+    },
+    {
+     "text": "1970年代から冬に日本へ来る数が増え、今では西日本でふつうの冬鳥になっている。",
+     "quote": "1970年代から冬期に渡来する数が増え",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%AA%E3%82%B9%E3%82%AC%E3%83%A9"
+    }
+   ],
+   "likeness": "ヨシの鞘を1本ずつはいで虫を見つけるように、仲間と一緒に作業の中の「すき間」を見つけて、手順を少しずつ仕組みに変えていく。",
+   "aruaru": [
+    "チームの作業の中から、自動化できる所を見つけるのが早い",
+    "便利な仕組みを作ると、仲間にもすぐ広める",
+    "気づけば、まわりにも同じ道具を使う人が増えている"
+   ],
+   "catch": "すき間を見つけて、みんなの手順を仕組みに",
+   "pos": "45% 85%",
+   "photo": {
+    "file": "shindan/img/chinese-penduline-tit.jpg",
+    "commons": "File:Remiz consobrinus southern Japan.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Remiz_consobrinus_southern_Japan.jpg",
+    "author": "Jerry Gunner from Lincoln, UK",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%AA%E3%82%B9%E3%82%AC%E3%83%A9"
+   ]
+  },
+  {
+   "id": "barn-swallow",
+   "name": "ツバメ",
+   "sci": "Hirundo rustica",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "人里近くに、泥や枯れ草をこねた巣を作る。親鳥は1時間に30回近く泥を運び、10日前後で巣を作り上げる。",
+     "quote": "親鳥は午前中を中心に1時間に30回近く泥を運搬し、10日前後で巣を作り上げる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%90%E3%83%A1"
+    },
+    {
+     "text": "人の住まいのすぐそばに巣を作るのは、天敵が近寄らないことを利用しているとも考えられている。",
+     "quote": "これらの天敵が寄り付かないことを利用しているともみられている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%90%E3%83%A1"
+    }
+   ],
+   "likeness": "人の家の軒先を上手に借りて巣を作るように、家族や身近な人の暮らしに合わせて、こまめに運んで組み立てた仕組みで毎日を回す。",
+   "aruaru": [
+    "家族のLINEに、気づけば便利な仕組みが増えている",
+    "決まった時間に、決まった作業をこまめに片付ける",
+    "毎年同じ時期に、同じ仕組みを見直している"
+   ],
+   "catch": "こまめに運んで、暮らしの仕組みを作る",
+   "pos": "35% 50%",
+   "photo": {
+    "file": "shindan/img/barn-swallow.jpg",
+    "commons": "File:Rauchschwalbe Hirundo rustica.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Rauchschwalbe_Hirundo_rustica.jpg",
+    "author": "Andreas Trepte",
+    "license": "CC BY-SA 2.5",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.5"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%90%E3%83%A1"
+   ]
+  },
+  {
+   "id": "common-kingfisher",
+   "name": "カワセミ",
+   "sci": "Alcedo atthis",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "土の崖に横穴を掘って巣を作る。巣穴は中で分かれず、奥までまっすぐになっている。",
+     "quote": "巣穴は内部で分岐せず奥まで一直線になっている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%BB%E3%83%9F"
+    },
+    {
+     "text": "巣を作る場所にあまりこだわらず、コンクリートの壁の裏に詰めた土でも十分に巣を作る。",
+     "quote": "カワセミは営巣場所にあまりこだわらず",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%BB%E3%83%9F"
+    },
+    {
+     "text": "繁殖期でないときは1羽で行動し、えさ場を見渡せる枝や石の上で休む。",
+     "quote": "えさ場が見渡せる枝や石の上で休む姿がみられる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%BB%E3%83%9F"
+    }
+   ],
+   "likeness": "えさ場を見渡せる枝でじっと待ってから一気に飛び込むように、無駄に動かず、まっすぐな一本道の仕組みを作って仕事を片付ける。",
+   "aruaru": [
+    "余計な分かれ道のない、まっすぐな手順が好き",
+    "ふだんは静かだが、ここぞという時の動きは速い",
+    "使える場所なら、新しいツールでも気にせず使う"
+   ],
+   "catch": "見張って、まっすぐ一気に片付ける",
+   "pos": "45% 40%",
+   "photo": {
+    "file": "shindan/img/common-kingfisher.jpg",
+    "commons": "File:日本のカワセミ.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:%E6%97%A5%E6%9C%AC%E3%81%AE%E3%82%AB%E3%83%AF%E3%82%BB%E3%83%9F.jpg",
+    "author": "dokure",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%BB%E3%83%9F"
+   ]
+  },
+  {
+   "id": "little-grebe",
+   "name": "カイツブリ",
+   "sci": "Tachybaptus ruficollis",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "主に水の上で暮らし、陸ではほとんど歩かない。飛ぶこともあまりない。",
+     "quote": "主に水上で生活して、ほとんど歩くことはない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%A4%E3%83%84%E3%83%96%E3%83%AA"
+    },
+    {
+     "text": "水草の葉や茎を組み合わせて、逆円すいの形の巣を作る。巣を離れるときは卵を巣材でかくす。",
+     "quote": "親鳥が巣を離れる際には卵を巣材で隠す",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%A4%E3%83%84%E3%83%96%E3%83%AA"
+    },
+    {
+     "text": "ヒナを背中に乗せて温めたり守ったりし、そのまま潜ることもある。",
+     "quote": "雌雄ともヒナを背に乗せて保温や外敵からの保護を行い、そのまま潜水することもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%A4%E3%83%84%E3%83%96%E3%83%AA"
+    }
+   ],
+   "likeness": "ヒナを背中に乗せたまま潜るように、いくつかの用事を一度に片付ける仕組みを作り、なるべく余計に動かずに暮らしを回すのが上手。",
+   "aruaru": [
+    "「ついでにこれも」を仕組みにまとめるのが得意",
+    "なるべく立ち上がらずに済むよう、手元で全部できるようにする",
+    "出かける前の片付けも、ちゃんと仕組みにしてある"
+   ],
+   "catch": "ついでにまとめて、動かず片付ける",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/little-grebe.jpg",
+    "commons": "File:Little grebe in Sakai, Osaka, February 2016.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Little_grebe_in_Sakai,_Osaka,_February_2016.jpg",
+    "author": "Laitche",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%A4%E3%83%84%E3%83%96%E3%83%AA"
+   ]
+  },
+  {
+   "id": "asian-house-martin",
+   "name": "イワツバメ",
+   "sci": "Delichon dasypus",
+   "group": "鳥類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "泥と枯れ草を使って、上に穴のあいた丸い巣を作る。集団で巣を作る。",
+     "quote": "泥と枯れ草を使って上部に穴の空いた球状の巣を作り",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%AF%E3%83%84%E3%83%90%E3%83%A1"
+    },
+    {
+     "text": "コンクリートの大きな建物が増えると、それにも巣を作るようになった。",
+     "quote": "本種もそれらに営巣するようになった",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%AF%E3%83%84%E3%83%90%E3%83%A1"
+    },
+    {
+     "text": "近年は橋げたや建物の軒下に集団で巣を作る例が増え、分布が広がっている。",
+     "quote": "本種の分布の拡大につながっている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%AF%E3%83%84%E3%83%90%E3%83%A1"
+    }
+   ],
+   "likeness": "新しくできたコンクリートの建物にさっそく巣をかけるように、新しい環境や道具にみんなで乗っかって、手間をかけずに仕組みを広げる。",
+   "aruaru": [
+    "新しいサービスが出ると、チームでさっそく試している",
+    "一から作るより、今ある土台に乗せるのが早いと知っている",
+    "仲間が使い始めると、自分も同じ場所に仕組みを作る"
+   ],
+   "catch": "新しい土台に、みんなで巣をかける",
+   "pos": "40% 50%",
+   "photo": {
+    "file": "shindan/img/asian-house-martin.jpg",
+    "commons": "File:Delichon dasypus -Hokkaido -Japan -collecting nest material-8a.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Delichon_dasypus_-Hokkaido_-Japan_-collecting_nest_material-8a.jpg",
+    "author": "Stella C Eagle",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A4%E3%83%AF%E3%83%84%E3%83%90%E3%83%A1"
+   ]
+  },
+  {
+   "id": "european-badger",
+   "name": "ヨーロッパアナグマ",
+   "sci": "Meles meles",
+   "group": "哺乳類",
+   "type": "SPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "巣穴を何十年も使い続け、いくつもの個体からなる家族で暮らす。",
+     "quote": "数十年にわたって巣穴を使い続け、複数個体からなる家族群がそこに入る",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A8%E3%83%BC%E3%83%AD%E3%83%83%E3%83%91%E3%82%A2%E3%83%8A%E3%82%B0%E3%83%9E"
+    },
+    {
+     "text": "巣穴の通路は35〜81mほどになることがあり、世代から世代へと受け継がれる。",
+     "quote": "彼等の構築する巣穴は最も複雑で、世代から世代へと受け継がれる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A8%E3%83%BC%E3%83%AD%E3%83%83%E3%83%91%E3%82%A2%E3%83%8A%E3%82%B0%E3%83%9E"
+    },
+    {
+     "text": "定期的に古い寝わらを片付けて捨てる、とてもきれい好きな動物である。",
+     "quote": "定期的に古い寝藁を片付けて捨てる、入念に清潔にする動物である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A8%E3%83%BC%E3%83%AD%E3%83%83%E3%83%91%E3%82%A2%E3%83%8A%E3%82%B0%E3%83%9E"
+    }
+   ],
+   "likeness": "家族で受け継ぐ巣穴で暮らすように、一度しっかり作った暮らしの仕組みを、みんなで長く使い回す。手入れだけはきちんと続ける。",
+   "aruaru": [
+    "何年も前に作った仕組みが、今も家で動いている",
+    "仕組みの手入れはするけど、作り直しはなるべくしない",
+    "家族にも使い方を教えて、自分が動かなくても回るようにする"
+   ],
+   "catch": "受け継いだ仕組みで、みんなでのんびり",
+   "pos": "40% 45%",
+   "photo": {
+    "file": "shindan/img/european-badger.jpg",
+    "commons": "File:European badger (Meles meles taxus) Drenthe.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:European_badger_(Meles_meles_taxus)_Drenthe.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A8%E3%83%BC%E3%83%AD%E3%83%83%E3%83%91%E3%82%A2%E3%83%8A%E3%82%B0%E3%83%9E"
+   ]
+  },
+  {
+   "id": "brown-throated-sloth",
+   "name": "ノドチャミユビナマケモノ",
+   "sci": "Bradypus variegatus",
+   "group": "哺乳類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "1日に15〜18時間眠り、起きて動いているのは短い時間だけ。昼でも夜でも活動する。",
+     "quote": "Brown-throated sloths sleep 15 to 18 hours every day and are active for only brief periods of time",
+     "source": "https://en.wikipedia.org/wiki/Brown-throated_sloth"
+    },
+    {
+     "text": "一生のほとんどを高い木の上で過ごし、地面に下りるのはおよそ8日に1度、ふんをするときだけ。",
+     "quote": "descending once every eight days or so to defecate in the soil",
+     "source": "https://en.wikipedia.org/wiki/Brown-throated_sloth"
+    },
+    {
+     "text": "行動範囲はせまく、お気に入りの1本の木で時間の2割ほどを過ごすこともある。",
+     "quote": "even spending up to 20% of its time in a single specific tree",
+     "source": "https://en.wikipedia.org/wiki/Brown-throated_sloth"
+    }
+   ],
+   "likeness": "たっぷり休んで、動くのは必要なときだけ。いつもの場所でいつものやり方を守り、余計な手間を増やさない。最小の動きで暮らしを回す、省エネ自動化の名人です。",
+   "aruaru": [
+    "一番よく使う自動化は「何もしなくていい」状態を保つこと",
+    "設定を見直すのは、だいたい8日に1度くらい",
+    "お気に入りのアプリが1つあれば、それで一日が回る"
+   ],
+   "catch": "動かないことこそ、いちばんの効率化",
+   "pos": "45% 45%",
+   "photo": {
+    "file": "shindan/img/brown-throated-sloth.jpg",
+    "commons": "File:Bradypus variegatus Costa Rica 01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Bradypus_variegatus_Costa_Rica_01.jpg",
+    "author": "Ken-ichi Ueda",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Brown-throated_sloth"
+   ]
+  },
+  {
+   "id": "ocean-sunfish",
+   "name": "マンボウ",
+   "sci": "Mola mola",
+   "group": "魚類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "海面に体を横たえる姿が見られ、小さな魚や海鳥に寄生虫を取ってもらうためとも考えられている。",
+     "quote": "小型の魚やカモメなどの海鳥に寄生虫を取ってもらうため",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%B3%E3%83%9C%E3%82%A6"
+    },
+    {
+     "text": "ただ漂っているだけと思われがちだが、黒潮に逆らって移動できるほどの泳ぐ力をもつ。",
+     "quote": "黒潮に逆らって移動し得るだけの遊泳力を持つことが示されている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%B3%E3%83%9C%E3%82%A6"
+    },
+    {
+     "text": "海の表層から水深800メートルほどまでの間を、行ったり来たりしている。",
+     "quote": "表層から水深800メートル程度までの間を往復していることが明らかにされている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%B3%E3%83%9C%E3%82%A6"
+    }
+   ],
+   "likeness": "ふだんはのんびり浮かんでいるようで、手入れは周りの仲間にちゃっかり手伝ってもらう。でも本気を出せば流れに逆らって進める。ゆるさと実力が同居した自動化スタイルです。",
+   "aruaru": [
+    "面倒な作業は、詳しい家族や友だちにさりげなく頼っている",
+    "のんびりして見えて、締め切り前だけ急に泳ぎが速い",
+    "家の中の仕組みは、だいたい誰かが作ったものに乗っている"
+   ],
+   "catch": "ぷかぷか浮かんで、手入れはおまかせ",
+   "pos": "45% 45%",
+   "photo": {
+    "file": "shindan/img/ocean-sunfish.jpg",
+    "commons": "File:Mola-mola-Lisboa-20051020.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Mola-mola-Lisboa-20051020.jpg",
+    "author": "Nol Aders",
+    "license": "CC BY 2.5",
+    "license_url": "https://creativecommons.org/licenses/by/2.5"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%83%B3%E3%83%9C%E3%82%A6"
+   ]
+  },
+  {
+   "id": "axolotl",
+   "name": "メキシコサラマンダー",
+   "sci": "Ambystoma mexicanum",
+   "group": "両生類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ふつうは幼生の姿を残したまま大人になる（幼形成熟）。めったに変態しない。",
+     "quote": "通常は幼生の形態を残したまま性成熟する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%AD%E3%82%B7%E3%82%B3%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    },
+    {
+     "text": "手足だけでなく背骨や心臓なども再生できるため、再生医療の研究で注目されている。",
+     "quote": "四肢だけでなく脊椎や心臓なども再生可能である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%AD%E3%82%B7%E3%82%B3%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    },
+    {
+     "text": "協調性が低いため、何匹かで飼うときは数より多い隠れ家を用意するとよいとされる。",
+     "quote": "協調性が低いため、複数飼育を行う場合は飼育頭数よりも多い数のシェルターを用意する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%AD%E3%82%B7%E3%82%B3%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    }
+   ],
+   "likeness": "わざわざ姿を変えなくても、今のままで十分やっていける。壊れたところだけ元どおりに直して、慣れた仕組みを使い続ける。自分の水槽で静かに回す、現状維持の自動化です。",
+   "aruaru": [
+    "何年も前に作ったひな形を、少し直しながらずっと使っている",
+    "新しいツールに乗り換えるより、今のを直すほうが早いと思う",
+    "共有フォルダより、自分だけのフォルダのほうが落ち着く"
+   ],
+   "catch": "変わらないまま、何度でも直せる",
+   "pos": "50% 60%",
+   "photo": {
+    "file": "shindan/img/axolotl.jpg",
+    "commons": "File:Ambystoma mexicanum at Vancouver Aquarium.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ambystoma_mexicanum_at_Vancouver_Aquarium.jpg",
+    "author": "ZeWrestler",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A1%E3%82%AD%E3%82%B7%E3%82%B3%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+   ]
+  },
+  {
+   "id": "galapagos-tortoise",
+   "name": "ガラパゴスゾウガメ",
+   "sci": "Chelonoidis niger",
+   "group": "爬虫類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "低地の乾燥地と高地の水場を行き来する種もいて、そのために踏み固めた「道」ができることもある。",
+     "quote": "低地の乾燥地と高地の水場を往復する種もいて",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AC%E3%83%A9%E3%83%91%E3%82%B4%E3%82%B9%E3%82%BE%E3%82%A6%E3%82%AC%E3%83%A1"
+    },
+    {
+     "text": "朝はまず1〜2時間ほど日光浴をして、黒っぽい甲羅で太陽の熱を取り込んでから動き出す。",
+     "quote": "to absorb the sun's heat through their dark shells",
+     "source": "https://en.wikipedia.org/wiki/Gal%C3%A1pagos_tortoise"
+    },
+    {
+     "text": "フィンチなどの鳥に寄生虫を取ってもらう関係があり、首や脚を伸ばして「どうぞ」と合図する。",
+     "quote": "The tortoise signals it is ready by rising up and extending its neck and legs",
+     "source": "https://en.wikipedia.org/wiki/Gal%C3%A1pagos_tortoise"
+    }
+   ],
+   "likeness": "同じ道を何度も通るうちに、いつのまにか決まったルートができあがる。朝の準備はゆっくり、助けてくれる相手にはきちんと合図。くり返しで仕事を自然に仕組み化していく型です。",
+   "aruaru": [
+    "毎朝の手順が決まっていて、順番が変わると落ち着かない",
+    "同じ作業をくり返すうちに、いつのまにか手順書ができている",
+    "手伝ってほしいときの合図だけは、はっきり出せる"
+   ],
+   "catch": "通い慣れた道が、そのまま仕組みになる",
+   "pos": "60% 45%",
+   "photo": {
+    "file": "shindan/img/galapagos-tortoise.jpg",
+    "commons": "File:Galapagos giant tortoise Geochelone elephantopus.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Galapagos_giant_tortoise_Geochelone_elephantopus.jpg",
+    "author": "Mfield, Matthew Field, http://www.photography.mattfield.com",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AC%E3%83%A9%E3%83%91%E3%82%B4%E3%82%B9%E3%82%BE%E3%82%A6%E3%82%AC%E3%83%A1",
+    "https://en.wikipedia.org/wiki/Gal%C3%A1pagos_tortoise"
+   ]
+  },
+  {
+   "id": "shoebill",
+   "name": "ハシビロコウ",
+   "sci": "Balaeniceps rex",
+   "group": "鳥類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "えさのハイギョが水面に浮かんでくるまで、数時間も動きを止めることがある「動かない鳥」。",
+     "quote": "餌とするハイギョが水面に浮かんでくるまで数時間動きを止めることがある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%93%E3%83%AD%E3%82%B3%E3%82%A6"
+    },
+    {
+     "text": "単独で暮らし、基本的にはひとりで行動するのを好む。昼間は草の間などで休んでいる。",
+     "quote": "基本的には単独行動を好む",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%93%E3%83%AD%E3%82%B3%E3%82%A6"
+    },
+    {
+     "text": "羽ばたきは1分間に150回ほどで、鳥の中ではとてもゆっくりしている。",
+     "quote": "羽ばたきの回数は1分間に150回と、鳥類の中では非常にゆっくりとしている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%93%E3%83%AD%E3%82%B3%E3%82%A6"
+    }
+   ],
+   "likeness": "あわてて動き回らず、ここぞという瞬間までじっくり待つ。決めた場所で、慣れた手順を自分のペースで淡々と回すのが得意。急がないけれど、取りこぼしの少ない職人タイプです。",
+   "aruaru": [
+    "新機能が出ても、評判が落ち着くまでしばらく様子を見る",
+    "通知が来ても、すぐには動かない。でも見落としはしない",
+    "ひとりで黙々と作業しているときがいちばんはかどる"
+   ],
+   "catch": "じっと待って、ここぞで確実にひとくち",
+   "pos": "55% 35%",
+   "photo": {
+    "file": "shindan/img/shoebill.jpg",
+    "commons": "File:Balaeniceps rex (Schuhschnabel - Shoebill) - Weltvogelpark Walsrode 2011.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Balaeniceps_rex_(Schuhschnabel_-_Shoebill)_-_Weltvogelpark_Walsrode_2011.jpg",
+    "author": "Olaf Oliviero Riemer",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%93%E3%83%AD%E3%82%B3%E3%82%A6"
+   ]
+  },
+  {
+   "id": "ural-owl",
+   "name": "フクロウ",
+   "sci": "Strix uralensis",
+   "group": "鳥類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "夜行性で、昼間は木のうろや横枝などでほとんど動かず、目を閉じて休んでいる。",
+     "quote": "昼間は樹洞や木の横枝などでほとんど動かず目を閉じて休息している",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%AF%E3%83%AD%E3%82%A6"
+    },
+    {
+     "text": "メスが卵を温める間、オスが獲物をとって巣の近くまで運び、メスに受け渡す。",
+     "quote": "オスは1日に1-2個体の獲物を捕獲し鳴きながら巣の近くまで来てメスに獲物を受け渡す",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%AF%E3%83%AD%E3%82%A6"
+    },
+    {
+     "text": "子育てに成功したつがいは、次の年もまた同じ巣を使う傾向が強い。",
+     "quote": "繁殖に成功したつがいは翌年同じ巣を利用する傾向が強い",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%AF%E3%83%AD%E3%82%A6"
+    }
+   ],
+   "likeness": "うまくいった巣は翌年もそのまま使い、相棒とは役割をきっちり分ける。ふだんは静かに休みつつ、動くべきときは音もなく片付ける。実績のあるやり方を相棒と回すのが得意です。",
+   "aruaru": [
+    "去年うまくいったやり方を、今年もそのまま使う",
+    "相棒との分担が決まっていて、言わなくても回る",
+    "昼間は静かなのに、夜になると作業がはかどる"
+   ],
+   "catch": "うまくいった巣は、来年もそのまま",
+   "pos": "50% 30%",
+   "photo": {
+    "file": "shindan/img/ural-owl.jpg",
+    "commons": "File:Strix uralensis 0a1.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Strix_uralensis_0a1.JPG",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%95%E3%82%AF%E3%83%AD%E3%82%A6"
+   ]
+  },
+  {
+   "id": "japanese-giant-salamander",
+   "name": "オオサンショウウオ",
+   "sci": "Andrias japonicus",
+   "group": "両生類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "日本の固有種。夜行性で、昼間は水辺に掘った巣穴などで休んでいる。",
+     "quote": "夜行性で、昼間は水辺に掘った巣穴などで休む",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    },
+    {
+     "text": "オスは川辺に産卵用の巣を作る。その巣は毎年同じ場所を使うことが多い。",
+     "quote": "産卵巣は毎年同じ場所を利用することが多く",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    },
+    {
+     "text": "寿命は野生でも10年以上とされ、飼育下では51年生きた例がある。",
+     "quote": "飼育下では51年の生存例がある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+    }
+   ],
+   "likeness": "毎年同じ場所、同じやり方で、自分の暮らしをこつこつ守る。新しいものに飛びつくより、長く使える仕組みをじっくり育てる。時間を味方につける、長持ち自動化の職人です。",
+   "aruaru": [
+    "家計簿のやり方を、もう何年も変えていない",
+    "置き場所が決まっていないと、ちょっと落ち着かない",
+    "10年使っている道具に、なかなか愛着が抜けない"
+   ],
+   "catch": "同じ場所で、長く、こつこつ続ける",
+   "pos": "55% 55%",
+   "photo": {
+    "file": "shindan/img/japanese-giant-salamander.jpg",
+    "commons": "File:Andrias japonicus.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Andrias_japonicus.jpg",
+    "author": "Daiju Azuma",
+    "license": "CC BY-SA 2.5",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.5"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A7%E3%82%A6%E3%82%A6%E3%82%AA"
+   ]
+  },
+  {
+   "id": "japanese-tree-frog",
+   "name": "ニホンアマガエル",
+   "sci": "Dryophytes japonicus",
+   "group": "両生類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "雨が降りそうになると、繁殖期でなくても、昼間でも鳴くのが大きな特徴。",
+     "quote": "雨が降りそうになると繁殖期でなくとも、昼間でも鳴くのが大きな特徴である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%A2%E3%83%9E%E3%82%AC%E3%82%A8%E3%83%AB"
+    },
+    {
+     "text": "春の夜の水田ではたくさんのカエルが鳴き、場所によっては集団で大合唱になる。",
+     "quote": "場所によっては集団で大合唱になることもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%A2%E3%83%9E%E3%82%AC%E3%82%A8%E3%83%AB"
+    },
+    {
+     "text": "指先の丸い吸盤で、枝から枝へ飛び移ったり、ガラスの垂直面に張りついたりできる。",
+     "quote": "ガラスの垂直面に張りつくこともできる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%A2%E3%83%9E%E3%82%AC%E3%82%A8%E3%83%AB"
+    }
+   ],
+   "likeness": "空の様子を感じ取って、言われる前にひと声かける。身近な場所で、みんなと声をそろえて季節の仕事をこなす。暮らしの変化にさっと気づき、周りにも知らせる見張り役の自動化です。",
+   "aruaru": [
+    "天気予報を見て、洗濯の段取りを家族に知らせる",
+    "家族のグループに「明日雨だよ」と送るのが習慣",
+    "季節の行事や大掃除は、みんなでやるほうが気が楽"
+   ],
+   "catch": "雨の気配を感じたら、まずひと声かける",
+   "pos": "50% 35%",
+   "photo": {
+    "file": "shindan/img/japanese-tree-frog.jpg",
+    "commons": "File:Hyla japonica sep01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Hyla_japonica_sep01.jpg",
+    "author": "池田正樹 (talk) masaki ikeda",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%A2%E3%83%9E%E3%82%AC%E3%82%A8%E3%83%AB"
+   ]
+  },
+  {
+   "id": "veiled-chameleon",
+   "name": "エボシカメレオン",
+   "sci": "Chamaeleo calyptratus",
+   "group": "爬虫類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "雨の少ない土地に暮らし、カメレオンには珍しく植物の葉や果実も食べて水分をとる。",
+     "quote": "本種はカメレオンとしては珍しく植物の葉や果実等も食べる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%9C%E3%82%B7%E3%82%AB%E3%83%A1%E3%83%AC%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "体の色は、まわりの環境や気分、体調によって変わる。オスの頭は烏帽子のように高い。",
+     "quote": "体色は環境や気分、体調によって変化する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%9C%E3%82%B7%E3%82%AB%E3%83%A1%E3%83%AC%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "危険を感じると体を大きくふくらませ、口を大きく開けて警戒音を出して身を守る。",
+     "quote": "口を大きく開けて警戒音を出して威嚇行動を取る",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%9C%E3%82%B7%E3%82%AB%E3%83%A1%E3%83%AC%E3%82%AA%E3%83%B3"
+    }
+   ],
+   "likeness": "足りないものがあれば、身の回りにあるもので工夫して補う。その場の状況に合わせて色を変えつつ、危ないと思ったらすぐ守りに入る。慎重さと小回りを両立した手作業派です。",
+   "aruaru": [
+    "専用ツールがなくても、手持ちの表計算でなんとかする",
+    "相手や場面に合わせて、メールの文面をこまめに変える",
+    "怪しい設定画面を見ると、まず一歩引いて身構える"
+   ],
+   "catch": "あるもので、その場をうまくしのぐ",
+   "pos": "65% 45%",
+   "photo": {
+    "file": "shindan/img/veiled-chameleon.jpg",
+    "commons": "File:Jemenchamäleon Chamaeleo calyptratus.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Jemencham%C3%A4leon_Chamaeleo_calyptratus.jpg",
+    "author": "Norbert Sdunzik",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%9C%E3%82%B7%E3%82%AB%E3%83%A1%E3%83%AC%E3%82%AA%E3%83%B3"
+   ]
+  },
+  {
+   "id": "japanese-rhinoceros-beetle",
+   "name": "カブトムシ",
+   "sci": "Trypoxylus dichotomus",
+   "group": "昆虫",
+   "type": "SIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "夕暮れとともに動き出して樹液の出る餌場に集まり、日の出とともにまた休む。",
+     "quote": "夕暮れとともに活動を開始し、餌場に集まる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%96%E3%83%88%E3%83%A0%E3%82%B7"
+    },
+    {
+     "text": "けがをするおそれが高いため、なるべくむだな争いを避ける傾向がある。",
+     "quote": "カブトムシは極力無用な争いを避ける傾向にあり",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%96%E3%83%88%E3%83%A0%E3%82%B7"
+    },
+    {
+     "text": "トネリコなどの木では、自分で樹皮を少しずつ削って樹液を出し、餌場を作ることがある。",
+     "quote": "カブトムシ自身で樹皮を削り樹液を得ることがある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%96%E3%83%88%E3%83%A0%E3%82%B7"
+    }
+   ],
+   "likeness": "決まった時間に決まった場所へ集まり、みんなの輪の中で自分の仕事をこなす。むだな争いは避けつつ、必要なら自分の手で道を作る。働き者で、意外と慎重な現場派です。",
+   "aruaru": [
+    "毎日だいたい同じ時間に、同じ順番で作業を始める",
+    "会議で揉めそうな話題は、そっと後回しにする",
+    "仕組みがなければ、自分で作って使い始めている"
+   ],
+   "catch": "夜になったら、いつもの持ち場へ",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/japanese-rhinoceros-beetle.jpg",
+    "commons": "File:Kabutomushi-20070710.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kabutomushi-20070710.jpg",
+    "author": "Joi Ito from Inbamura, Japan",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%96%E3%83%88%E3%83%A0%E3%82%B7"
+   ]
+  },
+  {
+   "id": "green-sea-turtle",
+   "name": "アオウミガメ",
+   "sci": "Chelonia mydas",
+   "group": "爬虫類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "エサを食べる海と、卵を産む浜とのあいだを行き来（回遊）することがある。",
+     "quote": "採食を行う地域と産卵地の間を回遊",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A6%E3%83%9F%E3%82%AC%E3%83%A1"
+    },
+    {
+     "text": "産卵のときは、まず前足で体が隠れるほど深いくぼみを掘り、その中に後足で穴を掘る。",
+     "quote": "産卵巣はまず前肢で姿勢安定用に全身が隠れるほどの深い窪み",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A6%E3%83%9F%E3%82%AC%E3%83%A1"
+    },
+    {
+     "text": "名前の「アオ」は、主食の海藻の色素が体脂肪に出て、脂肪が青（緑）色になることから。",
+     "quote": "主食である海藻類の色素が脂肪に反映される",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A6%E3%83%9F%E3%82%AC%E3%83%A1"
+    }
+   ],
+   "likeness": "大事なことは、手間を惜しまず自分の手で一段ずつ準備する。食べる場所と産む場所を決めて、遠くても通い続ける。暮らしの段取りを、ていねいに自分でこなす型です。",
+   "aruaru": [
+    "大事な手続きだけは、人任せにせず自分でやる",
+    "いつものお店まで、少し遠くてもわざわざ通う",
+    "下準備に時間をかけるぶん、本番はいつも落ち着いている"
+   ],
+   "catch": "大事な準備は、自分の手でていねいに",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/green-sea-turtle.jpg",
+    "commons": "File:Green turtle swimming over coral reefs in Kona.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Green_turtle_swimming_over_coral_reefs_in_Kona.jpg",
+    "author": "Brocken Inaglory",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%82%AA%E3%82%A6%E3%83%9F%E3%82%AC%E3%83%A1"
+   ]
+  },
+  {
+   "id": "marine-iguana",
+   "name": "ウミイグアナ",
+   "sci": "Amblyrhynchus cristatus",
+   "group": "爬虫類",
+   "type": "SIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "トカゲの仲間でただ一種、海に潜りながら、海中の岩についた海藻を食べる。",
+     "quote": "トカゲ類では本種のみ海中に潜水しながら採食を行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%83%9F%E3%82%A4%E3%82%B0%E3%82%A2%E3%83%8A"
+    },
+    {
+     "text": "冷たい海から上がると日光浴をして体を温め、熱くなりすぎると岩かげや木かげに避難する。",
+     "quote": "海から上がると日光浴をして体温を上げる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%83%9F%E3%82%A4%E3%82%B0%E3%82%A2%E3%83%8A"
+    },
+    {
+     "text": "夜は熱を逃がさないよう、多いときは50匹ほどが寄り集まって眠ることが多い。",
+     "quote": "they often sleep closely together in groups that may number up to 50 individuals",
+     "source": "https://en.wikipedia.org/wiki/Marine_iguana"
+    }
+   ],
+   "likeness": "冷たい海にも自分で潜ってごはんを取りに行き、あとは仲間と寄り添って温まる。動くときと休むときの切り替えがはっきりしていて、暮らしのリズムを自分の手で整える型です。",
+   "aruaru": [
+    "買い出しは自分で行くけれど、帰ったら家族とゴロゴロ",
+    "暑すぎる日、寒すぎる日の段取りはもう体が覚えている",
+    "家族で同じアプリを使い、みんなで温まるのが好き"
+   ],
+   "catch": "自分で潜って、あとはみんなで温まる",
+   "pos": "40% 40%",
+   "photo": {
+    "file": "shindan/img/marine-iguana.jpg",
+    "commons": "File:Galápagos marine iguana.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Gal%C3%A1pagos_marine_iguana.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A6%E3%83%9F%E3%82%A4%E3%82%B0%E3%82%A2%E3%83%8A",
+    "https://en.wikipedia.org/wiki/Marine_iguana"
+   ]
+  },
+  {
+   "id": "greenland-shark",
+   "name": "ニシオンデンザメ",
+   "sci": "Somniosus microcephalus",
+   "group": "魚類",
+   "type": "SIC",
+   "rare": true,
+   "facts": [
+    {
+     "text": "冷たい海で筋肉の動きが遅く、泳ぐ速さは時速1kmほど。「世界一のろい魚」とされる。",
+     "quote": "「世界一のろい魚」とされる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%82%AA%E3%83%B3%E3%83%87%E3%83%B3%E3%82%B6%E3%83%A1"
+    },
+    {
+     "text": "知られている脊椎動物の中でいちばん長生きで、推定392歳ほどの個体も見つかっている。",
+     "quote": "既知の脊椎動物としては最も長寿であり",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%82%AA%E3%83%B3%E3%83%87%E3%83%B3%E3%82%B6%E3%83%A1"
+    },
+    {
+     "text": "成長も遅く、メスが大人になるまでにおよそ150年かかると推定されている。",
+     "quote": "メスの性成熟には約150年かかると推定されている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%82%AA%E3%83%B3%E3%83%87%E3%83%B3%E3%82%B6%E3%83%A1"
+    }
+   ],
+   "likeness": "急ぐという考えが、そもそもない。ごく少ないエネルギーで、何百年もの時間をかけて物事を進める。一度動かした仕組みを、とんでもなく長く回し続ける究極のマイペースです。",
+   "aruaru": [
+    "「そのうちやる」の「そのうち」が、年単位で続いている",
+    "最後に設定を変えたのがいつか、自分でも思い出せない",
+    "急ぎの依頼でも、自分の速さはなぜか変わらない"
+   ],
+   "catch": "数百年単位で回す、究極のマイペース",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/greenland-shark.jpg",
+    "commons": "File:Somniosus microcephalus okeanos.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Somniosus_microcephalus_okeanos.jpg",
+    "author": "NOAA Okeanos Explorer Program",
+    "license": "Public domain",
+    "license_url": ""
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%82%AA%E3%83%B3%E3%83%87%E3%83%B3%E3%82%B6%E3%83%A1"
+   ]
+  },
+  {
+   "id": "new-caledonian-crow",
+   "name": "カレドニアガラス",
+   "sci": "Corvus moneduloides",
+   "group": "鳥類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "葉の柄を加工した棒を倒木の穴に差しこみ、中の幼虫にかみつかせて引っぱり出す。",
+     "quote": "ククイノキの葉柄を加工した棒を倒木の穴に差し込み、それに幼虫を噛みつかせて引っ張り出す",
+     "source": "https://ja.wikipedia.org/wiki/カレドニアガラス"
+    },
+    {
+     "text": "先をかぎ状にした棒「フックツール」で、穴にひそむ虫をとる地域もある。",
+     "quote": "先端をかぎ状にした棒「フックツール」",
+     "source": "https://ja.wikipedia.org/wiki/カレドニアガラス"
+    },
+    {
+     "text": "飼育されている個体は、針金の先を曲げてフックにし、筒の中の餌を引き上げることができる。",
+     "quote": "針金の先を曲げてフック状にした道具を使用し、筒の中の餌を引っ張り上げることができる",
+     "source": "https://ja.wikipedia.org/wiki/カレドニアガラス"
+    }
+   ],
+   "likeness": "手近な枝や葉を自分で加工して、ちょうどいい道具に仕立ててしまう。その場で作った小さな仕組みを、ひとりで黙々と使いこなすのが得意。",
+   "aruaru": [
+    "ないなら作ればいいと、つい道具づくりから始めてしまう",
+    "ちょっとした手づくりツールが、いつのまにか増えている",
+    "針金やクリップを見ると、何かに使えないか考えてしまう"
+   ],
+   "catch": "ちょうどいい道具は、その場で手づくり",
+   "pos": "40% 40%",
+   "photo": {
+    "file": "shindan/img/new-caledonian-crow.jpg",
+    "commons": "File:Corvus moneduloides, Sarramea, New Caledonia 1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Corvus_moneduloides,_Sarramea,_New_Caledonia_1.jpg",
+    "author": "benkeen",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/カレドニアガラス"
+   ]
+  },
+  {
+   "id": "bearded-capuchin",
+   "name": "ヒゲオマキザル",
+   "sci": "Sapajus libidinosus",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "木の実を石の台にのせ、別の石でたたいて割る。道具を使うことでよく知られている。",
+     "quote": "place them on a stone anvil, and use another stone to crack them open",
+     "source": "https://en.wikipedia.org/wiki/Black-striped_capuchin"
+    },
+    {
+     "text": "野生では、棒を差しこんで探ったり、はちみつをすくったりするのにも使うらしい。",
+     "quote": "Sticks also seem to be used to probe as well as dip for honey in the wild",
+     "source": "https://en.wikipedia.org/wiki/Black-striped_capuchin"
+    },
+    {
+     "text": "6〜20頭ほどの、仲間どうしのつながりが強い群れで暮らすことが多い。",
+     "quote": "They often live in highly social groups ranging from 6-20 individuals",
+     "source": "https://en.wikipedia.org/wiki/Black-striped_capuchin"
+    }
+   ],
+   "likeness": "石を台とハンマーに使い分けて、固い殻もこつこつ割っていく。仲間のそばで手を動かしながら、身近なものでやり方を工夫し続ける働き者。",
+   "aruaru": [
+    "手が空くと、つい何かを便利にする工夫を始めている",
+    "固い作業ほど、道具を持ちかえて燃えてくる",
+    "チームの中で、こっそり便利な裏ワザを広めがち"
+   ],
+   "catch": "身近なもので、固い仕事も割ってみせる",
+   "pos": "45% 35%",
+   "photo": {
+    "file": "shindan/img/bearded-capuchin.jpg",
+    "commons": "File:Stone tool use by a capuchin monkey.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Stone_tool_use_by_a_capuchin_monkey.jpg",
+    "author": "Tiago Falótico",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Black-striped_capuchin"
+   ]
+  },
+  {
+   "id": "woodpecker-finch",
+   "name": "キツツキフィンチ",
+   "sci": "Camarhynchus pallidus",
+   "group": "鳥類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "小枝やサボテンのとげを道具にして、木のすき間から幼虫などを引き出す。",
+     "quote": "its ability to use twigs, sticks, or cactus spines as tools",
+     "source": "https://en.wikipedia.org/wiki/Woodpecker_finch"
+    },
+    {
+     "text": "長すぎる枝やとげを短くして、使いやすい長さにしてから使うことがある。",
+     "quote": "shortening the length of sticks or cactus spines to make them more manageable for tool use",
+     "source": "https://en.wikipedia.org/wiki/Woodpecker_finch"
+    },
+    {
+     "text": "雨の少ない乾季には、獲物の最大50%を道具を使って手に入れている。",
+     "quote": "During the dry season, woodpecker finches use tools while foraging to acquire up to 50% of their prey",
+     "source": "https://en.wikipedia.org/wiki/Woodpecker_finch"
+    }
+   ],
+   "likeness": "舌が届かないなら、とげを道具にすればいい。長さを調整して使いやすくし、困ったときほど工夫の出番が増えていく、暮らし上手のアイデアマン。",
+   "aruaru": [
+    "届かない場所には、とりあえず手近な棒を差しこむ",
+    "道具の長さや形を、自分に合うように直してから使う",
+    "忙しい時期ほど、なぜか工夫がどんどん冴えてくる"
+   ],
+   "catch": "届かないなら、とげ一本でなんとかする",
+   "pos": "40% 45%",
+   "photo": {
+    "file": "shindan/img/woodpecker-finch.jpg",
+    "commons": "File:Camarhynchus pallidus 12789263.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Camarhynchus_pallidus_12789263.jpg",
+    "author": "Julien Renoult",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Woodpecker_finch"
+   ]
+  },
+  {
+   "id": "indo-pacific-bottlenose-dolphin",
+   "name": "ミナミハンドウイルカ",
+   "sci": "Tursiops aduncus",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "海底の海綿をちぎって口先にかぶせ、魚を探すのに使うことがある。",
+     "quote": "A dolphin breaks a marine sponge off the sea floor and wears it over its rostrum",
+     "source": "https://en.wikipedia.org/wiki/Indo-Pacific_bottlenose_dolphin"
+    },
+    {
+     "text": "決まった種類のサンゴや海綿に体をこすりつける。皮膚の病気の手当てに役立てているのかもしれない。",
+     "quote": "they might be used by the dolphins to treat skin infections",
+     "source": "https://en.wikipedia.org/wiki/Indo-Pacific_bottlenose_dolphin"
+    },
+    {
+     "text": "10〜20頭ほどの群れをつくることが多いが、単独で動いたり、100頭以上の大群になったりもする。",
+     "quote": "10～20頭程度の群れ（ポッド）を成すことが多い",
+     "source": "https://ja.wikipedia.org/wiki/ミナミハンドウイルカ"
+    }
+   ],
+   "likeness": "海綿を手袋のようにかぶったり、サンゴで体をケアしたり、海にあるものを暮らしの道具に変えてしまう。新しい工夫は、群れの仲間と一緒に楽しむ。",
+   "aruaru": [
+    "見つけた便利ワザは、すぐ家族や友だちに見せたくなる",
+    "身のまわりのものを、ついセルフケアに活用してしまう",
+    "動き回るのが好きで、じっとしている時間が少なめ"
+   ],
+   "catch": "海にあるものは、だいたい便利グッズ",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/indo-pacific-bottlenose-dolphin.jpg",
+    "commons": "File:Dolphins gesture language.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Dolphins_gesture_language.jpg",
+    "author": "Serguei S. Dukachev",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Indo-Pacific_bottlenose_dolphin",
+    "https://ja.wikipedia.org/wiki/ミナミハンドウイルカ"
+   ]
+  },
+  {
+   "id": "goffins-cockatoo",
+   "name": "シロビタイムジオウム",
+   "sci": "Cacatua goffiniana",
+   "group": "鳥類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "飼育下のオスが、木のかけらや小枝を自分で形づくって熊手を作り、届かない餌を引き寄せた。",
+     "quote": "spontaneously shaping splinters of wood and small sticks to create rakes",
+     "source": "https://en.wikipedia.org/wiki/Tanimbar_corella"
+    },
+    {
+     "text": "5つの部品が順につながった錠を、自分で手順を見つけて開け、餌を取り出した例がある。",
+     "quote": "spontaneously working out how to open a five-part locking mechanism in sequence to retrieve a food item",
+     "source": "https://en.wikipedia.org/wiki/Tanimbar_corella"
+    },
+    {
+     "text": "野生の個体も、太さのちがう枝を加工していくつもの道具を作り、種を食べていた。",
+     "quote": "Wild corellas were also observed shaping sticks of different dimensions to create a series of tools",
+     "source": "https://en.wikipedia.org/wiki/Tanimbar_corella"
+    }
+   ],
+   "likeness": "ゴフィンオウムとも呼ばれる。初めて見る仕掛けでも、いじっているうちに開け方を見つけてしまう。手近な材料で道具を作る、試行錯誤の名人。",
+   "aruaru": [
+    "説明書を読む前に、とりあえず触って動かしてみる",
+    "新しいアプリやツールは、まず全部のボタンを押してみる",
+    "退屈すると、身のまわりのものを分解したくなる"
+   ],
+   "catch": "いじっているうちに、なぜか解けている",
+   "pos": "45% 40%",
+   "photo": {
+    "file": "shindan/img/goffins-cockatoo.jpg",
+    "commons": "File:Cacatua goffiniana -Hong Kong-6b.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cacatua_goffiniana_-Hong_Kong-6b.jpg",
+    "author": "Charles Lam",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Tanimbar_corella"
+   ]
+  },
+  {
+   "id": "chimpanzee",
+   "name": "チンパンジー",
+   "sci": "Pan troglodytes",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "蟻塚に棒を差しこんでシロアリをとったり、石で堅い木の実の殻を割ったりと、いろいろな道具を使う。",
+     "quote": "蟻塚に棒を差込みシロアリを捕食する、石や倒木を使って堅い果実の殻を割る",
+     "source": "https://ja.wikipedia.org/wiki/チンパンジー"
+    },
+    {
+     "text": "道具の使い方には地域ごとのちがいがあり、文化的な行動と考えられている。",
+     "quote": "これらの道具および行動には地域変異があり、文化的行動と考えられている",
+     "source": "https://ja.wikipedia.org/wiki/チンパンジー"
+    },
+    {
+     "text": "複数のオスとメスをふくむ19〜106頭の群れで暮らし、群れは集まったり分かれたりをくり返す。",
+     "quote": "複数の雌雄が含まれる19 - 106頭の群れを形成し、群れは集合離散を繰り返す",
+     "source": "https://ja.wikipedia.org/wiki/チンパンジー"
+    }
+   ],
+   "likeness": "棒も石も葉っぱも、目の前のものを次々と道具にしてしまう。仲間のやり方をまねたり広めたりしながら、職場ごとの便利ワザをみんなで育てていく。",
+   "aruaru": [
+    "人の便利ワザを見ると、すぐまねして自分流にする",
+    "チームごとに、なぜか独自のやり方が生まれている",
+    "ひとつの道具を、思いもよらない使い方で使いがち"
+   ],
+   "catch": "目の前のものは、ぜんぶ道具の候補",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/chimpanzee.jpg",
+    "commons": "File:Adult female and infant wild chimpanzees feeding on Ficus sur.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File:Adult_female_and_infant_wild_chimpanzees_feeding_on_Ficus_sur.jpeg",
+    "author": "Alain Houle (Harvard University)",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/チンパンジー"
+   ]
+  },
+  {
+   "id": "veined-octopus",
+   "name": "メジロダコ",
+   "sci": "Amphioctopus marginatus",
+   "group": "軟体動物",
+   "type": "SIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ココナツの殻や貝殻を集めて、身をかくすための、すみかとして使う。",
+     "quote": "it gathers coconut shells and seashells and uses these for shelter",
+     "source": "https://en.wikipedia.org/wiki/Amphioctopus_marginatus"
+    },
+    {
+     "text": "人が捨てたココナツの殻を、20mほども運んで、体のまわりに組み立てることがある。",
+     "quote": "They were then carried up to 20 meters (66 ft) and arranged around the body of the octopus",
+     "source": "https://en.wikipedia.org/wiki/Amphioctopus_marginatus"
+    },
+    {
+     "text": "殻など自分より大きなものを運ぶときは、2本の腕で歩くように移動することが多い。",
+     "quote": "Octopuses will often engage in bipedal motion when carrying stacks of debris or items larger than themselves",
+     "source": "https://en.wikipedia.org/wiki/Amphioctopus_marginatus"
+    }
+   ],
+   "likeness": "落ちている殻やびんまで、使えそうなら拾って持ち歩き、必要な場面でさっと組み立てる。身近なものを自分の居場所に変えてしまうのが上手。",
+   "aruaru": [
+    "使えそうな箱や袋は、とりあえず持って帰ってくる",
+    "家の中のあちこちに、自作の便利コーナーがある",
+    "荷物は多めだけど、どれも出番があるから手放せない"
+   ],
+   "catch": "拾ったもので、自分の基地をつくる",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/veined-octopus.jpg",
+    "commons": "File:Octopus marginatus.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Octopus_marginatus.JPG",
+    "author": "Jens Petersen",
+    "license": "CC BY 2.5",
+    "license_url": "https://creativecommons.org/licenses/by/2.5"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Amphioctopus_marginatus"
+   ]
+  },
+  {
+   "id": "asian-elephant",
+   "name": "アジアゾウ",
+   "sci": "Elephas maximus",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "研究によれば、類人猿と同じくらい道具を使ったり作ったりする力をもっている。",
+     "quote": "アジアゾウは類人猿と同等の道具使用および道具作成能力を持つ",
+     "source": "https://ja.wikipedia.org/wiki/アジアゾウ"
+    },
+    {
+     "text": "前足をあまり使わないアフリカゾウとちがい、鼻と足を使って、ものを器用にあつかう。",
+     "quote": "アジアゾウは鼻と肢で物体を巧みに扱う",
+     "source": "https://ja.wikipedia.org/wiki/アジアゾウ"
+    },
+    {
+     "text": "メスと子どもは群れをつくる。血縁のあるメス3頭ほどと、その子どもで構成されることが多い。",
+     "quote": "おそらく血縁関係にある雌成獣3頭と、その子孫で構成されることが多い",
+     "source": "https://ja.wikipedia.org/wiki/アジアゾウ"
+    }
+   ],
+   "likeness": "長い鼻を手のように使って、身のまわりのものを器用にあつかう。家族のような仲間と一緒に、暮らしの中の工夫を少しずつ重ねていく。",
+   "aruaru": [
+    "家族みんなが使える便利ワザを考えるのが好き",
+    "ひとつの道具で、何役もこなそうとしてしまう",
+    "大きな仕事も、みんなでやればなんとかなると思っている"
+   ],
+   "catch": "鼻ひとつで、なんでも器用にこなす",
+   "pos": "50% 55%",
+   "photo": {
+    "file": "shindan/img/asian-elephant.jpg",
+    "commons": "File:Kui Buri National Park (Prachuap Khiri Khan Province, Thailand.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kui_Buri_National_Park_(Prachuap_Khiri_Khan_Province,_Thailand.jpg",
+    "author": "KOSIN SUKHUM",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/アジアゾウ"
+   ]
+  },
+  {
+   "id": "egyptian-vulture",
+   "name": "エジプトハゲワシ",
+   "sci": "Neophron percnopterus",
+   "group": "鳥類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "石をくわえてダチョウの卵にたたきつけたり、上空から石を落としたりして割る。",
+     "quote": "石は咥えて卵に叩きつけるか、上空から石を卵へ目掛けて落とす",
+     "source": "https://ja.wikipedia.org/wiki/エジプトハゲワシ"
+    },
+    {
+     "text": "石を使ってダチョウの卵を割る鳥として知られ、うまく割れないときは石を取りかえる。",
+     "quote": "上手く割れない場合は石を変える",
+     "source": "https://ja.wikipedia.org/wiki/エジプトハゲワシ"
+    },
+    {
+     "text": "小型のためか、ほかの動物が食べ終わった後に残った肉片をついばむことが多い。",
+     "quote": "他の動物が食べ終わった後に残った肉片をついばむことが多い",
+     "source": "https://ja.wikipedia.org/wiki/エジプトハゲワシ"
+    }
+   ],
+   "likeness": "大物は先に誰かが片付けた後でゆっくりいただき、固い卵は石でサクッと割る。力まかせより、手近な道具とタイミングで楽をするのが上手。",
+   "aruaru": [
+    "うまくいかないときは、自分より先に道具を取りかえる",
+    "人が作った下書きに、ちょい足しして仕上げるのが得意",
+    "一番乗りより、空いてからゆっくり行くほうが好き"
+   ],
+   "catch": "力まかせより、石ひとつで楽に割る",
+   "pos": "55% 35%",
+   "photo": {
+    "file": "shindan/img/egyptian-vulture.jpg",
+    "commons": "File:Neophron percnopterus - 01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Neophron_percnopterus_-_01.jpg",
+    "author": "Carlos Delgado",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/エジプトハゲワシ"
+   ]
+  },
+  {
+   "id": "common-raven",
+   "name": "ワタリガラス",
+   "sci": "Corvus corax",
+   "group": "鳥類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "死んだ動物のところにオオカミを呼ぶことがある。オオカミが体を開くので、残りが食べやすくなる。",
+     "quote": "Common ravens have been observed calling wolves to the site of dead animals. The wolves open the carcass",
+     "source": "https://en.wikipedia.org/wiki/Common_raven"
+    },
+    {
+     "text": "小枝を折って、仲間と遊ぶためのおもちゃを自分で作る、数少ない野生動物のひとつ。",
+     "quote": "They have been observed breaking off twigs to play with socially",
+     "source": "https://en.wikipedia.org/wiki/Common_raven"
+    },
+    {
+     "text": "若い鳥はとても遊び好きで、雪の斜面をすべり下りる姿も見られている。",
+     "quote": "They have been observed to slide down snowbanks, apparently purely for fun",
+     "source": "https://en.wikipedia.org/wiki/Common_raven"
+    }
+   ],
+   "likeness": "自分でやるのが大変なところは、得意な相手を呼んで開けてもらう。小枝一本でも遊び道具に変えて、仲間と面白がりながら片付けてしまう。",
+   "aruaru": [
+    "面倒なところは、得意な人をうまく呼んでくる",
+    "仕事の中にも、つい遊びの要素を入れたくなる",
+    "新しいものを見つけると、とりあえずつついてみる"
+   ],
+   "catch": "大変なところは、得意な仲間を呼ぶ",
+   "pos": "50% 35%",
+   "photo": {
+    "file": "shindan/img/common-raven.jpg",
+    "commons": "File:Corvus corax by David Hofmann.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Corvus_corax_by_David_Hofmann.jpg",
+    "author": "David Hofmann",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Common_raven"
+   ]
+  },
+  {
+   "id": "bornean-orangutan",
+   "name": "ボルネオオランウータン",
+   "sci": "Pongo pygmaeus",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "雨の中を移動するとき、葉のついた枝を束ねて「傘」のようにして使う。",
+     "quote": "a bunch of leafy branches held together as an \"umbrella\" while traveling in the rain",
+     "source": "https://en.wikipedia.org/wiki/Bornean_orangutan"
+    },
+    {
+     "text": "枝や葉を編みこんで寝床を作り、夜だけでなく昼に使うこともある。",
+     "quote": "Nests are built for use at night or during the day",
+     "source": "https://en.wikipedia.org/wiki/Bornean_orangutan"
+    },
+    {
+     "text": "スマトラにすむなかまよりも、ひとりで過ごすことが多い。オスはとくにその傾向が強い。",
+     "quote": "Bornean orangutan are more solitary than their Sumatran relatives",
+     "source": "https://en.wikipedia.org/wiki/Bornean_orangutan"
+    }
+   ],
+   "likeness": "雨が降れば枝で傘を作り、眠くなれば昼でも寝床を作る。困ったときに手近なもので、その場をいちばん楽にする工夫が自然に出てくる。",
+   "aruaru": [
+    "ひと休みのための工夫には、だれより本気になる",
+    "身近なものを、さっと即席の便利グッズに変える",
+    "ひとりでのんびりしながら、いいアイデアを思いつく"
+   ],
+   "catch": "雨が降ったら、枝で傘をつくればいい",
+   "pos": "40% 45%",
+   "photo": {
+    "file": "shindan/img/bornean-orangutan.jpg",
+    "commons": "File:Orangutan Kalimantan.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Orangutan_Kalimantan.jpg",
+    "author": "Ridwan0810",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Bornean_orangutan"
+   ]
+  },
+  {
+   "id": "sea-otter",
+   "name": "ラッコ",
+   "sci": "Enhydra lutris",
+   "group": "哺乳類",
+   "type": "SIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "貝やウニを、おなかの上にのせた石にたたきつけて割り、中身だけを食べることがある。",
+     "quote": "貝類やウニ類は胸部や腹部の上に石を乗せ、それに叩きつけて割り中身だけを食べることもある",
+     "source": "https://ja.wikipedia.org/wiki/ラッコ"
+    },
+    {
+     "text": "食べるときに使う石や、食べきれなかった貝を、わき腹のたるみをポケットにしてしまっておく。",
+     "quote": "わき腹のたるみをポケットにして、しまい込んでおく癖がある",
+     "source": "https://ja.wikipedia.org/wiki/ラッコ"
+    },
+    {
+     "text": "ふだんは単独で暮らすが、休むときには数十〜数百頭が集まることもある。",
+     "quote": "休息時には数十頭から数百頭の個体が集合することもある",
+     "source": "https://ja.wikipedia.org/wiki/ラッコ"
+    }
+   ],
+   "likeness": "おなかの上を作業台にして、手近な石で殻を割る。便利なものはポケットにしまっておき、ひと仕事終えたら、みんなで集まってのんびり浮かぶ。",
+   "aruaru": [
+    "便利な道具は、すぐ手の届くところにしまいこむ",
+    "作業台は、だいたいひざの上かソファの上になりがち",
+    "がんばった後は、みんなでだらだら休むのが好き"
+   ],
+   "catch": "おなかの上が、いちばんの作業台",
+   "pos": "65% 45%",
+   "photo": {
+    "file": "shindan/img/sea-otter.jpg",
+    "commons": "File:Adult Sea Otter in Morro Bay.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Adult_Sea_Otter_in_Morro_Bay.jpg",
+    "author": "Mike Baird from Morro Bay, USA",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/ラッコ"
+   ]
+  },
+  {
+   "id": "banded-archerfish",
+   "name": "テッポウウオ",
+   "sci": "Toxotes jaculatrix",
+   "group": "魚類",
+   "type": "SIN",
+   "rare": true,
+   "facts": [
+    {
+     "text": "口にふくんだ水を発射して、水面の上の葉にとまった虫などを撃ち落として食べる。",
+     "quote": "口に含んだ水を発射して、水面上の葉に止まった昆虫などを撃ち落とし、捕食する",
+     "source": "https://ja.wikipedia.org/wiki/テッポウウオ"
+    },
+    {
+     "text": "水面で光が曲がって見えるずれを計算して、水を飛ばしたりジャンプしたりできる。",
+     "quote": "テッポウウオ類は屈折を計算して水の噴射やジャンプができる",
+     "source": "https://ja.wikipedia.org/wiki/テッポウウオ"
+    },
+    {
+     "text": "命中しやすくするため、できるだけ獲物に近よってから水を打ち出す。",
+     "quote": "できる限り獲物に近寄ってから水を打ち出す",
+     "source": "https://ja.wikipedia.org/wiki/テッポウウオ"
+    }
+   ],
+   "likeness": "水の中から出ないまま、水鉄砲ひとつで上の獲物を落とす。動く距離はなるべく少なく、工夫はたっぷりの、座ったまま片付ける名人。",
+   "aruaru": [
+    "席を立たずに片付ける方法を、本気で考えている",
+    "遠くのものは、なにかを飛ばして取れないか考える",
+    "いちど狙いを決めたら、ほぼ一発で決めてみせる"
+   ],
+   "catch": "動かずに、水鉄砲で全部片付けたい",
+   "pos": "40% 50%",
+   "photo": {
+    "file": "shindan/img/banded-archerfish.jpg",
+    "commons": "File:Toxotes jaculatrix.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Toxotes_jaculatrix.jpg",
+    "author": "Chrumps",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/テッポウウオ"
+   ]
+  },
+  {
+   "id": "bluestreak-cleaner-wrasse",
+   "name": "ホンソメワケベラ",
+   "sci": "Labroides dimidiatus",
+   "group": "魚類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ほかの魚の体についた寄生虫を食べる「掃除屋」。魚たちのほうから近寄ってくる。",
+     "quote": "他の魚はホンソメワケベラを発見すると近寄っていく。ホンソメワケベラはその魚の回りを泳ぎながら、ウミクワガタを主体に体表に喰い付いている寄生虫を捕食する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%82%BD%E3%83%A1%E3%83%AF%E3%82%B1%E3%83%99%E3%83%A9"
+    },
+    {
+     "text": "掃除してほしい魚は「クリーニングステーション」と呼ばれる縄張りに自分から訪れる。",
+     "quote": "クリーニングステーションと呼ばれる掃除魚やクリーニングシュリンプがいる縄張りに訪れると",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%82%BD%E3%83%A1%E3%83%AF%E3%82%B1%E3%83%99%E3%83%A9"
+    },
+    {
+     "text": "あごにつけた印を石などでこすったあと、鏡の前に戻って取れたかを確かめる様子が観察された。",
+     "quote": "海藻や石で正しい側（鏡像とは反対）の顎をこすり、再び鏡の前に戻って印が取れたか確認する行為が観察された",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%82%BD%E3%83%A1%E3%83%AF%E3%82%B1%E3%83%99%E3%83%A9"
+    }
+   ],
+   "likeness": "決まった場所で依頼を受けて、ていねいに片付ける掃除屋さん。頼まれごとの窓口をきちんと用意して、終わったら仕上がりまで見直すところが、段取りと確認を大事にする自動化のクセとよく似ている。",
+   "aruaru": [
+    "問い合わせ窓口やフォームを作っておくと、なぜか安心する",
+    "作業が終わったあと、もう一度ちゃんと動いたか見に行く",
+    "「ここに頼めば片付く」と言われる場所を持っている"
+   ],
+   "catch": "窓口を開けて待つ、まじめな掃除屋",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/bluestreak-cleaner-wrasse.jpg",
+    "commons": "File:Lábrido limpiador común (Labroides dimidiatus), mar Rojo, Egipto, 2023-04-17, DD 90.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:L%C3%A1brido_limpiador_com%C3%BAn_(Labroides_dimidiatus),_mar_Rojo,_Egipto,_2023-04-17,_DD_90.jpg",
+    "author": "Diego Delso",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%82%BD%E3%83%A1%E3%83%AF%E3%82%B1%E3%83%99%E3%83%A9"
+   ]
+  },
+  {
+   "id": "japanese-honeybee",
+   "name": "ニホンミツバチ",
+   "sci": "Apis cerana japonica",
+   "group": "昆虫",
+   "type": "MPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "ほかの多くのミツバチと同じく、ダンスをして仲間に「よい花」のある場所を知らせる。",
+     "quote": "他の多くのミツバチと同様、ニホンミツバチはダンスで仲間に「有効な花」の場所を知らせる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    },
+    {
+     "text": "巣にスズメバチが入ってくると、数百匹で球のように取り囲み、温度を上げて身を守る。",
+     "quote": "スズメバチが巣に侵入すると、数百匹のミツバチが球状に取り囲み、外部と完全に遮断することで効果的に対処できないようにする。ミツバチは巣が寒い時と同じように飛翔筋を動かす。これによって温度が致命的な46℃に達する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    },
+    {
+     "text": "新しい巣に引っ越す前には、古い巣をきちんと解体してから移る。",
+     "quote": "新しい巣に移る前、古い巣を解体する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    }
+   ],
+   "likeness": "見つけた情報はすぐ仲間に共有し、困ったことはみんなで囲んで片付ける。引っ越しの前に古い巣を片付けるように、仕組みを入れ替えるときも後始末まで段取りに入れておくのが得意。",
+   "aruaru": [
+    "いい道具を見つけたら、すぐチームのチャットに共有する",
+    "トラブルが起きると、関係者を集めて一気に片付けにかかる",
+    "新しい仕組みに移る前に、古い設定の後片付けを済ませる"
+   ],
+   "catch": "見つけた情報は共有、守りはみんなで",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/japanese-honeybee.jpg",
+    "commons": "File:Japanese Honeybee Pollinating Japanese Apricot Blossoms (247564891).jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File:Japanese_Honeybee_Pollinating_Japanese_Apricot_Blossoms_(247564891).jpeg",
+    "author": "Greg Peterson",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+   ]
+  },
+  {
+   "id": "red-crowned-crane",
+   "name": "タンチョウ",
+   "sci": "Grus japonensis",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "体重は季節によって変わり、夏にいちばん軽く、冬を越す前の年末にいちばん重くなる。",
+     "quote": "体重は季節に応じて変動し、夏場が最も軽く、越冬前の年末に最も重くなる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%B3%E3%83%81%E3%83%A7%E3%82%A6"
+    },
+    {
+     "text": "卵はオスとメスが交代で温める。温める期間は31〜36日ほど。",
+     "quote": "雌雄交代で抱卵し、抱卵期間は31 - 36日。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%B3%E3%83%81%E3%83%A7%E3%82%A6"
+    },
+    {
+     "text": "ペアで鳴き交わすときは、オスが先に「クォー」と鳴き、メスが「カッカッ」と返す。",
+     "quote": "ペアで鳴き交わす際、先に「クォー」と鳴くのが雄、「カッカッ」と返すのが雌である。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%B3%E3%83%81%E3%83%A7%E3%82%A6"
+    }
+   ],
+   "likeness": "冬に備えて年末までに体をととのえ、子育ては相手と交代で回す。暮らしの用事も、先を見て準備し、任せる人と順番を決めて回していく。決まった合図でやりとりするところも、確認を欠かさないクセに重なる。",
+   "aruaru": [
+    "年末の用事は、秋のうちから少しずつ準備しておく",
+    "家事の当番表を作ると、気持ちがすっきりする",
+    "「やっておいたよ」「ありがとう」の返事までがひと区切り"
+   ],
+   "catch": "先に備え、合図を決めて交代で回す",
+   "pos": "40% 50%",
+   "photo": {
+    "file": "shindan/img/red-crowned-crane.jpg",
+    "commons": "File:Grus japonensis 336788797.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Grus_japonensis_336788797.jpg",
+    "author": "Nathan Ruser",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%BF%E3%83%B3%E3%83%81%E3%83%A7%E3%82%A6"
+   ]
+  },
+  {
+   "id": "greater-white-fronted-goose",
+   "name": "マガン",
+   "sci": "Anser albifrons",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "北の高緯度の地域で子育てをし、冬になると南の地域へ渡っていく。",
+     "quote": "北半球の高緯度地域で繁殖し、冬には低緯度地域へと渡りを行う。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%AC%E3%83%B3"
+    },
+    {
+     "text": "地上や水の上では、首を水平にのばし合い、低い声で鳴いてあいさつをする。",
+     "quote": "地上や水上では互いに頸を水平に伸ばして「グァァァァ」と低い声で鳴いて挨拶をする。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%AC%E3%83%B3"
+    },
+    {
+     "text": "「キュユユ」と大きな声で鳴き、飛び立つときや飛んでいる間によく鳴く。",
+     "quote": "「キュユユ」「クワワワ」と大きな声で鳴き、飛び立つ時や飛翔中によく鳴く。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%AC%E3%83%B3"
+    }
+   ],
+   "likeness": "季節が変わるたびに、群れで決まった道を移っていく渡り鳥。出発のときも移動中も声をかけ合うように、暮らしの段取りを家族や仲間と声をかけ合いながら、毎年同じ流れで回していくのが得意。",
+   "aruaru": [
+    "衣替えや大掃除は、毎年だいたい同じ時期にやる",
+    "出かける前に「鍵持った？」と声をかけ合う",
+    "家族の予定を、共有のカレンダーにまとめている"
+   ],
+   "catch": "声をかけ合って、毎年きちんと渡る",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/greater-white-fronted-goose.jpg",
+    "commons": "File:Greater white-fronted goose (cropped).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Greater_white-fronted_goose_(cropped).jpg",
+    "author": "Ryanx7",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%AC%E3%83%B3"
+   ]
+  },
+  {
+   "id": "dromedary",
+   "name": "ヒトコブラクダ",
+   "sci": "Camelus dromedarius",
+   "group": "哺乳類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "およそ100kgの荷物を、休んだり食べたりしながら、ゆっくり1日30kmほど運ぶことができる。",
+     "quote": "およそ100kgの荷物を休息と採食を繰り返しながらのゆっくりしたペースで一日30km運ぶことも出来る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%88%E3%82%B3%E3%83%96%E3%83%A9%E3%82%AF%E3%83%80"
+    },
+    {
+     "text": "ウマとちがい、人や荷物を乗せるときは膝をついて体を低くしてくれる。",
+     "quote": "ウマとは異なり、人や積み荷を乗せるときに、膝をついて体勢を低くする。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%88%E3%82%B3%E3%83%96%E3%83%A9%E3%82%AF%E3%83%80"
+    },
+    {
+     "text": "人を乗せて、時速13〜14.5kmほどの速さを数時間続けることができる。",
+     "quote": "騎手を乗せたヒトコブラクダは時速13-14.5km の速度を、数時間にわたり持続することができる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%88%E3%82%B3%E3%83%96%E3%83%A9%E3%82%AF%E3%83%80"
+    }
+   ],
+   "likeness": "重い荷物も、休みをはさみながら同じペースで運び続ける。仕事の山も一度に片付けず、受け取りやすい形に整えて、毎日決まった量を確実に進める。頼まれた荷をきちんと届ける、信頼される運び役。",
+   "aruaru": [
+    "大きな仕事は、1日の分量に分けて予定に入れる",
+    "人から頼まれやすいよう、受付の手順をわかりやすくしてある",
+    "急がないけれど、気づいたら一番遠くまで進んでいる"
+   ],
+   "catch": "休みながらも、荷はきちんと届ける",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/dromedary.jpg",
+    "commons": "File:Camelus dromedarius in Nuweiba.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Camelus_dromedarius_in_Nuweiba.jpg",
+    "author": "Florian Prischl",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%92%E3%83%88%E3%82%B3%E3%83%96%E3%83%A9%E3%82%AF%E3%83%80"
+   ]
+  },
+  {
+   "id": "african-bush-elephant",
+   "name": "アフリカゾウ",
+   "sci": "Loxodonta africana",
+   "group": "哺乳類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "群れの中では、食べ物のある場所や水場などの情報が共有され、受け継がれていく。",
+     "quote": "群れでは、採食場や水場などの情報が共有・伝承される。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%95%E3%83%AA%E3%82%AB%E3%82%BE%E3%82%A6"
+    },
+    {
+     "text": "子どものいる群れに危険が迫ると、大人たちが子どものまわりを囲んで守る。",
+     "quote": "幼獣のいる群れに危険が迫ると、成獣が幼獣の周囲を囲うようにして保護する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%95%E3%83%AA%E3%82%AB%E3%82%BE%E3%82%A6"
+    },
+    {
+     "text": "乾季に水がなくなると、干上がった川底などを牙や前足で掘って水を探す。",
+     "quote": "乾季に水が無くなった時は、干上がった川底などの地面を牙や前肢で掘って水を探す。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%95%E3%83%AA%E3%82%AB%E3%82%BE%E3%82%A6"
+    }
+   ],
+   "likeness": "どこに何があるかを群れで共有し、次の世代へ受け継いでいく。手順書や引き継ぎメモを残して、誰に任せても同じように回る形にしておくのが得意。困ったときにはみんなで囲んで守る、頼れるまとめ役。",
+   "aruaru": [
+    "「あのファイルどこ？」と聞かれたら、すぐ場所を答えられる",
+    "異動の前には、引き継ぎメモをきっちり作っておく",
+    "新人さんが困っていると、さりげなくチームで支える"
+   ],
+   "catch": "場所も手順も、みんなで覚えておく",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/african-bush-elephant.jpg",
+    "commons": "File:African bush elephants (Loxodonta africana) female with six-week-old baby.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:African_bush_elephants_(Loxodonta_africana)_female_with_six-week-old_baby.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%95%E3%83%AA%E3%82%AB%E3%82%BE%E3%82%A6"
+   ]
+  },
+  {
+   "id": "eastern-spot-billed-duck",
+   "name": "カルガモ",
+   "sci": "Anas zonorhyncha",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "大手町のビルの池から皇居のお堀へ引っ越す親子が話題になり、ブームになったことがある。",
+     "quote": "東京都千代田区大手町にある三井物産ビルのプラザ池から皇居和田倉堀へ引っ越す本種の親子をメディアが取り上げ、ブームとなったことがある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%82%AC%E3%83%A2"
+    },
+    {
+     "text": "草や枯れ草などを組み合わせて皿のような巣を作り、10〜14個の卵を産む。",
+     "quote": "草本や枯草・ササなどを組み合わせた直径22 - 30センチメートルに達する皿状の巣を作る。10 - 14個の卵を産む。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%82%AC%E3%83%A2"
+    },
+    {
+     "text": "親子が一列に並んで歩く姿から、車が連なって走ることを「カルガモ走行」と呼ぶようになった。",
+     "quote": "一列に並んで歩く親子の様子から、道路上を複数の車両が密接に連なって走行することや",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%82%AC%E3%83%A2"
+    }
+   ],
+   "likeness": "たくさんの子どもを連れて、一列に並ばせて目的地まで連れていく。暮らしの用事も、順番を決めてきちんと並べ、ひとつずつ確実に片付ける。見守ってくれる人の力も借りつつ、先頭で段取りする頼もしさがある。",
+   "aruaru": [
+    "買い物リストは、売り場をまわる順番に並べて書く",
+    "引っ越しは、まず段取り表を作ってから始める派",
+    "家族が出かける前に、人数と持ち物を指さしで確認する"
+   ],
+   "catch": "一列に並べて、ちゃんと連れていく",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/eastern-spot-billed-duck.jpg",
+    "commons": "File:Anas zonorhyncha family.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Anas_zonorhyncha_family.jpg",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%82%AC%E3%83%A2"
+   ]
+  },
+  {
+   "id": "long-tailed-tit",
+   "name": "エナガ",
+   "sci": "Aegithalos caudatus",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "シジュウカラやメジロなど、別の種類の小鳥とまじった群れをつくり、その先頭に立って案内する。",
+     "quote": "違う種の小鳥と混群することも多い。エナガはその混群の先導を行う。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%8A%E3%82%AC"
+    },
+    {
+     "text": "鳴き声で仲間がいるのを確かめながら、群れで林の中を動き回る。",
+     "quote": "地鳴きで仲間を確認しながら、群れで雑木林の中を動き回る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%8A%E3%82%AC"
+    },
+    {
+     "text": "コケをクモの糸で丸くまとめた、袋のような手のこんだ巣を作る。",
+     "quote": "苔をクモの糸で丸くまとめた袋状の精巧な巣を作る",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%8A%E3%82%AC"
+    }
+   ],
+   "likeness": "小さな体で、ほかの種類の鳥たちまで引き連れて林を進む。暮らしの用事も、家族や友だちに声をかけて分担し、こまめに確かめ合いながら進めていく。巣作りのような細かい仕込みもていねい。",
+   "aruaru": [
+    "グループの旅行では、いつのまにか段取り係になっている",
+    "待ち合わせの日は「いまどこ？」の連絡をこまめに入れる",
+    "共有メモに持ち物リストを作って、みんなに配る"
+   ],
+   "catch": "小さな体で、ちがう仲間まで先導する",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/long-tailed-tit.jpg",
+    "commons": "File:Aegithalos caudatus trivirgatus Gumma-ken Japan 20260112 YAS1111-Edit.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Aegithalos_caudatus_trivirgatus_Gumma-ken_Japan_20260112_YAS1111-Edit.jpg",
+    "author": "Yasuo Hamashima",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%8A%E3%82%AC"
+   ]
+  },
+  {
+   "id": "red-billed-oxpecker",
+   "name": "アカハシウシツツキ",
+   "sci": "Buphagus erythrorynchus",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ウシなどの大きな哺乳類の体にとまって、ダニを食べる習性がある。",
+     "quote": "this species' habit of perching on large wild and domesticated mammals such as cattle and eating ticks",
+     "source": "https://en.wikipedia.org/wiki/Red-billed_oxpecker"
+    },
+    {
+     "text": "成鳥は1日に、血を吸ったダニを100匹近く、幼虫なら1万2000匹以上食べることがある。",
+     "quote": "An adult will take nearly 100 blood-engorged female Rhipicephalus (Boophilus) decoloratus ticks, or more than 12,000 larvae in a day.",
+     "source": "https://en.wikipedia.org/wiki/Red-billed_oxpecker"
+    },
+    {
+     "text": "目があまりよくないサイに、危険を知らせる様子が観察されている。",
+     "quote": "Field observations in rhinoceros have shown oxpeckers warning the nearsighted rhinoceros of danger.",
+     "source": "https://en.wikipedia.org/wiki/Red-billed_oxpecker"
+    }
+   ],
+   "likeness": "自分で歩き回らず、大きな動物の背中に乗って食事の場ごと運んでもらう。大きな仕組みやサービスにうまく乗りつつ、細かいチェックと見張りはしっかり引き受ける。任せ上手で、確認役としても頼りになる。",
+   "aruaru": [
+    "会社で使える便利なサービスは、まず乗ってみる",
+    "自分は動かず、異常の知らせだけ届く仕組みを作りがち",
+    "人より先に「なんか変ですよ」と気づいて声をかける"
+   ],
+   "catch": "大きな背中に乗って、見張りは任せて",
+   "pos": "60% 40%",
+   "photo": {
+    "file": "shindan/img/red-billed-oxpecker.jpg",
+    "commons": "File:Red billed oxpecker close.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Red_billed_oxpecker_close.jpg",
+    "author": "Profberger at English Wikipedia",
+    "license": "CC BY 2.5",
+    "license_url": "https://creativecommons.org/licenses/by/2.5"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Red-billed_oxpecker"
+   ]
+  },
+  {
+   "id": "western-lowland-gorilla",
+   "name": "ニシローランドゴリラ",
+   "sci": "Gorilla gorilla gorilla",
+   "group": "哺乳類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "群れのリーダーのシルバーバックは、食事や寝床づくり、移動などの活動をまとめる。",
+     "quote": "群れのリーダーであるシルバーバックは、行動範囲内での食事、巣作り、移動などの活動をまとめる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B4%E3%83%AA%E3%83%A9"
+    },
+    {
+     "text": "群れが1日に移動する距離は、ふつう3〜5kmほどにとどまる。",
+     "quote": "通常、1日に 3 - 5 km移動する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B4%E3%83%AA%E3%83%A9"
+    },
+    {
+     "text": "力は強いが、ふだんは穏やかで、じゃまをされない限り攻撃的ではない。",
+     "quote": "このような行動と身体能力にもかかわらず、一般的に穏やかで、邪魔されない限りは攻撃的ではない。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B4%E3%83%AA%E3%83%A9"
+    }
+   ],
+   "likeness": "自分が動き回るよりも、群れ全体の流れをまとめて、みんなが動ける形を整える。仕事でも、手を動かすのはメンバーやツールに任せ、予定と段取りの確認に力を使う。どっしり構えた穏やかなまとめ役。",
+   "aruaru": [
+    "自分で作業するより、担当と期限を決める方が早い",
+    "会議では最後に「では、そういう段取りで」とまとめる",
+    "忙しそうに見えないのに、なぜか全部まわっている"
+   ],
+   "catch": "どっしり構えて、全体をまとめる",
+   "pos": "50% 35%",
+   "photo": {
+    "file": "shindan/img/western-lowland-gorilla.jpg",
+    "commons": "File:Lowland Gorilla (8973697544).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Lowland_Gorilla_(8973697544).jpg",
+    "author": "Rennett Stowe from USA",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%82%B7%E3%83%AD%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E3%82%B4%E3%83%AA%E3%83%A9"
+   ]
+  },
+  {
+   "id": "emperor-penguin",
+   "name": "コウテイペンギン",
+   "sci": "Aptenodytes forsteri",
+   "group": "鳥類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "卵を産んだメスは、卵をオスに預けて、エサを食べに海へ出かける。",
+     "quote": "産卵したメスは、オスに卵を託して採食のために海へ向かう。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A6%E3%83%86%E3%82%A4%E3%83%9A%E3%83%B3%E3%82%AE%E3%83%B3"
+    },
+    {
+     "text": "卵を温めるオスは、エネルギーを節約するため、眠りに近い状態で過ごす。",
+     "quote": "エネルギー消費量を抑えるため睡眠に近い状態で過ごす",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A6%E3%83%86%E3%82%A4%E3%83%9A%E3%83%B3%E3%82%AE%E3%83%B3"
+    },
+    {
+     "text": "寒さをしのぐ群れ（ハドル）の中では、外側にいる個体が少しずつ内側へ移っていく。",
+     "quote": "ハドルの中は絶えず移動しており、外側にいる個体が内側へ移動していく。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A6%E3%83%86%E3%82%A4%E3%83%9A%E3%83%B3%E3%82%AE%E3%83%B3"
+    }
+   ],
+   "likeness": "役割をきっちり分けて、任された番はひとりで守り抜く。むだに動かず力を温存しながら、大事なものからは目を離さない。暮らしの用事も、分担を決めたら省エネで、でも確実に回していくタイプ。",
+   "aruaru": [
+    "家のことは「これは私の担当」と決めておくと安心する",
+    "動かなくていいように、手元に必要なものを全部そろえておく",
+    "休日は省エネモード。でも大事な用事だけは忘れない"
+   ],
+   "catch": "任された番は、省エネで守り抜く",
+   "pos": "50% 55%",
+   "photo": {
+    "file": "shindan/img/emperor-penguin.jpg",
+    "commons": "File:Kaiserpinguine mit Jungen.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kaiserpinguine_mit_Jungen.jpg",
+    "author": "Image ID: corp2417, NOAA Corps Collection Photographer: Giuseppe Zibordi Credit: Michael Van Woert, NOAA NESDIS, ORA",
+    "license": "Public domain",
+    "license_url": ""
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A6%E3%83%86%E3%82%A4%E3%83%9A%E3%83%B3%E3%82%AE%E3%83%B3"
+   ]
+  },
+  {
+   "id": "black-tailed-prairie-dog",
+   "name": "オグロプレーリードッグ",
+   "sci": "Cynomys ludovicianus",
+   "group": "哺乳類",
+   "type": "MPC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "巣穴に敷く草は、オスもメスも、子どもから大人まで一年じゅう集めている。",
+     "quote": "Nest material is collected throughout the year by both sexes and all age classes.",
+     "source": "https://en.wikipedia.org/wiki/Black-tailed_prairie_dog"
+    },
+    {
+     "text": "冬も完全には冬眠しないが、夜はエネルギーを節約するために休眠に近い状態になる。",
+     "quote": "They continue to leave the burrow to forage, but will enter a state of torpor at night to conserve energy.",
+     "source": "https://en.wikipedia.org/wiki/Black-tailed_prairie_dog"
+    },
+    {
+     "text": "危険を知らせる鳴き声は、近くに身内がいる個体ほどよく発することがわかっている。",
+     "quote": "Prairie dogs with kin close by called more often than those without.",
+     "source": "https://en.wikipedia.org/wiki/Black-tailed_prairie_dog"
+    }
+   ],
+   "likeness": "家族みんなで少しずつ巣の材料を集め、危ないときは鳴き声で知らせ合う。暮らしの備えも家族で分担し、異変があればすぐ共有する仕組みを作っておく。夜はしっかり省エネで休むところも似ている。",
+   "aruaru": [
+    "日用品のストックは、家族みんなで少しずつ補充する",
+    "家族のグループチャットで、ちょっとした異変もすぐ共有する",
+    "仕組みさえあれば、あとはのんびりしていたい"
+   ],
+   "catch": "家族で備えて、異変はすぐ知らせ合う",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/black-tailed-prairie-dog.jpg",
+    "commons": "File:Prairie dog Theodore Roosevelt NP ND1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Prairie_dog_Theodore_Roosevelt_NP_ND1.jpg",
+    "author": "Acroterion",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Black-tailed_prairie_dog"
+   ]
+  },
+  {
+   "id": "orca",
+   "name": "シャチ",
+   "sci": "Orcinus orca",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "回遊型のシャチは、小さな群れか1頭だけで暮らし、決まった行動区域を持たない。",
+     "quote": "回遊型は小さな群れまたは1頭のみで生活し、決まった行動区域を持たず",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%83%81"
+    },
+    {
+     "text": "ほかの個体の行動をまねし、仲間に新しい行動をわざと教えることが知られている。",
+     "quote": "他の個体の行動を真似し、意図的に仲間に新たな行動を教えている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%83%81"
+    },
+    {
+     "text": "南極では波を起こして氷の上の獲物を海に落とし、待ちぶせして捕らえる。",
+     "quote": "これにより獲物は氷から落ち、待ち伏せしていたシャチに捕らえられる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%83%81"
+    }
+   ],
+   "likeness": "少ない人数でも広い海を動き回り、覚えたやり方を仲間や道具に教えこんで回すところが似ている。波を起こして獲物を落とすように、仕掛けを作って結果が転がりこむ流れをつくるのが得意。",
+   "aruaru": [
+    "新しい道具を見つけると、その日のうちにまわりに布教している",
+    "「これ、仕組みにすれば一回で済むよね」が口ぐせ",
+    "ひとりで動いているのに、なぜか全体の段取りまで把握している"
+   ],
+   "catch": "ひとりでも海を動かす、仕掛けの名手",
+   "pos": "45% 45%",
+   "photo": {
+    "file": "shindan/img/orca.jpg",
+    "commons": "File:Killerwhales jumping.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Killerwhales_jumping.jpg",
+    "author": "Robert Pittman",
+    "license": "Public domain",
+    "license_url": ""
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B7%E3%83%A3%E3%83%81"
+   ]
+  },
+  {
+   "id": "african-wild-dog",
+   "name": "リカオン",
+   "sci": "Lycaon pictus",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "群れで暮らすリカオンは、1日に平均10キロメートルも移動して獲物を探し回る。",
+     "quote": "1日に平均10キロメートルを移動し獲物を探す",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%82%AB%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "弱った個体や子どもを狙い、群れで協力して長い距離を追いかける。",
+     "quote": "弱った個体や幼獣を狙い、群れで協力し長距離を追走する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%82%AB%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "群れの子どもには、大人の全員が獲物を吐きもどして分け与える。",
+     "quote": "幼獣には全ての個体が、獲物を吐き戻して与える。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%82%AB%E3%82%AA%E3%83%B3"
+    }
+   ],
+   "likeness": "家族みんなで役目を分け、長い距離を走りきって成果をみんなに配るところが似ている。暮らしの用事も一人で抱えず、家族や便利な仕組みを巻きこんで、最後まで回しきるのが得意。",
+   "aruaru": [
+    "家族の予定を共有カレンダーにまとめ、通知まで設定済み",
+    "買い物リストは家族全員が書きこめるアプリで管理している",
+    "便利な家電を見つけると、家族への説明会を開いてしまう"
+   ],
+   "catch": "家族総出で走りきる、暮らしの指揮役",
+   "pos": "55% 50%",
+   "photo": {
+    "file": "shindan/img/african-wild-dog.jpg",
+    "commons": "File:African wild dog (Lycaon pictus pictus).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:African_wild_dog_(Lycaon_pictus_pictus).jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%AA%E3%82%AB%E3%82%AA%E3%83%B3"
+   ]
+  },
+  {
+   "id": "weaver-ant",
+   "name": "ツムギアリ",
+   "sci": "Oecophylla smaragdina",
+   "group": "昆虫",
+   "type": "MPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "働きアリが葉を寄せ集め、別の働きアリがくわえた幼虫の糸で葉どうしをくっつけて巣をつくる。",
+     "quote": "働きアリたちが協力して葉を顎と後肢で寄せ集め、別の働きアリが大顎で咥えてもってきたツムギアリの幼虫の糸で木の葉どうしをくっつける。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%A0%E3%82%AE%E3%82%A2%E3%83%AA"
+    },
+    {
+     "text": "ツムギアリの幼虫はまゆを作らず、その糸は巣づくりだけに使われる。",
+     "quote": "ツムギアリの幼虫は繭を作らず、この糸は巣作りにのみ用いられる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%A0%E3%82%AE%E3%82%A2%E3%83%AA"
+    },
+    {
+     "text": "自分の体の何倍も大きな虫を捕まえ、集団で巣に持ち帰ることがある。",
+     "quote": "自分の体の大きさの何倍もある昆虫、ときにはトカゲなども捕まえて集団で巣に持ち帰る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%A0%E3%82%AE%E3%82%A2%E3%83%AA"
+    }
+   ],
+   "likeness": "葉を押さえる係と糸を出す係に分かれて巣を縫い上げるように、人と道具に役目を割りふって大きな仕事を組み上げるところが似ている。チームの段取りを考えるほど燃える。",
+   "aruaru": [
+    "会議の前に、だれが何をやるかの表がもうできている",
+    "新しいツールを入れるとき、チーム用の手順書まで作ってしまう",
+    "「この作業、あの人とあのツールでつなげば早い」とすぐ思いつく"
+   ],
+   "catch": "みんなの力を縫い合わせる、段取り職人",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/weaver-ant.jpg",
+    "commons": "File:Weaver Ant (Oecophylla smaragdina) (15452026016).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Weaver_Ant_(Oecophylla_smaragdina)_(15452026016).jpg",
+    "author": "Bernard DUPONT from FRANCE",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%84%E3%83%A0%E3%82%AE%E3%82%A2%E3%83%AA"
+   ]
+  },
+  {
+   "id": "humpback-whale",
+   "name": "ザトウクジラ",
+   "sci": "Megaptera novaeangliae",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "夏は極の近くでえさを食べ、冬は暖かい海へ移って子育てをする回遊生活を送る。",
+     "quote": "夏は極の近くで主に捕食をし、冬は赤道までは行かないが温かい海域まで移動し出産・繁殖・子育てをし",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B6%E3%83%88%E3%82%A6%E3%82%AF%E3%82%B8%E3%83%A9"
+    },
+    {
+     "text": "「歌」を歌うクジラとして知られ、何曲も繰り返して20時間ほど続いた記録もある。",
+     "quote": "歌は1曲数分から30分以上続くが、何曲も繰り返して歌う。最長で20時間程の繰り返しが観測されている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B6%E3%83%88%E3%82%A6%E3%82%AF%E3%82%B8%E3%83%A9"
+    },
+    {
+     "text": "息を吐いて作った泡で獲物の群れを取り囲み、まとめてから食べることがある。",
+     "quote": "小規模な気泡（気泡柱）で獲物の群れを取り囲んだり（気泡網）",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B6%E3%83%88%E3%82%A6%E3%82%AF%E3%82%B8%E3%83%A9"
+    }
+   ],
+   "likeness": "季節ごとに行き先を決めて大移動するように、暮らしの一年を先に組み立てて動くところが似ている。泡の網で獲物を集めるように、道具を仕掛けて用事のほうから集まってくる形をつくるのが得意。",
+   "aruaru": [
+    "年間の予定を、年の初めにまとめて登録している",
+    "定期便やサブスクの更新日まで一覧にしてある",
+    "お気に入りの作業用プレイリストを何周もくり返している"
+   ],
+   "catch": "一年の航路を描く、暮らしの設計者",
+   "pos": "55% 45%",
+   "photo": {
+    "file": "shindan/img/humpback-whale.jpg",
+    "commons": "File:Humpback whale breaching off Cabo San Lucas.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Humpback_whale_breaching_off_Cabo_San_Lucas.jpg",
+    "author": "Juan Cruzado Cortés",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B6%E3%83%88%E3%82%A6%E3%82%AF%E3%82%B8%E3%83%A9"
+   ]
+  },
+  {
+   "id": "western-honey-bee",
+   "name": "セイヨウミツバチ",
+   "sci": "Apis mellifera",
+   "group": "昆虫",
+   "type": "MPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "働きバチは生まれて最初の10日間、巣の手入れをして幼虫にえさを与える係を受け持つ。",
+     "quote": "最初の10日間は働きバチ（働きバチはすべて雌）は巣の手入れをして、幼虫に餌を食べさせる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%82%A4%E3%83%A8%E3%82%A6%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    },
+    {
+     "text": "円形ダンスと8の字ダンスで、えさのある場所へ仲間を向かわせることができる。",
+     "quote": "ミツバチは円形ダンスと8の字ダンスを舞うことで、食物源に仲間のミツバチを向かわせることが出来る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%82%A4%E3%83%A8%E3%82%A6%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    },
+    {
+     "text": "巣がいっぱいになると、古い女王が働きバチのおよそ半分を連れて新しい巣をつくりに出る。",
+     "quote": "新しいコロニーを創立するために年をとった女王蜂が働きバチのおよそ半分を連れて出て行く。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%82%A4%E3%83%A8%E3%82%A6%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+    }
+   ],
+   "likeness": "ダンスで仲間に行き先を伝えるように、情報をうまく共有してみんなを動かすところが似ている。役目を時期ごとに分け、人と道具の流れを整えて、チーム全体の成果を大きくするのが得意。",
+   "aruaru": [
+    "いい情報を見つけると、すぐチームのチャットに流している",
+    "役割分担の表を作ると、それだけで少し満足する",
+    "「この作業、自動で回る形にしておきました」とさらっと言う"
+   ],
+   "catch": "ダンスで群れを動かす、情報の配り手",
+   "pos": "55% 45%",
+   "photo": {
+    "file": "shindan/img/western-honey-bee.jpg",
+    "commons": "File:European honey bee extracts nectar.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:European_honey_bee_extracts_nectar.jpg",
+    "author": "John Severns (Severnjc)",
+    "license": "Public domain",
+    "license_url": ""
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%BB%E3%82%A4%E3%83%A8%E3%82%A6%E3%83%9F%E3%83%84%E3%83%90%E3%83%81"
+   ]
+  },
+  {
+   "id": "great-white-pelican",
+   "name": "モモイロペリカン",
+   "sci": "Pelecanus onocrotalus",
+   "group": "鳥類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "5〜10羽ほどの群れで魚の群れを追いこみ、逃げ道をふさいでから一斉にすくい上げる。",
+     "quote": "獲物の魚を捕る時は5-10羽程度の群れで魚の群れを追い込み、逃げ道を塞いだ上で一斉に喉の袋で掬い上げると言う行動が見られる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A4%E3%83%AD%E3%83%9A%E3%83%AA%E3%82%AB%E3%83%B3"
+    },
+    {
+     "text": "ふだんはほぼ白いが、繁殖期になると全身が橙色がかったピンク色に変わる。",
+     "quote": "繁殖期には全身が橙色がかったピンク色になる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A4%E3%83%AD%E3%83%9A%E3%83%AA%E3%82%AB%E3%83%B3"
+    },
+    {
+     "text": "湿地や湖に群れで暮らし、コロニーをつくって地上に巣をかまえる。",
+     "quote": "コロニーを形成し、地上に営巣する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A4%E3%83%AD%E3%83%9A%E3%83%AA%E3%82%AB%E3%83%B3"
+    }
+   ],
+   "likeness": "みんなで追いこんでから一斉にすくい上げるように、家族や友だちと段取りをそろえて、用事をまとめて片付けるところが似ている。ばらばらにやるより、合図ひとつで一気に動く形が好き。",
+   "aruaru": [
+    "週末の家事を「せーの」で一気に片付ける日を決めている",
+    "旅行の計画は、共有メモにみんなを招待するところから始まる",
+    "まとめ買いの段取りを考えるのが、ちょっと楽しい"
+   ],
+   "catch": "みんなでせーの、一斉すくいの名人",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/great-white-pelican.jpg",
+    "commons": "File:Great white pelican (Pelecanus onocrotalus).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Great_white_pelican_(Pelecanus_onocrotalus).jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A4%E3%83%AD%E3%83%9A%E3%83%AA%E3%82%AB%E3%83%B3"
+   ]
+  },
+  {
+   "id": "harris-hawk",
+   "name": "モモアカノスリ",
+   "sci": "Parabuteo unicinctus",
+   "group": "鳥類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "アジア以外のアメリカやヨーロッパ、中東では、鷹狩りに使われる最も一般的なタカになっている。",
+     "quote": "現在ではアジアを除いたアメリカ、ヨーロッパ、中東において鷹狩に用いられるもっとも一般的なタカになっている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A2%E3%82%AB%E3%83%8E%E3%82%B9%E3%83%AA"
+    },
+    {
+     "text": "人間も仲間と認めてくれるため、鷹匠が獲物を取り上げるときは木に止まって休む。",
+     "quote": "本種は人間をも仲間と認めてくれるため、鷹匠が獲物を取り上げるときはそれぞれ木に止まって休みを取る。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A2%E3%82%AB%E3%83%8E%E3%82%B9%E3%83%AA"
+    },
+    {
+     "text": "ヨーロッパの街では、カワラバトやホシムクドリを追い払う役目にも使われている。",
+     "quote": "ヨーロッパの街中にはびこるカワラバトやホシムクドリを追い払うのにも使用されている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A2%E3%82%AB%E3%83%8E%E3%82%B9%E3%83%AA"
+    }
+   ],
+   "likeness": "一羽で飛びながらも、鷹匠という相棒に後のことを任せるところが似ている。自分の得意な部分だけを引き受け、残りは人や道具にきれいに渡す。手放し上手で、仕事の流れを止めない。",
+   "aruaru": [
+    "面倒な作業は、信頼できる道具や人にさっと渡している",
+    "自分は一番おいしい部分だけを担当する流れを作るのがうまい",
+    "新しいサービスを試すとき、まず使いこなして相棒にしてしまう"
+   ],
+   "catch": "相棒に任せて飛ぶ、手放し上手のハンター",
+   "pos": "40% 45%",
+   "photo": {
+    "file": "shindan/img/harris-hawk.jpg",
+    "commons": "File:Parabuteo unicinctus - 01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Parabuteo_unicinctus_-_01.jpg",
+    "author": "Carlos Delgado",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A2%E3%83%A2%E3%82%A2%E3%82%AB%E3%83%8E%E3%82%B9%E3%83%AA"
+   ]
+  },
+  {
+   "id": "gray-wolf",
+   "name": "ハイイロオオカミ",
+   "sci": "Canis lupus",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "群れはふつう、父と母のペアとその子どもからなる家族でできている。",
+     "quote": "オオカミの群れは主に繁殖ペア（父母）とその子どもからなる家族集団で構成される。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%AB%E3%83%9F"
+    },
+    {
+     "text": "大人になると群れに残るか、群れを出て新しい場所へ移り、自分の群れをつくる。",
+     "quote": "成熟したオオカミは群れに残るか、群れを出て新たな場所に移り、配偶者を見つけ新たな群れを形成する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%AB%E3%83%9F"
+    },
+    {
+     "text": "遠吠えは仲間との連絡や狩りの前触れなどに使われ、合唱のようにそろうこともある。",
+     "quote": "遠吠えは、群れの仲間との連絡、狩りの前触れ、縄張りの主張などの目的で行われ、目的に応じて吠え方が異なるといわれる。合唱のように共同で遠吠えすることもある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%AB%E3%83%9F"
+    }
+   ],
+   "likeness": "ひとりで新しい場所へ出ていき、そこで自分の群れを一からつくるところが似ている。最初は自分で試し、うまくいった仕組みを家族やまわりに広げて、暮らし全体を動かしていくのが得意。",
+   "aruaru": [
+    "新しい家電は、まず自分で試してから家族に広める",
+    "便利な仕組みを見つけると、遠くの友だちにも連絡してしまう",
+    "気づけば家の中の「こうすると楽」の発信元になっている"
+   ],
+   "catch": "ひとりで出発し、群れをつくる開拓者",
+   "pos": "60% 40%",
+   "photo": {
+    "file": "shindan/img/gray-wolf.jpg",
+    "commons": "File:Eurasian wolf 2.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Eurasian_wolf_2.jpg",
+    "author": "User:Mas3cf",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%AB%E3%83%9F"
+   ]
+  },
+  {
+   "id": "lion",
+   "name": "ライオン",
+   "sci": "Panthera leo",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "一日のほとんどを寝そべって過ごし、およそ20時間はのんびりしている。",
+     "quote": "一日のほとんどを寝そべり、およそ20時間ほどを怠惰に過ごす。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "狩りのほとんどはメスが行い、獲物に忍び寄るときはグループをつくって協力し合う。",
+     "quote": "獲物に忍び寄り、捕食を成功させるため、メスたちはグループをつくり協力し合って行動する。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%82%AA%E3%83%B3"
+    },
+    {
+     "text": "群れの中では、それぞれのライオンが決まった役割を受け持つ傾向がある。",
+     "quote": "ライオンたちは群れのなかで特定の役割を担っている傾向にあり",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%82%AA%E3%83%B3"
+    }
+   ],
+   "likeness": "役割をしっかり分けたチームを持ち、自分はよく休みながら全体を見守るところが似ている。人と仕組みに任せるところは任せきり、ここぞという場面でだけ動く。休むことも段取りのうち。",
+   "aruaru": [
+    "仕事を任せる相手と道具が決まっていて、自分は確認係",
+    "昼休みは長めでも、仕事はちゃんと回っている",
+    "「それ、あの人に頼めば早いよ」とすぐ言える"
+   ],
+   "catch": "よく休み、よく任せる、群れの王",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/lion.jpg",
+    "commons": "File:Lion waiting in Namibia.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Lion_waiting_in_Namibia.jpg",
+    "author": "Kevin Pluck",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%A9%E3%82%A4%E3%82%AA%E3%83%B3"
+   ]
+  },
+  {
+   "id": "meerkat",
+   "name": "ミーアキャット",
+   "sci": "Suricata suricatta",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "太陽に向かって、尾を支えにまっすぐ立ち、体を温める習性がある。",
+     "quote": "太陽に向かって尾を支えにして直立し、体を温める習性を持つ。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%BC%E3%82%A2%E3%82%AD%E3%83%A3%E3%83%83%E3%83%88"
+    },
+    {
+     "text": "群れのほかのメンバーはヘルパーとして、子守りや授乳を受け持つ。",
+     "quote": "群れの他のメンバーは基本的に繁殖をせず、ヘルパーとして子守や授乳を行う。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%BC%E3%82%A2%E3%82%AD%E3%83%A3%E3%83%83%E3%83%88"
+    },
+    {
+     "text": "ヘルパーが幼い子どもたちに、えさの捕り方を教える行動が観察されている。",
+     "quote": "ヘルパーが幼い子供たちに餌の捕り方を教育するという行動が観察されている。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%BC%E3%82%A2%E3%82%AD%E3%83%A3%E3%83%83%E3%83%88"
+    }
+   ],
+   "likeness": "家族みんなで子守りを分け合い、手のあいた者は日なたで休むところが似ている。暮らしの用事も家族や便利な道具に上手に割りふって、自分のひなたぼっこの時間をちゃんと確保するのが得意。",
+   "aruaru": [
+    "家事の当番表を作ったら、あとは日なたでのんびり",
+    "ロボット掃除機が動いている間に、ソファでくつろいでいる",
+    "家族のだれかに頼むのが上手で、なぜか角が立たない"
+   ],
+   "catch": "みんなで分けて、ひなたで休む達人",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/meerkat.jpg",
+    "commons": "File:Meerkat (Suricata suricatta) Tswalu.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Meerkat_(Suricata_suricatta)_Tswalu.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%BC%E3%82%A2%E3%82%AD%E3%83%A3%E3%83%83%E3%83%88"
+   ]
+  },
+  {
+   "id": "spotted-hyena",
+   "name": "ブチハイエナ",
+   "sci": "Crocuta crocuta",
+   "group": "哺乳類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "単独やペアで暮らす地域もあれば、何十頭もの群れ（クラン）で暮らす地域もある。",
+     "quote": "単独かペアで生活する個体群（セレンゲティ、トランスバール）もあれば",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%81%E3%83%8F%E3%82%A4%E3%82%A8%E3%83%8A"
+    },
+    {
+     "text": "自分で狩りもするが、ほかの動物が倒した獲物を手に入れることもある。",
+     "quote": "主に狩りを行って獲物を食べるが、他の動物が倒した獲物も奪う。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%81%E3%83%8F%E3%82%A4%E3%82%A8%E3%83%8A"
+    },
+    {
+     "text": "倒した獲物の一部を、あとで食べるために水の中や泥の中へ運んでたくわえることがある。",
+     "quote": "倒した獲物の一部を後で食べたり、水中や泥中に貯蔵するために運搬することもある。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%81%E3%83%8F%E3%82%A4%E3%82%A8%E3%83%8A"
+    }
+   ],
+   "likeness": "ゼロから作るより、すでにある成果を上手に使い、残りはあとのためにためておくところが似ている。ひとりでも、人が作ったひな形や仕組みを取りこんで、少ない力で仕事を進めるのが得意。",
+   "aruaru": [
+    "人が作ったテンプレートを見つけるのが、とにかく早い",
+    "使えそうな資料は、あとで使う用のフォルダにためておく",
+    "「一から作るより、あれを借りよう」が最初に浮かぶ"
+   ],
+   "catch": "あるものを活かす、ちゃっかり仕事人",
+   "pos": "60% 45%",
+   "photo": {
+    "file": "shindan/img/spotted-hyena.jpg",
+    "commons": "File:Spotted hyena (Crocuta crocuta).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Spotted_hyena_(Crocuta_crocuta).jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%81%E3%83%8F%E3%82%A4%E3%82%A8%E3%83%8A"
+   ]
+  },
+  {
+   "id": "great-cormorant",
+   "name": "カワウ",
+   "sci": "Phalacrocorax carbo",
+   "group": "鳥類",
+   "type": "MPN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ぬれた翼を広げ、長い時間同じ姿勢のまま小さくふるわせて乾かす習性がある。",
+     "quote": "長時間、同じ姿勢を保ち濡れた翼を広げ小刻みに震わせ翼を乾かす習性を持つ。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%A6"
+    },
+    {
+     "text": "1羽で1日に500グラムほどの魚を食べるとされ、魚の種類は選り好みしない。",
+     "quote": "1羽で1日500gの魚を食べるとされ、魚種の選択性はない。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%A6"
+    },
+    {
+     "text": "群れでたまる場所をいくつか持っていて、そこで休んだり眠ったりする。",
+     "quote": "カワウは群れで溜まる場所をいくつか持っており、そこで休息と睡眠をとる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%A6"
+    }
+   ],
+   "likeness": "食べるときは一気に潜り、あとは翼を広げてじっくり休むところが似ている。暮らしの用事は決まった時間にまとめて片付け、残りは仕組みに任せて、休む場所と時間をいくつも確保しておくのが得意。",
+   "aruaru": [
+    "用事は一気に片付けて、あとは長めの休けいタイム",
+    "くつろぎ場所が家の中に何か所も決まっている",
+    "選り好みせず、使える便利グッズは何でも取り入れる"
+   ],
+   "catch": "一気に潜って、ゆっくり乾かす休み上手",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/great-cormorant.jpg",
+    "commons": "File:Great Cormorant (26 September 2015), Osaka, Japan.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Great_Cormorant_(26_September_2015),_Osaka,_Japan.jpg",
+    "author": "Laitche",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AF%E3%82%A6"
+   ]
+  },
+  {
+   "id": "common-starling",
+   "name": "ホシムクドリ",
+   "sci": "Sturnus vulgaris",
+   "group": "鳥類",
+   "type": "MPN",
+   "rare": true,
+   "facts": [
+    {
+     "text": "暗い色の体に、星のような斑点がちりばめられていることが名前の由来になっている。",
+     "quote": "名前の由来は、暗い体色に星状の斑点がちりばめられていることによる。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%83%A0%E3%82%AF%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "日本に来るものは、ムクドリの群れに混じって過ごしていることが多い。",
+     "quote": "日本ではムクドリの群れに混じっていることが多い。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%83%A0%E3%82%AF%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "北アメリカのホシムクドリは、ニューヨークの公園で放されたおよそ100羽の子孫とされる。",
+     "quote": "ニューヨークのセントラルパークで放ったおよそ100羽の子孫である。",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%83%A0%E3%82%AF%E3%83%89%E3%83%AA"
+    }
+   ],
+   "likeness": "自分で群れをつくらなくても、ムクドリの群れにすっと混じって過ごすところが似ている。すでに動いている人や仕組みにうまく乗り、自分はほとんど力を使わずに全体についていく。究極の任せ上手。",
+   "aruaru": [
+    "気づけば、だれかの作った仕組みにちゃっかり乗っている",
+    "自分で動かなくても、まわりが勝手に回してくれる",
+    "便利な流れに混ざるのが上手すぎて、いつの間にか中心にいる"
+   ],
+   "catch": "群れに混じって星を散らす、まれな鳥",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/common-starling.jpg",
+    "commons": "File:Toulouse - Sturnus vulgaris - 2012-02-26 - 2.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Toulouse_-_Sturnus_vulgaris_-_2012-02-26_-_2.jpg",
+    "author": "PierreSelim",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%82%B7%E3%83%A0%E3%82%AF%E3%83%89%E3%83%AA"
+   ]
+  },
+  {
+   "id": "koala",
+   "name": "コアラ",
+   "sci": "Phascolarctos cinereus",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "栄養の少ないユーカリの葉が主食で、1日のうち18〜20時間を眠ってすごし、エネルギーを節約している。",
+     "quote": "一日のうち18 - 20時間を眠って過ごすことで、エネルギーを節約している",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A2%E3%83%A9"
+    },
+    {
+     "text": "葉を食べる前ににおいをかいで、体の中で毒を分解できる種類の葉だけを選んで食べる。",
+     "quote": "コアラはユーカリを食べる前ににおいをかぎ、体内で毒素を酵素で分解できる種類の葉を選別してから食べる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A2%E3%83%A9"
+    },
+    {
+     "text": "ふつうは単独でくらし、群れを作らない。決まった巣も持たない。",
+     "quote": "通常は単独性で、群れを作らない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A2%E3%83%A9"
+    }
+   ],
+   "likeness": "限られた力を寝ることに回すように、毎日の家事や用事は「いつもの便利なやり方」に任せきり。新しいものには手を出さず、決まった道具だけを選んで、浮いた時間でしっかり休むのが得意。",
+   "aruaru": [
+    "気に入ったアプリは何年も同じものを使い続けている",
+    "休日の予定表は「何もしない」でびっしり埋まっている",
+    "ネットスーパーの注文履歴から「いつもの」を押すだけで買い物が終わる"
+   ],
+   "catch": "よく眠って節約、いつもの葉で安心",
+   "pos": "50% 30%",
+   "photo": {
+    "file": "shindan/img/koala.jpg",
+    "commons": "File:Koala climbing tree.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Koala_climbing_tree.jpg",
+    "author": "Diliff",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%82%A2%E3%83%A9"
+   ]
+  },
+  {
+   "id": "giant-anteater",
+   "name": "オオアリクイ",
+   "sci": "Myrmecophaga tridactyla",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "1つの巣で食べる時間は1分ほどと短く、そのかわり1日に最大200もの巣を回って虫を食べる。",
+     "quote": "1つの巣で摂食する時間は1分ほどだが、1日に最大200の巣を攻撃し",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A4"
+    },
+    {
+     "text": "体温は約33℃と、哺乳類としては低め。仲間のグループは代謝が低い傾向があるとされる。",
+     "quote": "体温は哺乳類としては低い約33℃",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A4"
+    },
+    {
+     "text": "眠るときは地面のくぼみで体を丸め、ふさふさの尾を体にかぶせて温まる。",
+     "quote": "体を丸め、尾を体に被せて眠る",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A4"
+    }
+   ],
+   "likeness": "1つの巣に長居せず、ちょっとずつ回って食べるように、仕事もひとつに根を詰めない。慣れた手順でさっと片付けて次へ。体力は使いすぎず、残りの時間は丸まって休むのがこの省エネ流。",
+   "aruaru": [
+    "メールは開いたらその場で1分だけ対応して閉じる",
+    "完璧は目指さず「だいたい終わった」で次に行く",
+    "定時になったら毛布にくるまる準備がもうできている"
+   ],
+   "catch": "1分でさっと片付けて、あとは丸まる",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/giant-anteater.jpg",
+    "commons": "File:Myrmecophaga tridactyla, Pantanal region, Brazil.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Myrmecophaga_tridactyla,_Pantanal_region,_Brazil.jpg",
+    "author": "Anagoria",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%A2%E3%83%AA%E3%82%AF%E3%82%A4"
+   ]
+  },
+  {
+   "id": "rock-hyrax",
+   "name": "ケープハイラックス",
+   "sci": "Procavia capensis",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "1日の時間のおよそ95%を休んですごし、仲間と重なり合ってひなたぼっこをすることもある。",
+     "quote": "The rock hyrax spends roughly 95% of its time resting.",
+     "source": "https://en.wikipedia.org/wiki/Rock_hyrax"
+    },
+    {
+     "text": "10〜80頭ほどの群れでくらし、見張り役が天敵の接近を仲間に知らせると報告されている。",
+     "quote": "They have been reported to use sentries to warn of the approach of predators.",
+     "source": "https://en.wikipedia.org/wiki/Rock_hyrax"
+    }
+   ],
+   "likeness": "見張り役を決めてみんなで日なたに並ぶように、仕事は「当番」や「担当」をうまく回して、自分は温存。慣れたチームのしくみに乗っかって、のんびりしながらも危ないところは見逃さない。",
+   "aruaru": [
+    "当番表ができた瞬間、肩の荷がすっと下りる",
+    "会議では「誰かが言ってくれる」を信じて待つ",
+    "チャットの通知はリーダーの分だけオンにしている"
+   ],
+   "catch": "見張りは当番制、あとはひなたぼっこ",
+   "pos": "50% 45%",
+   "photo": {
+    "file": "shindan/img/rock-hyrax.jpg",
+    "commons": "File:Procavia capensis.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Procavia_capensis.jpg",
+    "author": "Hans Hillewaert",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Rock_hyrax"
+   ]
+  },
+  {
+   "id": "hippopotamus",
+   "name": "カバ",
+   "sci": "Hippopotamus amphibius",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "昼は温度の変わりにくい水の中でほとんど動かず、エネルギーの消費をおさえていると考えられている。",
+     "quote": "昼間に温度変化の少ない水中でほとんど動かずに、エネルギー消費を抑えているためと考えられている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%90"
+    },
+    {
+     "text": "体の大きさのわりに食べる量は少なく、体重1500kgでも1日約50kgほどとされる。",
+     "quote": "体重1,500 kgの本種は約50kgの食物を食べるとされる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%90"
+    },
+    {
+     "text": "メスと子ども10〜20頭ほどの群れでくらし、乾季には100頭をこえる群れになることもある。",
+     "quote": "10 - 20頭のメスと幼獣からなる群れを形成して生活する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%90"
+    }
+   ],
+   "likeness": "昼は水につかって動かず、出かけるのは夜だけ。暮らしの用事も、家族やいつものサービスにどっぷり頼って、自分は省エネ。少ない手間で回るしくみの中に、仲間とまったり浮かんでいるタイプ。",
+   "aruaru": [
+    "家事は家族の「ついで」にのっかるのが上手",
+    "お風呂に入ったら、出るまでがとにかく長い",
+    "宅配の再配達は、いつも一番遅い時間帯を選ぶ"
+   ],
+   "catch": "昼は水の中で、みんなとまったり省エネ",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/hippopotamus.jpg",
+    "commons": "File:Hippo pod edit.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Hippo_pod_edit.jpg",
+    "author": "Paul Maritz",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%90"
+   ]
+  },
+  {
+   "id": "capybara",
+   "name": "カピバラ",
+   "sci": "Hydrochoerus hydrochaeris",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "昼は水の中で休み、午後おそくから夕方に草を食べる。平均10〜20頭の群れでくらす。",
+     "quote": "昼間は水中で休み、午後遅くから夕方に採食を行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%94%E3%83%90%E3%83%A9"
+    },
+    {
+     "text": "動物園で湯に尻をつけてくつろぐ姿が見られたのをきっかけに、冬の露天風呂が広まった。",
+     "quote": "湯に尻を浸けて寛ぐカピバラを目撃し、展示場に岩を組んで露天風呂を始めた",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%94%E3%83%90%E3%83%A9"
+    },
+    {
+     "text": "群れのメスは、自分の子でなくても群れの子どもにお乳をあげることがある。",
+     "quote": "群れにいるメスは母親でなくても、幼獣に授乳を行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%94%E3%83%90%E3%83%A9"
+    }
+   ],
+   "likeness": "気持ちいいお湯を見つけたら、みんなでつかってのんびり。暮らしの面倒も、家族や近所と「おたがいさま」で分け合って、自分ひとりでがんばらない。慣れた心地よさを大事にする、おだやかな省エネ派。",
+   "aruaru": [
+    "家族のグループチャットで買い物をそっと頼む",
+    "入浴剤だけは、いつもの銘柄を切らさないようにしている",
+    "近所の人と野菜やおかずのおすそ分けが自然に回っている"
+   ],
+   "catch": "みんなでお湯につかって、急がない",
+   "pos": "50% 50%",
+   "photo": {
+    "file": "shindan/img/capybara.jpg",
+    "commons": "File:Capybaras resting.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Capybaras_resting.JPG",
+    "author": "Laurita",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%94%E3%83%90%E3%83%A9"
+   ]
+  },
+  {
+   "id": "spotted-seal",
+   "name": "ゴマフアザラシ",
+   "sci": "Phoca largha",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "食べ物の好みが広く、口に入るものなら魚もイカもタコもエビやカニも食べる。",
+     "quote": "広食性で口に入るものなら何でも食べる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%9E%E3%83%95%E3%82%A2%E3%82%B6%E3%83%A9%E3%82%B7"
+    },
+    {
+     "text": "北海道の抜海港には、冬に多いときで1200頭をこえるゴマフアザラシが集まってくる。",
+     "quote": "11月 - 4月まで多いときで1200頭を超えるゴマフアザラシが越冬のためにやってくる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%9E%E3%83%95%E3%82%A2%E3%82%B6%E3%83%A9%E3%82%B7"
+    },
+    {
+     "text": "冬の抜海港では、防波堤の消波ブロックの上で寝転がる姿が見られる。",
+     "quote": "防波堤の消波ブロックの上に寝転がる姿",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%9E%E3%83%95%E3%82%A2%E3%82%B6%E3%83%A9%E3%82%B7"
+    }
+   ],
+   "likeness": "目の前にあるものは何でもうまく使い、仕事のやり方にこだわりすぎない。冬になると同じ港に集まるように、いつものメンバーと集まれる場所で、寝転がりながらも仕事を回していく。",
+   "aruaru": [
+    "ツールは会社で配られたものをそのまま使い倒す",
+    "ランチは「みんなが行く店」にとりあえずついていく",
+    "休憩スペースのソファの定位置が決まっている"
+   ],
+   "catch": "あるもので回して、仲間とごろり",
+   "pos": "40% 50%",
+   "photo": {
+    "file": "shindan/img/spotted-seal.jpg",
+    "commons": "File:Phoca largha1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Phoca_largha1.jpg",
+    "author": "KENPEI",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B4%E3%83%9E%E3%83%95%E3%82%A2%E3%82%B6%E3%83%A9%E3%82%B7"
+   ]
+  },
+  {
+   "id": "giant-panda",
+   "name": "ジャイアントパンダ",
+   "sci": "Ailuropoda melanoleuca",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "食べるものの99%が竹やササ。いつも手に入りやすい竹ばかり食べるようになったと考えられている。",
+     "quote": "常に入手しやすい竹ばかり食べるようになったと考えられている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%83%91%E3%83%B3%E3%83%80"
+    },
+    {
+     "text": "1日に500メートル以上動くことはまれで、竹林の中でくらす。",
+     "quote": "1日あたり500メートル以上を移動することはまれ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%83%91%E3%83%B3%E3%83%80"
+    },
+    {
+     "text": "群れや家族を作らず、基本的に単独で行動している。冬眠はしない。",
+     "quote": "群れや家族を形成せず、基本的に単独で行動している",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%83%91%E3%83%B3%E3%83%80"
+    }
+   ],
+   "likeness": "手に入りやすい竹ばかり選ぶように、仕事でも「すぐ使える、いつもの道具」一本でやりくり。あまり遠くへは動かず、手の届く範囲で黙々とこなす。身近なものを使い続けるのが、いちばんの近道。",
+   "aruaru": [
+    "表計算ソフトだけで仕事のほとんどを片付ける",
+    "席を立たずに済むよう、手の届く所に何でも置く",
+    "新しいツールの案内は、だいたい既読で終わる"
+   ],
+   "catch": "手の届く範囲で、ずっと同じ竹をもぐもぐ",
+   "pos": "45% 35%",
+   "photo": {
+    "file": "shindan/img/giant-panda.jpg",
+    "commons": "File:Giant Panda Eating.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Giant_Panda_Eating.jpg",
+    "author": "Chen Wu from Shanghai, China",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B8%E3%83%A3%E3%82%A4%E3%82%A2%E3%83%B3%E3%83%88%E3%83%91%E3%83%B3%E3%83%80"
+   ]
+  },
+  {
+   "id": "red-panda",
+   "name": "レッサーパンダ",
+   "sci": "Ailurus fulgens",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "単独でくらし、ほとんど木の上ですごす。地上ではあまり休まず、高い場所を好む。",
+     "quote": "地上ではあまり休息せずに高い場所を好むため、樹上棲と考えられている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%83%E3%82%B5%E3%83%BC%E3%83%91%E3%83%B3%E3%83%80"
+    },
+    {
+     "text": "暑いときは枝の上に手足をたらして寝そべり、寒いときは体を丸めて後ろ足で顔をおおう。",
+     "quote": "curled up with its hindlimb over the face when it is cold",
+     "source": "https://en.wikipedia.org/wiki/Red_panda"
+    },
+    {
+     "text": "蒸し暑いのが苦手なので、日本の動物園では夏は涼しい場所で休むことが多い。",
+     "quote": "高温多湿な環境が苦手であるため、日本の動物園では、夏場は涼しい場所で休む場合が多い",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%83%E3%82%B5%E3%83%BC%E3%83%91%E3%83%B3%E3%83%80"
+    }
+   ],
+   "likeness": "暑い日は手足をだらりとのばし、寒い日は丸くなる。暮らしの中でも、その日の気分と気温に合わせて「いちばん楽な姿勢」を自分で見つけるのが上手。お気に入りの高い場所で、ひとりのんびりが好き。",
+   "aruaru": [
+    "夏はエアコン、冬はこたつから出ない日がある",
+    "部屋に「ここで寝転ぶと最高」という特等席がある",
+    "気分が乗らない日は、家事を明日の自分に任せる"
+   ],
+   "catch": "その日の気温で、いちばん楽な姿勢",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/red-panda.jpg",
+    "commons": "File:Red Panda (25193861686).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Red_Panda_(25193861686).jpg",
+    "author": "Mathias Appel",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%83%E3%82%B5%E3%83%BC%E3%83%91%E3%83%B3%E3%83%80",
+    "https://en.wikipedia.org/wiki/Red_panda"
+   ]
+  },
+  {
+   "id": "sand-cat",
+   "name": "スナネコ",
+   "sci": "Felis margarita",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "群れずに単独でくらす。巣穴は自分で掘るほか、キツネやヤマアラシなどの古い巣も利用する。",
+     "quote": "自分で巣穴を掘ったり、キツネ類やヤマアラシ類などの古巣を利用する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%8A%E3%83%8D%E3%82%B3"
+    },
+    {
+     "text": "砂漠にすみ、水分はおもに食べ物からとる。水が飲める場所なら水も飲む。",
+     "quote": "水分は主に食物から摂取するが、水が飲める環境であれば飲水も行う",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%8A%E3%83%8D%E3%82%B3"
+    },
+    {
+     "text": "主に夜に活動し、一晩で5kmも移動することがある。昼は穴に隠れる。",
+     "quote": "一晩で5㎞移動することもあり",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%8A%E3%83%8D%E3%82%B3"
+    }
+   ],
+   "likeness": "空いている古い巣があれば、わざわざ掘らずにそのまま使う。暮らしでも、すでにあるものや人の作ったしくみを上手に借りて、手間を減らす。動くときはしっかり動く、メリハリのある省エネ派。",
+   "aruaru": [
+    "レシピは検索して一番上に出てきたものを使う",
+    "引っ越しても前の家の収納グッズをそのまま使い回す",
+    "夜になると急にやる気が出て、片付けが進む"
+   ],
+   "catch": "空いている巣を借りて、すまし顔",
+   "pos": "50% 40%",
+   "photo": {
+    "file": "shindan/img/sand-cat.jpg",
+    "commons": "File:Sand Cat.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Sand_Cat.jpg",
+    "author": "Ltshears",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%8A%E3%83%8D%E3%82%B3"
+   ]
+  },
+  {
+   "id": "ruby-throated-hummingbird",
+   "name": "ノドアカハチドリ",
+   "sci": "Archilochus colubris",
+   "group": "鳥類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "体重はわずか2〜6gほどの小さな鳥で、交尾のとき以外は単独で行動する。",
+     "quote": "交尾時以外は単独で行動する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8E%E3%83%89%E3%82%A2%E3%82%AB%E3%83%8F%E3%83%81%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "寒い夜などには、体温を下げた休眠状態に入ってエネルギーを節約することがある。",
+     "quote": "they may conserve energy by entering hypothermic torpor",
+     "source": "https://en.wikipedia.org/wiki/Ruby-throated_hummingbird"
+    },
+    {
+     "text": "アメリカなどでは、人が庭に置く赤い砂糖水入れにハチドリが集まる風景がよく見られる。",
+     "quote": "赤色の砂糖水入れを戸外に設置してハチドリを庭に誘引している風景がよく見られる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8E%E3%83%89%E3%82%A2%E3%82%AB%E3%83%8F%E3%83%81%E3%83%89%E3%83%AA"
+    }
+   ],
+   "likeness": "人が用意してくれた砂糖水は、ありがたく使う。仕事でも、すでにある便利なしくみにさっと乗っかって、すばやく用事を済ませる。動くときは素早く、休むときはしっかり電源オフにする切りかえ上手。",
+   "aruaru": [
+    "社内にあるテンプレートを見つけるのが一番早い",
+    "集中するときは短く一気に、終わったら即休憩",
+    "おいしい差し入れがある席を、だれより先に見つける"
+   ],
+   "catch": "素早く動いて、休むときはしっかりオフ",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/ruby-throated-hummingbird.jpg",
+    "commons": "File:Ruby-throated Hummingbird (Archilochus colubris) RWD4.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ruby-throated_Hummingbird_(Archilochus_colubris)_RWD4.jpg",
+    "author": "Dick Daniels (http://carolinabirds.org/)",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8E%E3%83%89%E3%82%A2%E3%82%AB%E3%83%8F%E3%83%81%E3%83%89%E3%83%AA",
+    "https://en.wikipedia.org/wiki/Ruby-throated_hummingbird"
+   ]
+  },
+  {
+   "id": "japanese-macaque",
+   "name": "ニホンザル",
+   "sci": "Macaca fuscata",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "幸島の群れでは、サツマイモを海水で洗って食べる行動が見られ、ほかのサルにも広がった。",
+     "quote": "餌のサツマイモを海水で洗って食べる行動が報告されている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%B6%E3%83%AB"
+    },
+    {
+     "text": "寒さをしのぐため、何頭もが体をくっつけて「サル団子」を作って眠る。",
+     "quote": "身体を密着させて「サル団子」と呼ばれる塊を作って眠る習性がある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%B6%E3%83%AB"
+    },
+    {
+     "text": "十数頭から100頭以上の群れでくらし、毛づくろいは仲直りなどの大事なやりとりにもなる。",
+     "quote": "複数の異性が含まれる十数頭から100頭以上の群れ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%B6%E3%83%AB"
+    }
+   ],
+   "likeness": "だれかが見つけたいいやり方を、群れのみんながまねして使う。仕事でも、仲間のコツや決まった手順に上手に乗って、自分で一から考えない。寒い日はみんなで団子になる、助け合い上手。",
+   "aruaru": [
+    "同僚の便利なやり方を、すぐまねして自分のものにする",
+    "わからないことは調べる前にまず隣の人に聞く",
+    "寒い日の職場では、暖房の近くに人だかりができる"
+   ],
+   "catch": "いいやり方は、みんなでまねする",
+   "pos": "50% 35%",
+   "photo": {
+    "file": "shindan/img/japanese-macaque.jpg",
+    "commons": "File:Snow Monkeys, Nagano, Japan.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Snow_Monkeys,_Nagano,_Japan.JPG",
+    "author": "Yblieb",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8B%E3%83%9B%E3%83%B3%E3%82%B6%E3%83%AB"
+   ]
+  },
+  {
+   "id": "common-wombat",
+   "name": "ヒメウォンバット",
+   "sci": "Vombatus ursinus",
+   "group": "哺乳類",
+   "type": "MIC",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "おもに夜に活動し、巣穴でくらす。いくつもの巣穴を持ち、1〜9日ごとに眠る巣穴を変える。",
+     "quote": "They typically switch the burrow that they sleep in every 1–9 days.",
+     "source": "https://en.wikipedia.org/wiki/Common_wombat"
+    },
+    {
+     "text": "ひとつの巣穴で、何頭ものウォンバットがいっしょにくらすこともある。",
+     "quote": "Many wombats can live in the same burrow",
+     "source": "https://en.wikipedia.org/wiki/Common_wombat"
+    },
+    {
+     "text": "掘った巣穴は、トカゲや鳥、ウサギ、コアラなど、ほかの多くの動物にも使われる。",
+     "quote": "A wide range of other animals are known to make use of wombat burrows",
+     "source": "https://en.wikipedia.org/wiki/Common_wombat"
+    }
+   ],
+   "likeness": "一度しっかり掘った巣穴を、自分も仲間もずっと使い回す。暮らしでも、一度整えた「いつもの場所」や手順を家族みんなで使い続ける。最初だけがんばって、あとは楽をするタイプ。",
+   "aruaru": [
+    "一度決めた収納の場所を、家族全員が守っている",
+    "寝る部屋を、その日の気分で変えることがある",
+    "自分が作った家計の表を、なぜか家族も使っている"
+   ],
+   "catch": "一度掘った巣穴は、みんなで使い回す",
+   "pos": "45% 50%",
+   "photo": {
+    "file": "shindan/img/common-wombat.jpg",
+    "commons": "File:Vombatus ursinus -Maria Island National Park.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Vombatus_ursinus_-Maria_Island_National_Park.jpg",
+    "author": "JJ Harrison (jjharrison89@facebook.com)",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Common_wombat"
+   ]
+  },
+  {
+   "id": "live-sharksucker",
+   "name": "コバンザメ",
+   "sci": "Echeneis naucrates",
+   "group": "魚類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "頭の上にある小判の形の吸盤で、大きなサメやウミガメ、クジラなどに吸い付いて暮らす。",
+     "quote": "これで大型のサメ類やカジキ類、ウミガメ、クジラなどに吸い付き",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%90%E3%83%B3%E3%82%B6%E3%83%A1"
+    },
+    {
+     "text": "吸い付いた相手が速く泳いでも外れず、離れたいときは少し速く泳ぐだけで簡単に離れられる。",
+     "quote": "離れたいときは大きな魚などより少し速く泳ぐだけで簡単に離れることができる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%90%E3%83%B3%E3%82%B6%E3%83%A1"
+    },
+    {
+     "text": "サメという名前がついているが、実はアジの仲間で、サメとは近い仲間ではない。",
+     "quote": "サメの名がついているがアジ目に属し、軟骨魚類のサメ類ではなく近縁でもない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%90%E3%83%B3%E3%82%B6%E3%83%A1"
+    }
+   ],
+   "likeness": "大きな相手にくっついて遠くまで運んでもらうように、強いツールやサービスにうまく乗っかって、自分は少ない力で先へ進むのが得意。外したいときにさっと外せる身軽さもある。",
+   "aruaru": [
+    "便利なツールを見つけると、まず仕事ごと乗っかれないか考える",
+    "「それ、もう誰かが作ってない？」がつい口に出る",
+    "サービスの乗り換えも、あっさり身軽にこなす"
+   ],
+   "catch": "大きな流れに、ぴたっと乗る名人",
+   "photo": {
+    "file": "shindan/img/live-sharksucker.jpg",
+    "commons": "File:Live Sharksucker (Echeneis naucrates) (6056011333).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Live_Sharksucker_(Echeneis_naucrates)_(6056011333).jpg",
+    "author": "Bernard DUPONT from FRANCE",
+    "license": "CC BY-SA 2.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%90%E3%83%B3%E3%82%B6%E3%83%A1"
+   ]
+  },
+  {
+   "id": "great-frigatebird",
+   "name": "オオグンカンドリ",
+   "sci": "Fregata minor",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "アホウドリの仲間のように、あまり羽ばたかずに長い距離を飛ぶことができる。",
+     "quote": "アホウドリ類のようにあまり羽ばたかず長距離を飛ぶことができ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B0%E3%83%B3%E3%82%AB%E3%83%B3%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "ほかの海鳥をしつこく追い回し、飲み込んでいた獲物を吐き出させて横取りすることがある。",
+     "quote": "飲み込んでいた獲物を吐き出させて奪い取る行動が知られている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B0%E3%83%B3%E3%82%AB%E3%83%B3%E3%83%89%E3%83%AA"
+    },
+    {
+     "text": "羽毛に油分が少ないため、海鳥なのに水に浮くことも泳ぐこともできない。",
+     "quote": "海鳥であるにもかかわらず水面に浮く事も泳ぐ事も出来ない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B0%E3%83%B3%E3%82%AB%E3%83%B3%E3%83%89%E3%83%AA"
+    }
+   ],
+   "likeness": "自分では潜らず、ほかの鳥がとった獲物をいただくように、ゼロから作るより、できあがった成果やデータを上手に受け取って仕上げるのが得意。羽ばたきは最小限ですませる。",
+   "aruaru": [
+    "だれかが作った表やひな形を見つけた瞬間が、いちばん輝いている",
+    "苦手な作業は、はじめから「やらない」と決めている",
+    "ネットで完成品を探し当てるスピードがとにかく速い"
+   ],
+   "catch": "羽ばたかずに、遠くまで行く省エネ飛行",
+   "photo": {
+    "file": "shindan/img/great-frigatebird.jpg",
+    "commons": "File:Male greater frigate bird displaying.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Male_greater_frigate_bird_displaying.jpg",
+    "author": "Charles J. Sharp",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AA%E3%82%AA%E3%82%B0%E3%83%B3%E3%82%AB%E3%83%B3%E3%83%89%E3%83%AA"
+   ]
+  },
+  {
+   "id": "common-cuckoo",
+   "name": "カッコウ",
+   "sci": "Cuculus canorus",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "ほかの鳥の巣に卵を産んで、ヒナを育ててもらう「托卵」をする鳥として有名。",
+     "quote": "本種は「托卵」を行う種として有名である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%83%E3%82%B3%E3%82%A6"
+    },
+    {
+     "text": "托卵するときは、巣の中にあった卵をひとつ持ち去って、卵の数を合わせておく。",
+     "quote": "托卵の際には巣の中にあった卵をひとつ持ち去って数を合わせる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%83%E3%82%B3%E3%82%A6"
+    },
+    {
+     "text": "卵の模様を相手の鳥の卵に似せるなど、見破られないための力を発達させている。",
+     "quote": "カッコウもその鳥の卵に模様を似せるなど見破られないようにするための能力を発達させており",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%83%E3%82%B3%E3%82%A6"
+    }
+   ],
+   "likeness": "子育てをほかの鳥に任せるように、家のことや手間のかかる作業を、得意な人やサービスにまるごと預けるのが上手。預ける相手に合わせた下ごしらえも抜かりない。",
+   "aruaru": [
+    "家事代行や宅配サービスの比べ方に、やたらくわしい",
+    "「自分でやるより頼んだほうが早い」をすぐ計算できる",
+    "預ける前の準備だけは、なぜかきっちりしている"
+   ],
+   "catch": "子育てまで任せる、おまかせ上手",
+   "photo": {
+    "file": "shindan/img/common-cuckoo.jpg",
+    "commons": "File:Kuckuck (Cuculus canorus) by Tim Peukert.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Kuckuck_(Cuculus_canorus)_by_Tim_Peukert.jpg",
+    "author": "Tim Peukert",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%83%E3%82%B3%E3%82%A6"
+   ]
+  },
+  {
+   "id": "hermit-crab-filholi",
+   "name": "ホンヤドカリ",
+   "sci": "Pagurus filholi",
+   "group": "甲殻類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "high",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "潮が引いた磯の潮だまりや石の下で、ほかのヤドカリたちと一緒に見られる。",
+     "quote": "潮が引いた磯のタイドプール内や転石下で他のヤドカリ類と共に見られる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%83%A4%E3%83%89%E3%82%AB%E3%83%AA"
+    },
+    {
+     "text": "使う貝殻は、イシダタミやスガイ、タマキビなど小さな巻貝のものが多い。",
+     "quote": "イシダタミ、コシダカガンガラ、スガイ、タマキビ等の小型種が多い",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%83%A4%E3%83%89%E3%82%AB%E3%83%AA"
+    },
+    {
+     "text": "危険を感じると素早く殻の奥に引っ込み、大きな右のはさみで入口をふさぐ。",
+     "quote": "危険を感じると素早く殻の奥に引っ込む。この時に大きな右の鋏脚が殻口を塞ぐ役割をもつ",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%83%A4%E3%83%89%E3%82%AB%E3%83%AA"
+    }
+   ],
+   "likeness": "家を自分で作らず、ちょうどいい貝殻を見つけて住むように、ゼロから作らずに、すでにある道具やテンプレートを見つけて自分サイズで使いこなすのが得意。",
+   "aruaru": [
+    "合わなくなった道具からは、さっと新しいものへ引っ越す",
+    "テンプレート集をながめるのが、ちょっとした楽しみ",
+    "近くの人と便利な道具を見せ合うのが、けっこう好き"
+   ],
+   "catch": "ちょうどいい家を見つける引っ越し上手",
+   "photo": {
+    "file": "shindan/img/hermit-crab-filholi.jpg",
+    "commons": "File:Hon-yadokari1104-1.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Hon-yadokari1104-1.jpg",
+    "author": "ふうけ",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9B%E3%83%B3%E3%83%A4%E3%83%89%E3%82%AB%E3%83%AA"
+   ]
+  },
+  {
+   "id": "eastern-cattle-egret",
+   "name": "アマサギ",
+   "sci": "Ardea coromanda",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "家畜が移動するときに追い立てられた虫などを目当てに、その後をついて歩く。",
+     "quote": "ウシなどの家畜が移動する際に追い立てられた獲物を目当てに後をつけることが由来",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%82%B5%E3%82%AE"
+    },
+    {
+     "text": "今では家畜だけでなく、田畑を耕す耕運機の後をついて歩くこともある。",
+     "quote": "現在では家畜のみならず、耕運機の後をつけることもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%82%B5%E3%82%AE"
+    },
+    {
+     "text": "大型の草食動物の背中に止まり、体についた寄生虫をとることもある。",
+     "quote": "大型の草食獣の背中に止まり、寄生虫を採ることもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%82%B5%E3%82%AE"
+    }
+   ],
+   "likeness": "ウシや耕運機が虫を追い出してくれるのを待つように、だれかや何かが動いた「ついで」に、自分の用事もまとめて片付けるのが上手。新しい機械にもすぐになじむ。",
+   "aruaru": [
+    "人の作業の「ついで」に乗っかるタイミングを逃さない",
+    "会議のメモが出たら、それをもとにさっと自分の作業を決める",
+    "みんなが動き出すと、つられて自分の作業もはかどる"
+   ],
+   "catch": "動くものの後ろに、いつも近道あり",
+   "pos": "50% 30%",
+   "photo": {
+    "file": "shindan/img/eastern-cattle-egret.jpg",
+    "commons": "File:Bubulcus ibis coromandus walking.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Bubulcus_ibis_coromandus_walking.JPG",
+    "author": "Alpsdake",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%A2%E3%83%9E%E3%82%B5%E3%82%AE"
+   ]
+  },
+  {
+   "id": "black-kite",
+   "name": "トビ",
+   "sci": "Milvus migrans",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "主に上昇気流に乗って輪を描くように滑空し、羽ばたくことは少ない。",
+     "quote": "主に上昇気流を利用して輪を描くように滑空し、羽ばたきは少ない",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%93"
+    },
+    {
+     "text": "空を飛びながら餌を探し、見つけるとその場所に急降下してとらえる。",
+     "quote": "上空を飛翔しながら餌を探し、餌を見つけるとその場所に急降下して捕らえる",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%93"
+    },
+    {
+     "text": "高い山から海岸、農地、都市部まで、すむ場所をほとんど選ばない。",
+     "quote": "生息地は高山から海岸線、農地、都市部までほとんど場所を選ばず",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%93"
+    }
+   ],
+   "likeness": "上昇気流に乗ってほとんど羽ばたかずに空を回るように、しくみの流れに乗って力をためておき、ここぞという場面でだけ一気に動く。どんな場所にもすぐなじめる。",
+   "aruaru": [
+    "通知が来るまでは、空の上でゆったりかまえている",
+    "チャンスを見つけたときの動きだけは、だれより速い",
+    "職場が変わっても、使える道具をすぐ見つけてなじむ"
+   ],
+   "catch": "風に乗って待ち、ここぞで急降下",
+   "photo": {
+    "file": "shindan/img/black-kite.jpg",
+    "commons": "File:Milvus migrans -Japan -flying-8.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Milvus_migrans_-Japan_-flying-8.jpg",
+    "author": "nubobo",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%88%E3%83%93"
+   ]
+  },
+  {
+   "id": "ocellaris-clownfish",
+   "name": "カクレクマノミ",
+   "sci": "Amphiprion ocellaris",
+   "group": "魚類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "イソギンチャクを住みかにし、敵から逃げる場所としても利用している。",
+     "quote": "住みかとして、また捕食者からの避難のために利用している",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%AF%E3%83%AC%E3%82%AF%E3%83%9E%E3%83%8E%E3%83%9F"
+    },
+    {
+     "text": "イソギンチャクの毒針に強いので、その触手の中で暮らすことができる。",
+     "quote": "クマノミ類の魚はそれに耐性があるため、そのようなことが可能である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%AF%E3%83%AC%E3%82%AF%E3%83%9E%E3%83%8E%E3%83%9F"
+    },
+    {
+     "text": "住みかにしているイソギンチャクが食べ残したものを、自分の餌にしている。",
+     "quote": "彼らが住みかとしているイソギンチャクが食べ残したものを餌としている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%AF%E3%83%AC%E3%82%AF%E3%83%9E%E3%83%8E%E3%83%9F"
+    }
+   ],
+   "likeness": "守ってくれるイソギンチャクの中で暮らすように、頼れるしくみや仲間の中に自分の居場所をつくり、そのおかげでのびのび動ける。おすそわけを上手に生かすのも得意。",
+   "aruaru": [
+    "家族のグループチャットから、必要な情報だけさっと拾う",
+    "便利な共有アプリを家族に広めるのは、いつも自分",
+    "頼れる人が近くにいると、急にてきぱき動き出す"
+   ],
+   "catch": "頼れる住みかで、のびのび暮らす",
+   "photo": {
+    "file": "shindan/img/ocellaris-clownfish.jpg",
+    "commons": "File:Amphiprion ocellaris (Clown anemonefish) Nemo.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Amphiprion_ocellaris_(Clown_anemonefish)_Nemo.jpg",
+    "author": "Nhobgood Nick Hobgood",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%AB%E3%82%AF%E3%83%AC%E3%82%AF%E3%83%9E%E3%83%8E%E3%83%9F"
+   ]
+  },
+  {
+   "id": "tibetan-sand-fox",
+   "name": "チベットスナギツネ",
+   "sci": "Vulpes ferrilata",
+   "group": "哺乳類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "mid",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "岩の下や石のすき間を巣穴にしていて、ひとつの巣穴に入口が1〜12個ある。",
+     "quote": "岩の下や石の隙間などを巣穴にし、巣穴には入口が1 - 12個ある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%99%E3%83%83%E3%83%88%E3%82%B9%E3%83%8A%E3%82%AE%E3%83%84%E3%83%8D"
+    },
+    {
+     "text": "夏のあいだに、最大で54もの巣穴を使っていた例が知られている。",
+     "quote": "夏季に最大54の巣穴を使用した例もある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%99%E3%83%83%E3%83%88%E3%82%B9%E3%83%8A%E3%82%AE%E3%83%84%E3%83%8D"
+    },
+    {
+     "text": "ふだんは単独で食べものを探すが、ペアで狩りをすることもある。",
+     "quote": "単独で採食を行うが、ペアで狩りをすることもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%99%E3%83%83%E3%83%88%E3%82%B9%E3%83%8A%E3%82%AE%E3%83%84%E3%83%8D"
+    }
+   ],
+   "likeness": "入口がたくさんある巣穴をいくつも使うように、暮らしの中に「すぐ使える出口」や近道をいくつも用意しておき、そのとき一番近いものをすっと選ぶのが得意。",
+   "aruaru": [
+    "同じことができるアプリが、なぜか3つくらい入っている",
+    "顔には出ないけれど、近道を見つけると内心かなりうれしい",
+    "ショートカットキーを覚えるのが、だれより早い"
+   ],
+   "catch": "すずしい顔で、近道をいくつも持つ",
+   "photo": {
+    "file": "shindan/img/tibetan-sand-fox.jpg",
+    "commons": "File:20260309 4502 Wild Yak Valley Renard du Tibet 01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:20260309_4502_Wild_Yak_Valley_Renard_du_Tibet_01.jpg",
+    "author": "Fstoger",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%81%E3%83%99%E3%83%83%E3%83%88%E3%82%B9%E3%83%8A%E3%82%AE%E3%83%84%E3%83%8D"
+   ]
+  },
+  {
+   "id": "greater-honeyguide",
+   "name": "ノドグロミツオシエ",
+   "sci": "Indicator indicator",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "人を野生のハチの巣まで案内することで知られ、英名と学名もこの習性に由来する。",
+     "quote": "Its English and scientific names refer to its habit of guiding people to bee colonies.",
+     "source": "https://en.wikipedia.org/wiki/Greater_honeyguide"
+    },
+    {
+     "text": "人がハチの巣からハチミツをとったあと、残ったミツロウを食べる。",
+     "quote": "After harvesting the honey, the honeyguide eats wax that is left.",
+     "source": "https://en.wikipedia.org/wiki/Greater_honeyguide"
+    },
+    {
+     "text": "ある研究では、この鳥の案内で、人がハチミツを探す時間がおよそ3分の2減った。",
+     "quote": "reduces their search time for honey by approximately two-thirds",
+     "source": "https://en.wikipedia.org/wiki/Greater_honeyguide"
+    }
+   ],
+   "likeness": "ハチの巣の場所を人に教え、とってもらったあとにミツロウをいただくように、自分の知っていることで人を動かし、おたがいに得をする流れをつくるのが得意。",
+   "aruaru": [
+    "「これ便利だよ」と人に教えて、結局自分もラクになっている",
+    "人に頼むときの声のかけ方が、なぜかうまい",
+    "いい情報を見つけると、まずだれかに知らせたくなる"
+   ],
+   "catch": "教えて、頼んで、おいしいところをいただく",
+   "photo": {
+    "file": "shindan/img/greater-honeyguide.jpg",
+    "commons": "File:Greater Honeyguide Male.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Greater_Honeyguide_Male.jpg",
+    "author": "Michael Heyns",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+   },
+   "sources": [
+    "https://en.wikipedia.org/wiki/Greater_honeyguide"
+   ]
+  },
+  {
+   "id": "kea",
+   "name": "ミヤマオウム",
+   "sci": "Nestor notabilis",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "team"
+   },
+   "facts": [
+    {
+     "text": "好奇心がとても強く、ゴミ箱のふたやボルトナットを外すことも簡単にこなす。",
+     "quote": "ゴミ箱の蓋を外す、ボルトナットを外す",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%A4%E3%83%9E%E3%82%AA%E3%82%A6%E3%83%A0"
+    },
+    {
+     "text": "仲間と集団で協力して、さまざまないたずらをすることが知られている。",
+     "quote": "集団で協力して様々ないたずらをする",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%A4%E3%83%9E%E3%82%AA%E3%82%A6%E3%83%A0"
+    },
+    {
+     "text": "冬に高カロリーな食べものを手に入れやすいスキー場の近くに、巣を作るつがいも現れている。",
+     "quote": "これら高カロリー食品を簡単に入手できる山岳地帯のスキー場の近傍に営巣するつがいも出現している",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%A4%E3%83%9E%E3%82%AA%E3%82%A6%E3%83%A0"
+    }
+   ],
+   "likeness": "ふたやボルトをどんどん外してしまうように、新しい道具やしくみをすぐにいじって、仲間と一緒に楽しい近道を見つけ出す。便利な場所の近くに住みつくのも上手。",
+   "aruaru": [
+    "新しいガジェットは、説明書より先にさわってみる",
+    "友だちと「これ自動にできない？」で盛り上がる",
+    "家選びでは、お店が近いことを何より大事にする"
+   ],
+   "catch": "いじって、試して、みんなで近道",
+   "photo": {
+    "file": "shindan/img/kea.jpg",
+    "commons": "File:Nestor notabilis -Fiordland, New Zealand-8b.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Nestor_notabilis_-Fiordland,_New_Zealand-8b.jpg",
+    "author": "Mark Whatmough",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%9F%E3%83%A4%E3%83%9E%E3%82%AA%E3%82%A6%E3%83%A0"
+   ]
+  },
+  {
+   "id": "striated-heron",
+   "name": "ササゴイ",
+   "sci": "Butorides striata",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "work",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "一部の個体は水面に物を落とし、それに近づいてきた魚などの獲物をとらえる。",
+     "quote": "水面に物を落とし、近づいてきた獲物を捕食する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%B5%E3%82%B4%E3%82%A4"
+    },
+    {
+     "text": "川や池、水田などの水辺で、魚などの獲物を待ち伏せしてとらえる。",
+     "quote": "水辺で獲物を待ち伏せて捕食する",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%B5%E3%82%B4%E3%82%A4"
+    },
+    {
+     "text": "ふつうは木の上に巣を作るが、テレビアンテナに巣を作ることもある。",
+     "quote": "テレビアンテナに巣を作ることもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%B5%E3%82%B4%E3%82%A4"
+    }
+   ],
+   "likeness": "水面に物を落として魚を呼び寄せるように、ちょっとした仕掛けを置いて、あとは向こうから来てくれるのを待つのが得意。人の作ったものも遠慮なく足場にする。",
+   "aruaru": [
+    "メールの自動ふり分けや自動返信を、こっそり仕込んでいる",
+    "仕掛けがうまく動いた日は、ひとりで満足している",
+    "新しい便利ワザは、だいたい一人でこっそり試す"
+   ],
+   "catch": "エサを落として、待つだけの釣り名人",
+   "photo": {
+    "file": "shindan/img/striated-heron.jpg",
+    "commons": "File:Butorides striatus - Daintree River.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Butorides_striatus_-_Daintree_River.jpg",
+    "author": "JJ Harrison (https://www.jjharrison.com.au/)",
+    "license": "CC BY 3.0",
+    "license_url": "https://creativecommons.org/licenses/by/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%82%B5%E3%82%B5%E3%82%B4%E3%82%A4"
+   ]
+  },
+  {
+   "id": "carrion-crow",
+   "name": "ハシボソガラス",
+   "sci": "Corvus corone",
+   "group": "鳥類",
+   "type": "MIN",
+   "cell": {
+    "lazy": "low",
+    "scene": "life",
+    "style": "solo"
+   },
+   "facts": [
+    {
+     "text": "信号で止まっている車のタイヤの前にクルミや貝を置いて割るのは、このカラスである。",
+     "quote": "信号停車中の車のタイヤの前にクルミや貝などを置いて割るのも本種である",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%9C%E3%82%BD%E3%82%AC%E3%83%A9%E3%82%B9"
+    },
+    {
+     "text": "木の枝を組んでお椀のような巣を作り、針金やハンガーを材料に使うこともある。",
+     "quote": "巣材に針金やハンガーなどを利用することもある",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%9C%E3%82%BD%E3%82%AC%E3%83%A9%E3%82%B9"
+    },
+    {
+     "text": "ハシブトガラスと違って、地面を一歩ずつ歩いて過ごす時間が長い。",
+     "quote": "ハシブトガラスと違って地面をウォーキング",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%9C%E3%82%BD%E3%82%AC%E3%83%A9%E3%82%B9"
+    }
+   ],
+   "likeness": "車にクルミを割ってもらうように、身のまわりの機械や道具の力をちゃっかり借りて、自分では大変な作業を片付けるのが得意。家にあるものも上手に材料にする。",
+   "aruaru": [
+    "食洗機やロボット掃除機への感謝を忘れない",
+    "家電の新しい機能を見つけると、すぐに試したくなる",
+    "「これ、機械にやらせればいいのでは」と毎日考えている"
+   ],
+   "catch": "かたいクルミ割りは、車におまかせ",
+   "photo": {
+    "file": "shindan/img/carrion-crow.jpg",
+    "commons": "File:Carrion crow 20090612.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Carrion_crow_20090612.jpg",
+    "author": "Aomorikuma（あおもりくま）",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%82%B7%E3%83%9C%E3%82%BD%E3%82%AC%E3%83%A9%E3%82%B9"
+   ]
+  },
+  {
+   "id": "orchid-mantis",
+   "name": "ハナカマキリ",
+   "sci": "Hymenopus coronatus",
+   "group": "昆虫",
+   "type": "MIN",
+   "rare": true,
+   "facts": [
+    {
+     "text": "ランの花に体の姿を似せることで、花に集まる昆虫をとらえて暮らしている。",
+     "quote": "その花の姿に体を似せている事で、花に集まる昆虫類を捕食して暮らしている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8A%E3%82%AB%E3%83%9E%E3%82%AD%E3%83%AA"
+    },
+    {
+     "text": "幼虫は葉の上で花のように見せかけ、ハチを呼ぶ物質も出してハチをおびき寄せる。",
+     "quote": "ハチのフェロモンである物質を放出することでハチをおびき寄せている",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8A%E3%82%AB%E3%83%9E%E3%82%AD%E3%83%AA"
+    },
+    {
+     "text": "野外での観察では、幼虫がハチをとらえる成功率は9割にも達した。",
+     "quote": "幼虫の捕獲成功率は9割に達した",
+     "source": "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8A%E3%82%AB%E3%83%9E%E3%82%AD%E3%83%AA"
+    }
+   ],
+   "likeness": "花のふりをして獲物のほうから来てもらうように、自分は動かずにしくみだけ整えて、結果が向こうからやってくるのを待つ。いちばん力を使わない近道を知っている。",
+   "aruaru": [
+    "自分から探しに行くより、届くしくみを作ってしまう",
+    "通知と自動化だけで、一日が回っている日がある",
+    "見た目がおしゃれな道具ほど、なぜかよく働いてくれる"
+   ],
+   "catch": "動かずに、向こうから来てもらう",
+   "pos": "50% 35%",
+   "photo": {
+    "file": "shindan/img/orchid-mantis.jpg",
+    "commons": "File:Mantis Hymenopus coronatus 6 Luc Viatour.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Mantis_Hymenopus_coronatus_6_Luc_Viatour.jpg",
+    "author": "Luc Viatour",
+    "license": "CC BY-SA 3.0",
+    "license_url": "http://creativecommons.org/licenses/by-sa/3.0/"
+   },
+   "sources": [
+    "https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%8A%E3%82%AB%E3%83%9E%E3%82%AD%E3%83%AA"
+   ]
+  }
+ ]
+}

@@ -6,6 +6,10 @@
  "exclude": [
   "/assets/*",
   "/img/*",
-  "/robots.txt"
+  "/robots.txt",
+  "/shindan/img/*",
+  "/shindan/share/*",
+  "/shindan/*.js",
+  "/shindan/*.css"
  ]
 }

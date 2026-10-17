@@ -310,3 +310,17 @@ img { max-width: 100%; height: auto; }
 /* note の別バージョンへの案内（scripts/build.py。note に載せた記事だけ） */
 .note-link { margin: 2em 0 0; padding: 10px 14px; border-left: 3px solid #41c9b4; background: var(--soft); font-size: 0.9rem; color: var(--muted); }
 .note-link a { color: inherit; font-weight: 700; }
+
+/* ---------- 自動化いきもの診断（/shindan/）への入り口 ---------- */
+.shindan-nav {
+  padding: 5px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; line-height: 1.6; white-space: nowrap;
+  color: #23806a; background: #e8f8f0; border: 1px solid #5ccfb0; text-decoration: none;
+}
+.shindan-nav::before { content: "🐾 "; }
+.shindan-nav:hover { background: #5ccfb0; color: #fff; }
+.shindan-nav + .featured-nav { margin-left: 0; }
+.site-header .shindan-nav { margin-left: auto; }
+.shindan-link { margin: 2em 0 0; padding: 14px 16px; border-radius: 14px; background: #e8f8f0; border: 1px solid #b9ead6; }
+.shindan-link a { display: block; font-weight: 800; font-size: 1.05rem; color: #23806a; }
+.shindan-link a::before { content: "🐾 "; }
+.shindan-link span { display: block; margin-top: 4px; font-size: 0.88rem; color: var(--muted); }
