@@ -163,6 +163,61 @@ def overlap(blog_md, note_md, n=10):
 X_LOG = ROOT / "data" / "x.json"
 
 
+def x_check_replies():
+    """X に付いたリプライを数える（朝の x-plan.py が1日1回）。自動では返さない（X API の申請でそう約束している）。
+    data/x.json の replies に {user_id, since_id, checked_at, items: [{id, url, author, text, at}]} を入れる。結果の説明を返す。"""
+    import datetime
+    keys = load_x_keys()
+    if not keys:
+        return "キーがないため見送り"
+    xlog = json.loads(X_LOG.read_text(encoding="utf-8")) if X_LOG.exists() else {}
+    rp = xlog.setdefault("replies", {"items": []})
+    if not rp.get("user_id"):
+        code, me = x_request("GET", "https://api.x.com/2/users/me", keys)
+        if code != 200:
+            return f"自分の ID を取れませんでした（{code}）"
+        rp["user_id"] = me["data"]["id"]
+    params = {"max_results": "100", "tweet.fields": "created_at,in_reply_to_user_id,author_id",
+              "expansions": "author_id", "user.fields": "username"}
+    if rp.get("since_id"):
+        params["since_id"] = rp["since_id"]
+    else:
+        params["start_time"] = load_config().get("x_api", {}).get("start", "2026-10-17") + "T00:00:00Z"
+    code, data = x_request("GET", f"https://api.x.com/2/users/{rp['user_id']}/mentions", keys, params=params)
+    if code != 200:
+        return f"取れませんでした（{code} {json.dumps(data, ensure_ascii=False)[:150]}）"
+    users = {u["id"]: u["username"] for u in (data.get("includes") or {}).get("users", [])}
+    new = []
+    for t in data.get("data") or []:
+        if t.get("in_reply_to_user_id") != rp["user_id"] or t.get("author_id") == rp["user_id"]:
+            continue      # 自分あてのリプライだけ（ただの言及・自分の返信は数えない）
+        u = users.get(t.get("author_id"), "i")
+        at = datetime.datetime.fromisoformat(t["created_at"].replace("Z", "+00:00")).astimezone(
+            datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%dT%H:%M")
+        new.append({"id": t["id"], "url": f"https://x.com/{u}/status/{t['id']}", "author": u, "text": t.get("text", "")[:140], "at": at})
+    if data.get("meta", {}).get("newest_id"):
+        rp["since_id"] = data["meta"]["newest_id"]
+    seen = {i["id"] for i in rp["items"]}
+    rp["items"] = (rp["items"] + [n for n in new if n["id"] not in seen])[-100:]
+    rp["checked_at"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M")
+    X_LOG.write_text(json.dumps(xlog, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    return f"新しいリプライ {len(new)} 件"
+
+
+def x_reply_alert(xlog=None, days=7):
+    """STATUS.md の先頭に出す「Xに返信が来ています」（直近 days 日・なければ None）。返信は人が行う。"""
+    import datetime
+    if xlog is None:
+        xlog = json.loads(X_LOG.read_text(encoding="utf-8")) if X_LOG.exists() else {}
+    since = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
+    items = [i for i in (xlog.get("replies") or {}).get("items", []) if i.get("at", "") >= since]
+    if not items:
+        return None
+    urls = " / ".join(i["url"] for i in sorted(items, key=lambda i: i["at"], reverse=True)[:10])
+    return (f"- **Xに返信が来ています（直近{days}日で {len(items)} 件）**: {urls}"
+            + (" ほか" if len(items) > 10 else "") + "。自動では返しません。返信する場合は X で直接どうぞ。")
+
+
 def x_api_alert(xlog=None, cfg=None):
     """STATUS.md の先頭に出す X API の知らせ（なければ None）。"""
     if xlog is None:

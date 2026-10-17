@@ -1,5 +1,5 @@
 {
- "_about": "X API の投稿の記録（GitHub Actions の scripts/x-actions.py が書く）。cost は概算（data/social.json の x_api の単価）",
+ "_about": "X API の投稿の記録（Cloudflare の x-poster の記録を scripts/xpost.py sync が写したもの）。cost は概算（data/social.json の x_api の単価）",
  "posts": [
   {
    "id": "2026-10-16-1",
@@ -24,12 +24,18 @@
    "cost": 0.015
   }
  ],
- "failed": {},
  "months": {
   "2026-10": {
    "posts": 2,
    "link_posts": 0,
    "cost": 0.03
   }
+ },
+ "credit": {},
+ "failed": {},
+ "replies": {
+  "items": [],
+  "user_id": "2109492125918470144",
+  "checked_at": "2026-10-17T18:15"
  }
 }

@@ -750,6 +750,9 @@ def cmd_status():
     x_alert = social.x_api_alert()
     if x_alert:
         alerts.insert(0, x_alert)
+    x_reply = social.x_reply_alert()      # X のリプライは自動で返さない。件数と URL を知らせるだけ
+    if x_reply:
+        alerts.insert(0, x_reply)
     x_cfg = load_json(ROOT / "data" / "social.json", {}).get("x_api", {})
     x_log = load_json(ROOT / "data" / "x.json", {})
     x_month = x_log.get("months", {}).get(datetime.date.today().strftime("%Y-%m"), {})

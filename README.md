@@ -328,8 +328,9 @@ GitHub Actions の待ち番（x-post.yml / x-actions.py）は 2026-10-17 にや�
 ```
 毎朝の自動実行（boot-run.py の 5.）
   scripts/x-plan.py … その日の投稿（本文・カード画像・投稿予定時刻）を作る → data/x-queue/<日付>.json と data/x-queue/img/ → GitHub
-     文面は Claude Code（claude -p・scripts/x-prompt.md）が書き、禁止語・長さ・過去との重複をプログラムが確かめる（3回まで書き直し）
+     文面は Claude Code（claude -p・scripts/x-prompt.md＋data/content-guide.md）が書き、禁止語・長さ・型の形・過去との重複をプログラムが確かめる（3回まで書き直し）
      実話として書いてよいのは data/x-facts.md と jidouka-ranking.json の根拠「自社の実例」だけ
+     自分あてのリプライを数えて data/x.json へ（返信はしない）
      作る前に Cloudflare の投稿の記録を data/x.json に写す（xpost.py sync → 今月の概算費用・クレジット切れ）
 
 日中（PC は切れていてよい）
@@ -348,8 +349,12 @@ GitHub Actions の待ち番（x-post.yml / x-actions.py）は 2026-10-17 にや�
 | 投稿の記録・月ごとの件数と概算費用・クレジット切れ | Cloudflare の KV → 朝に `data/x.json` に写す |
 | ログ | `logs/x-plan.log`（朝）・`python scripts/xpost.py status`（投稿係の最後の実行と最近の記録） |
 
-- **件数と時刻**：start（1日目）から10日目までは1日2件（7:00〜22:00 のばらばら・3時間以上あける）。11日目から1日3件（朝 7:00〜9:00・昼 11:30〜13:30・夜 18:00〜21:30）
-- **中身**：リンク＋カード画像付きは1日1件（その日の自動化記事の紹介・水曜はオリシャン）。記事の公開予定時刻の20分後以降に置き、間に合わなければ公開済みの最新記事を紹介。残りは文章だけ（小ワザ・ひと言・つまずいた話）。リンクは `?utm_source=x`
+- **書き方**：`data/content-guide.md` の「共通の土台」と「X のルール」（x-plan.py が毎回 x-prompt.md に差し込む。note の部分は note 担当）。1行目は30字以内の手を止めさせる一文・ハッシュタグ0〜1個・自動で動いていることには触れない
+- **件数と時刻**：時間帯は social.json の `windows`（朝 7:00〜9:00・昼 12:00〜13:00・夜 19:00〜21:00）の中でランダム。start（1日目）から10日目までは1日2件（別々の帯・3時間以上あける）、11日目から1日3件（各帯に1件）
+- **中身**：リンク付きは1日1件（画像＋説明文＋リンク。その日の自動化記事の紹介・水曜はオリシャン）。記事の公開予定時刻の20分後以降に置き、間に合わなければ公開済みの最新記事を紹介。リンクは `?utm_source=x`
+- **型**（文章の投稿）：実物を見せる（jitsubutsu・作ったものの画面のダミー）→ 体験＋意見（taiken）→ まとめ（matome・ランキングの番号付き3行）→ Before/After（beforeafter・「前：／今：」）を日替わりで回す（`types_cycle`）。火・金（`question_weekdays`）は1件を問いかけの型（toikake・最後を質問で終える。ほかの型は質問で終えない）。「DMで」は木曜（`dm_weekdays`）の1件だけ。型の形・1行目の長さ・ハッシュタグ数はプログラムが確かめ、だめなら3回まで書き直し
+- **画像**：どの投稿にも型に合った図解カード（1200×675・`render_card`）を付ける。カードの言葉が条件を満たさないときだけ画像なし。サンプルは `python scripts/x-plan.py samples` → `data/content-samples-x.md`
+- **リプライ**：自動では返さない（X API の申請でそう約束している）。朝の x-plan.py が自分あてのリプライを数え（`social.x_check_replies`・data/x.json の replies）、直近7日にあれば STATUS.md の先頭に「Xに返信が来ています（件数と URL）」。返信は人が行う
 - **失敗したとき**：混雑・一時的なエラー（429・5xx・通信）と残高切れ（402）は次の回に再試行（6回まで）。それ以外はその投稿をやめる。残高切れは朝の sync で STATUS.md の先頭に出る
 - **費用**：単価は social.json（文章だけ $0.015・リンク付き $0.20）。月の概算が `budget_usd_month`（$10）を超えそうなら朝の x-plan.py が文章だけの投稿を減らす。Cloudflare は無料枠内（cron 288回/日・KV 書き込み 約300回/日）
 - **コマンド**：`python scripts/x-plan.py show [日付]`（予定）／`python scripts/xpost.py status`（投稿係）／`sync`（記録を data/x.json へ）／`check`（認証確認・投稿しない）／`python scripts/x-keys.py secrets`（キーを Cloudflare に入れ直す）／`profile`（プロフィールを API で設定）

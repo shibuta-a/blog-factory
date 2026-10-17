@@ -147,6 +147,8 @@ def sync():
     new = {"_about": "X API の投稿の記録（Cloudflare の x-poster の記録を scripts/xpost.py sync が写したもの）。cost は概算（data/social.json の x_api の単価）",
            "posts": sorted(posts.values(), key=lambda p: p["posted_at"]), "months": months,
            "credit": lg.get("credit") or {}, "failed": lg.get("failed") or {}}
+    if old.get("replies"):
+        new["replies"] = old["replies"]          # リプライの確認（social.x_check_replies）の記録は残す
     social.X_LOG.write_text(json.dumps(new, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     return True
 
