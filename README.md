@@ -320,6 +320,17 @@ Advanced → Chipset Configuration → **Deep Sleep = Disabled**。F10 で保存
   オリシャン（本業）への案内は orishan ジャンルの記事の note 版だけ（ブログ側はトップ固定枠・各記事の誘導ボックスで既に出ている）
 - note の画面が変わって投稿に失敗したら、`logs/note.log` と `.secrets/shots/note-error-*.png` を見て `scripts/note-run.py` の `post_to_note` を直す
 
+### note の有料記事「自動化ランキング100 完全版（◯月版）」（2026-10-17〜・scripts/note_ranking.py）
+
+毎朝の `note-run.py run` の中で動く（Chrome を開く前に毎月の見直し、ログインのあとに `note_ranking.daily`）。
+
+- 原稿: `data/note/ranking/manuscript.md`（`python scripts/note_ranking.py build` で作り直す）。順位は版ごとに `data/note/ranking/<YYYY-MM>.json`（初版は data/jidouka-ranking.json の順位のまま。ブログの自動化記事の回は変えない）
+- 無料: 作り方・1〜10位・「11〜100位と、職業別の見方はこの先で。」（有料エリアの線はこの段落の直後）。有料: 11〜100位・職業別・今月の新着・最後に一言（https://maf-group.jp/act/）
+- 道具の名前は data/jidouka-research と毎月の下調べで公式サイトを確かめたものだけ。料金は書かない。ブログへのリンクは `?utm_source=note-rank`（アフィリエイトリンクは入れない）
+- 売り出し: 300円。note が本人情報（氏名・住所）の登録を求めたら、入力せずに下書きで止め、STATUS.md の「要対応」に出す。登録されれば次の朝に自動で公開
+- 値段: 毎朝、販売履歴（保存済みのパスワードで確認画面を通る）で売れた数を数え、50件を超えたら 500円に変える → `data/note/ranking/state.json` の price_log・logs/note.log。売れた数は `state/note-ranking-sales.json`（GitHub に上げない）
+- 毎月1日: Claude Code（scripts/note-ranking-prompt.md）が新しい道具・項目を公式サイトで確かめ、コメントの「面倒」を項目に結びつける → 前の月のよく読まれた記事（state/report の閲覧数・note-rank からのクリック）と合わせて順位を付け直す → 有料記事のタイトル・本文を差し替え、その日の通常投稿の代わりに「◯月版を公開しました。今月の注目は◯位の◯◯」の紹介記事（無料）
+
 ## X（X API・Cloudflare Workers・2026-10-17〜）
 
 X（@maf_media_jp）は X API（公式・従量課金）で投稿する。投稿の主役は Cloudflare Workers の定期実行（5分おき）。

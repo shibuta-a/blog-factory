@@ -849,6 +849,13 @@ def cmd_status():
               + f"・今月 {x_month.get('posts', 0)} 件・概算 ${x_month.get('cost', 0):.2f} / 上限 ${x_cfg.get('budget_usd_month')}）")
     note_text = (f"{'**オン**' if load_json(ROOT / 'data' / 'social.json', {}).get('note', {}).get('enabled') else 'オフ'}"
                  f"（投稿済み {len(note_log)} 本・ログイン: {note_st.get('text', '未確認')}）")
+    try:   # note の有料記事「自動化ランキング100」（scripts/note_ranking.py）
+        import note_ranking
+        ranking_text, ranking_alert = note_ranking.status_line()
+    except Exception as e:
+        ranking_text, ranking_alert = f"状態を読めませんでした（{type(e).__name__}）", ""
+    if ranking_alert:
+        alerts.append(ranking_alert)
     review = [k for k, v in ledger.items() if v.get("needs_review")]
     if review:
         alerts.append(f"- 新しく提携した広告 {len(review)} 件の説明文が未整備です（次の自動実行で整えます）: {' / '.join(review)}")
@@ -898,6 +905,7 @@ def cmd_status():
 | X 自動ポスト | {x_text} |
 | note 自動投稿 | {note_text} |
 | note のコメント返信 | {note_comment_text} |
+| note の有料記事（自動化ランキング100） | {ranking_text or '未作成'} |
 
 ## ジャンル別
 

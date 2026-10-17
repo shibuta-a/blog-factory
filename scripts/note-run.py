@@ -11,6 +11,8 @@
   python scripts/note-run.py due        … 今日投稿する記事があるか（あれば終了コード 0）
   python scripts/note-run.py magazines  … マガジン2つ（なければ作る）に、投稿済みの記事を入れる
   python scripts/note-run.py profile    … note の顔（アイコン・ヘッダー・名前・自己紹介。scripts/note_design.py の絵柄）を設定する
+  ※ 毎朝の run では、有料記事「自動化ランキング100」（scripts/note_ranking.py）の売り出し・値段・毎月の更新も行う。
+    毎月の更新の日は、通常投稿の代わりに「◯月版を公開しました」の紹介記事を出す
 
 流れ:
   1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを選ぶ。
@@ -43,6 +45,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import note_design  # noqa: E402
+import note_ranking  # noqa: E402
 import social  # noqa: E402
 from claude_env import claude_env  # noqa: E402
 from note_browser import CDP_URL, SHOTS, auto_login, close_chrome, current_user, published_notes, save_status, start_chrome  # noqa: E402
@@ -538,7 +541,7 @@ def add_to_magazine(page, name):
 
 def magazine_for(slug, done):
     series = done.get(slug, {}).get("series") or note_design.series_name(genre_of(slug))
-    return note_design.MAGAZINES[series]["name"]
+    return note_design.MAGAZINES.get(series, note_design.MAGAZINES[note_design.SERIES_DEFAULT])["name"]
 
 
 def magazine_notes(mag_key):
@@ -716,8 +719,10 @@ def main():
         if args.cmd == "due":  # 今日 note に投稿する記事があるか（boot-run.py が待ち時間を置くかの判断に使う）
             print(" ".join(s for _, s, _, _ in targets) or "なし")
             return 0 if targets else 1
-        if args.cmd == "run" and not targets:
-            log("note: 今日投稿する記事はありません")
+    ranking = args.cmd == "run" and not args.slug and not args.dry   # 有料記事「自動化ランキング100」も毎朝見る（売り出し・売れた数・毎月の更新）
+    if args.cmd == "run" and not targets:
+        log("note: 今日投稿する記事はありません" + ("（自動化ランキングの確認だけ行います）" if ranking else ""))
+        if not ranking:
             return 0
 
     if args.dry:
@@ -725,6 +730,11 @@ def main():
             ensure_version(slug, md, meta, base_url)
         return 0
 
+    if ranking and not REHEARSAL:
+        try:   # 毎月の見直し（Claude Code の下調べ）は Chrome を開く前に
+            note_ranking.prepare_month()
+        except Exception as e:
+            log(f"note ランキング: 毎月の見直しに失敗（{type(e).__name__}: {str(e)[:200]}）。次回また試します")
     from playwright.sync_api import sync_playwright
     if not start_chrome():
         log("note: Chrome を開けませんでした")
@@ -785,6 +795,9 @@ def main():
                     log(f"note: {slug} の見出し画像に失敗（{type(e).__name__}: {str(e)[:300]}）")
             close_chrome(browser)
             return 0
+        if ranking and note_ranking.daily(page, user):
+            log("note: 今日は自動化ランキングの紹介記事を出したので、通常の投稿はしません")
+            targets = []
         for _, slug, md, meta in targets:
             ver = ensure_version(slug, md, meta, base_url)
             if not ver:
