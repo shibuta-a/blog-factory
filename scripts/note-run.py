@@ -9,6 +9,7 @@
   python scripts/note-run.py list       … note に投稿済みの記事
   python scripts/note-run.py header     … 投稿済みで見出し画像のない記事に、あとから見出し画像を付ける
   python scripts/note-run.py due        … 今日投稿する記事があるか（あれば終了コード 0）
+  python scripts/note-run.py magazines  … マガジン2つ（なければ作る）に、投稿済みの記事を入れる
   python scripts/note-run.py profile    … note の顔（アイコン・ヘッダー・名前・自己紹介。scripts/note_design.py の絵柄）を設定する
 
 流れ:
@@ -16,6 +17,8 @@
      優先の順: オリシャン記事（週1本）→ 自動化記事（毎日1本。3つの困りごとから1つを選んで深掘りする）→ ほかの記事（新しい順）。
      ほかの記事は、公開済みの自動化記事・オリシャン記事が1本もないときだけ（自動化記事を始めた最初の日など）
   2. Claude Code（claude -p・scripts/note-prompt.md）が note 用の別バージョンを書く → data/note/<slug>.md
+     書き方は data/content-guide.md の「共通の土台」＋ data/content-guide-note.md の「note のルール」、体験は data/note-facts.md だけ。
+     最後に次回予告（シリーズの次の番号）・問いかけ・ブログへの案内。投稿時にシリーズのマガジン（data/note-magazines.json）へ追加
   3. 重複チェック: ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し（3回書いてだめなら見送り）
   4. 見出し画像＝記事サムネイル（scripts/note_design.py。シリーズ名と note での連番・原稿の thumb_* の文字・絵。
      はみ出したら文字を小さく→それでもだめなら thumb_* を言い換えさせる。作れなければブログの写真）→ state/note-img/<slug>.png
@@ -111,15 +114,69 @@ def find_claude():
     return None
 
 
-def write_version(slug, md, meta, base_url, feedback=""):
-    out = NOTE_DIR / f"{slug}.md"
+GUIDE = ROOT / "data" / "content-guide.md"            # X 担当と共通（「共通の土台」だけ使う）
+GUIDE_NOTE = ROOT / "data" / "content-guide-note.md"  # note のルール（共通の土台の控えも入っている）
+
+
+def md_section(text, heading):
+    """Markdown の「## heading」で始まる節（次の「## 」まで）。なければ空。"""
+    m = re.search(rf"^## {re.escape(heading)}.*?$(.*?)(?=^## |\Z)", text.replace("\r\n", "\n"), re.M | re.S)
+    return m.group(1).strip() if m else ""
+
+
+def guide_text():
+    note = GUIDE_NOTE.read_text(encoding="utf-8") if GUIDE_NOTE.exists() else ""
+    common = md_section(GUIDE.read_text(encoding="utf-8"), "共通の土台") if GUIDE.exists() else ""
+    common = common or md_section(note, "共通の土台")
+    return f"### 共通の土台\n{common}\n\n### note のルール\n{md_section(note, 'note のルール')}"
+
+
+def series_no(slug, meta, done):
+    """(シリーズ名, その記事の note での番号)。投稿済みの記録（done）の同じシリーズの件数 + 1。"""
+    series = note_design.series_name(meta.get("genre"))
+    no = 1 + sum(1 for s, v in done.items() if s != slug and v.get("series", note_design.series_name(genre_of(s))) == series)
+    return series, no
+
+
+def next_jidouka_topics():
+    """次に書く自動化記事の回の困りごと（3つ）。分からなければ []。"""
+    try:
+        ranking = json.loads((ROOT / "data" / "jidouka-ranking.json").read_text(encoding="utf-8"))
+        done = json.loads((ROOT / "data" / "jidouka-progress.json").read_text(encoding="utf-8")).get("done", {})
+        left = sorted({it["記事の回"] for it in ranking if str(it["記事の回"]) not in done})
+        return [it["困りごと"] for it in ranking if left and it["記事の回"] == left[0]]
+    except Exception:
+        return []
+
+
+def closing_lines(slug, meta, done):
+    """記事の最後の「次回予告」と「問いかけ」の文言。"""
+    series, no = series_no(slug, meta, done)
+    nxt = note_design.badge("", no + 1, "").strip()
+    if series == note_design.SERIES_DEFAULT:
+        topics = next_jidouka_topics()
+        next_line = (f"次は {nxt} です。{'・'.join(topics)}のうち、1つを取り上げる予定です。" if topics else
+                     f"次は {nxt} です。また別の「毎回の面倒」を1つ取り上げます。")
+        question = "あなたの家や職場の一番の面倒は何ですか？コメントで教えてください。"
+    else:
+        next_line = f"次は {nxt} です。小さな商売の始め方を、また1つ取り上げます。"
+        question = "あなたが小さな商売を始めるなら、何を届けてみたいですか？コメントで教えてください。"
+    return next_line, question
+
+
+def write_version(slug, md, meta, base_url, feedback="", done=None, out=None):
+    out = out or NOTE_DIR / f"{slug}.md"
     NOTE_DIR.mkdir(parents=True, exist_ok=True)
     blog_url = f"{base_url}/{slug}"
     own = meta.get("genre") == "orishan"
     jidouka = meta.get("genre") == "jidouka"
     link_line = (f"ほかの困りごとの自動化のやり方も、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}" if jidouka else
                  f"もう少し詳しい選び方や比較は、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}")
+    next_line, question = closing_lines(slug, meta, done if done is not None else load_log())
     prompt = (PROMPT.read_text(encoding="utf-8")
+              .replace("{GUIDE}", guide_text())
+              .replace("{NEXT_LINE}", next_line)
+              .replace("{QUESTION_LINE}", question)
               .replace("{SOURCE}", md.relative_to(ROOT).as_posix())
               .replace("{OUTPUT}", out.relative_to(ROOT).as_posix())
               .replace("{BLOG_LINK_LINE}", link_line)
@@ -291,8 +348,7 @@ def thumbnail(slug, ver, meta, done):
     """記事サムネイル（シリーズ名・番号・大きな文字・下の一行・絵）を作る。(画像のパス, シリーズ名, 番号)。
     文字がはみ出すときは note_design が小さくし、それでもだめなら thumb_* を言い換えさせて作り直す（2回まで）。
     作れなければ、これまでの見出し画像（ブログの写真）にする。"""
-    series = note_design.series_name(meta.get("genre"))
-    no = 1 + sum(1 for s, v in done.items() if v.get("series", note_design.series_name(genre_of(s))) == series)
+    series, no = series_no(slug, meta, done)
     out = ROOT / "state" / "note-img" / f"{slug}.png"
     why = ""
     for attempt in range(3):
@@ -421,6 +477,117 @@ def set_profile(page, user):
     return d.get("nickname"), d.get("profile"), d.get("profileImageUrl") or d.get("userProfileImagePath"), d.get("headerImageUrl")
 
 
+MAGAZINE_LOG = ROOT / "data" / "note-magazines.json"
+
+
+def load_magazines():
+    return json.loads(MAGAZINE_LOG.read_text(encoding="utf-8")) if MAGAZINE_LOG.exists() else {}
+
+
+def create_magazine(page, user, series):
+    """シリーズのマガジンを作る（無料・公開）。{name, key, url} を返す。"""
+    info = note_design.MAGAZINES[series]
+    cover = ROOT / "state" / "note-img" / f"magazine-{info['name']}.png"
+    note_design.make_thumb(info["cover"], cover, palette_index=list(note_design.MAGAZINES).index(series) + 1)
+    page.goto("https://note.com/magazines/new", wait_until="domcontentloaded")
+    page.locator("input#name").wait_for(timeout=30000)
+    page.wait_for_timeout(2000)
+    page.locator('main input[type="file"]').first.set_input_files(str(cover))
+    use_image_dialog(page, "magazine-cover")
+    page.locator("input#name").fill(info["name"])
+    page.locator("textarea#description").fill(info["description"])
+    shot(page, "magazine-before-create")
+    page.get_by_role("button", name="作成", exact=True).click()
+    wait_js(page, "() => /\\/m\\/\\w+/.test(location.pathname)", 60)
+    key = re.search(r"/m/(\w+)", page.url).group(1)
+    return {"name": info["name"], "key": key, "url": f"https://note.com/{user}/m/{key}"}
+
+
+def ensure_magazines(page, user):
+    """2つのマガジン（面倒を減らすシリーズ・小さな商売のつくり方）がなければ作る。data/note-magazines.json に記録。"""
+    mags = load_magazines()
+    for series in note_design.MAGAZINES:
+        if series not in mags:
+            mags[series] = create_magazine(page, user, series)
+            MAGAZINE_LOG.write_text(json.dumps(mags, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+            log(f"note: マガジン「{mags[series]['name']}」を作りました → {mags[series]['url']}")
+    return mags
+
+
+def add_to_magazine(page, name):
+    """公開設定の画面（/publish）の「記事の追加」→「マガジン」で、マガジン name の行の「追加」を押す。"""
+    try:   # 「マガジン」のタブ（ふだんは最初から開いている）
+        page.locator("button:text-is('マガジン')").first.click(timeout=3000)
+        page.wait_for_timeout(1000)
+    except Exception:
+        pass
+    row = page.locator(f"xpath=//*[normalize-space(text())='{name}']/ancestor::*[.//button][1]")
+    row.first.wait_for(timeout=15000)
+    row.first.scroll_into_view_if_needed()
+    btn = row.first.locator("button").last
+    label = btn.inner_text().strip()
+    if label != "追加":
+        return label   # すでに入っている（「追加済み」など）
+    btn.click()
+    page.wait_for_timeout(2000)
+    after = btn.inner_text().strip()
+    if after == "追加":
+        raise RuntimeError(f"マガジン「{name}」に追加できませんでした（ボタンが変わらない）")
+    return after
+
+
+def magazine_for(slug, done):
+    series = done.get(slug, {}).get("series") or note_design.series_name(genre_of(slug))
+    return note_design.MAGAZINES[series]["name"]
+
+
+def magazine_notes(mag_key):
+    """マガジンに入っている記事の key の集合（公開API）。取れなければ None。"""
+    keys = set()
+    try:
+        for n in range(1, 30):
+            req = urllib.request.Request(f"https://note.com/api/v1/layout/magazine/{mag_key}/section?page={n}",
+                                         headers={"User-Agent": "Mozilla/5.0 blog-factory"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                sec = json.loads(r.read().decode("utf-8"))["data"]["section"]
+            keys |= {c.get("key") for c in sec.get("contents") or []}
+            if sec.get("isLastPage", True):
+                return keys
+        return keys
+    except Exception:
+        return None
+
+
+def add_posted_to_magazines(page, done):
+    """投稿済みでマガジンに入っていない記事を、シリーズのマガジンに入れる（編集→公開に進む→「追加」。
+    「追加」はその場で反映されるので「更新する」は押さない）。入ったかは公開APIで確かめる。"""
+    mags = {m["name"]: m["key"] for m in load_magazines().values()}
+    for slug, v in sorted(done.items(), key=lambda x: x[1].get("posted_at", "")):
+        if v.get("magazine"):
+            continue
+        name = magazine_for(slug, done)
+        key = v["url"].rstrip("/").split("/")[-1]
+        try:
+            if key not in (magazine_notes(mags[name]) or ()):
+                page.goto(f"https://editor.note.com/notes/{key}/edit/", wait_until="domcontentloaded")
+                page.locator('textarea[placeholder="記事タイトル"]').wait_for(timeout=30000)
+                page.wait_for_timeout(3000)
+                page.get_by_role("button", name="公開に進む").click()
+                page.wait_for_url(re.compile(r"/publish"), timeout=60000)
+                page.wait_for_timeout(2000)
+                add_to_magazine(page, name)
+                shot(page, f"magazine-{slug}")
+                page.wait_for_timeout(3000)
+                if key not in (magazine_notes(mags[name]) or ()):
+                    raise RuntimeError("「追加」を押しても、マガジンの記事一覧に出ません")
+            v["magazine"] = name
+            save_log(done)
+            log(f"note: {slug} はマガジン「{name}」に入っています")
+        except Exception as e:
+            shot(page, f"error-magazine-{slug}")
+            log(f"note: {slug} をマガジンに入れられませんでした（{type(e).__name__}: {str(e)[:200]}）")
+
+
 PASTE_JS = """(html) => {
   const el = document.querySelector('.ProseMirror');
   el.focus();
@@ -431,7 +598,7 @@ PASTE_JS = """(html) => {
 }"""
 
 
-def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
+def post_to_note(page, user, title, body_html, tags, image=None, publish=True, magazine=None):
     """note の新規記事画面で、見出し画像・タイトル・本文・ハッシュタグを入れて公開する。(記事のURL, 見出し画像を付けられたか) を返す。"""
     page.goto("https://note.com/notes/new", wait_until="domcontentloaded")
     page.wait_for_url(re.compile(r"editor\.note\.com/notes/\w+/edit"), timeout=60000)
@@ -467,6 +634,11 @@ def post_to_note(page, user, title, body_html, tags, image=None, publish=True):
     shot(page, "2-publish")
     if not publish:
         return page.url, has_header
+    if magazine:   # 入らなくても投稿は続ける（投稿後の add_posted_to_magazines で確かめて入れ直す）
+        try:
+            add_to_magazine(page, magazine)
+        except Exception as e:
+            log(f"note: 公開設定の画面でマガジン「{magazine}」に入れられませんでした（{type(e).__name__}）。投稿後に入れ直します")
     page.get_by_role("button", name=re.compile("^投稿する")).click()
     # 公開後の画面は note 側の都合で変わる（別画面へ移る・「シェアしてみましょう」・「記事が公開されました」
     # 「○日連続投稿！」のお祝いポップアップなど）。画面の文言は目安にとどめ、成否は公開APIに記事が出たかで決める
@@ -516,7 +688,7 @@ def find_same_title(user, title):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header", "due", "profile"])
+    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header", "due", "profile", "magazines"])
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--slug")
     args = ap.parse_args()
@@ -580,6 +752,15 @@ def main():
             print(f"note: ログイン中（{user}）")
             close_chrome(browser)
             return 0
+        if args.cmd == "magazines":  # マガジンを作り、投稿済みの記事を入れる
+            try:
+                ensure_magazines(page, user)
+                add_posted_to_magazines(page, done)
+            except Exception as e:
+                shot(page, "error-magazine")
+                log(f"note: マガジンの作成に失敗（{type(e).__name__}: {str(e)[:300]}）")
+            close_chrome(browser)
+            return 0
         if args.cmd == "profile":  # note の顔（アイコン・ヘッダー・名前・自己紹介）
             try:
                 print(json.dumps(set_profile(page, user), ensure_ascii=False))
@@ -621,7 +802,8 @@ def main():
                     continue
                 image, series, no = thumbnail(slug, ver, meta, done)
                 url, has_header = post_to_note(page, user, n_meta["title"], to_html(n_body), tags,
-                                               image=image, publish=not REHEARSAL)
+                                               image=image, publish=not REHEARSAL,
+                                               magazine=note_design.MAGAZINES[series or note_design.series_name(meta.get("genre"))]["name"])
                 if REHEARSAL:
                     log(f"note:（通し確認）{slug} を公開設定の画面まで入力して止めました（公開していません・下書き {url}）")
                     continue
@@ -640,6 +822,8 @@ def main():
             posted.append(slug)
             log(f"note: 投稿しました {slug} → {url}")
             time.sleep(5)
+        if posted:   # マガジンに入ったかを確かめる（入っていなければ入れ直す）
+            add_posted_to_magazines(page, done)
         close_chrome(browser)
 
     if posted:  # ブログ側に note への案内を足す

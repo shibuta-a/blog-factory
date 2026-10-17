@@ -198,6 +198,25 @@ def series_name(genre):
     return SERIES.get(genre, SERIES_DEFAULT)
 
 
+# note のマガジン（シリーズ名 → マガジン名・説明・カバー画像の文字）
+MAGAZINES = {
+    SERIES_DEFAULT: {
+        "name": "面倒を減らすシリーズ",
+        "description": "家事・お金・仕事で毎回やっている面倒を、1回に1つずつ取り上げて、道具と仕組みで減らす方法を書いています。"
+                       "献立、洗濯、家計簿、請求書など。どの回も、今日から1つだけ試せることで終わります。",
+        "cover": {"badge": "マガジン", "title": "毎回の面倒を、／[ひとつずつ]／減らす。",
+                  "sub": "献立・洗濯・家計簿・請求書。今日から試せる小さな仕組み", "motif": "house"},
+    },
+    SERIES["orishan"]: {
+        "name": "小さな商売のつくり方",
+        "description": "小さく商売を始めたい人に向けて、売る相手の決め方、名前の付け方、始める前に確かめておきたいことを書いています。"
+                       "お祝いのお酒（オリジナルシャンパン）での開業の話もここにまとめます。",
+        "cover": {"badge": "マガジン", "title": "小さな商売の／[つくり方]",
+                  "sub": "売る相手・名前・始める前に確かめること", "motif": "sprout"},
+    },
+}
+
+
 def badge(series, no, topic):
     num = CIRCLED[no - 1] if 1 <= no <= len(CIRCLED) else f"No.{no}"
     return " ".join(x for x in (series, num, topic) if x)
