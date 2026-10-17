@@ -373,3 +373,47 @@ GitHub Actions の待ち番（x-post.yml / x-actions.py）は 2026-10-17 にや�
 - 上限: 返信・フォローとも1日10件、返信の間は40〜90秒。制限・警告の表示が出たら返信をすべて止める（`python scripts/note-comments.py resume` で再開）
 - 記録: `data/note-comments.json`（同じコメントは二度扱わない）・ログ `logs/note-comments.log`
 - コマンド: `list` / `reply <key> --text "文"` / `follow <key>` / `resolve <key>`（要確認を確認済みに）/ 通し確認は `BLOG_REHEARSAL=1`（返信欄に入れて送らない）
+
+## 見張り番・通知・バックアップ（2026-10-17〜）
+
+止まったときに、人が見に行かなくても Gmail（asoutobata@gmail.com）で必ず気づけるようにする仕組み。見張り番は PC の外（Cloudflare）にいるので、PC が起動しなかった日も届く。
+
+```
+PC② の朝の実行（boot-run.py）── 各段階が終わるたびに「合図」──> Cloudflare の見張り番 maf-guard（workers/guard）
+   boot-start → blog（記事の本数・タイトル・Claude の上限）→ xplan（X の予定・クレジット・返信）→ note（投稿・コメント返信・要確認）→ boot-end（STATUS の要対応・週の点検）
+X の投稿係 maf-x-poster ── 各投稿の結果 ──> 見張り番（失敗はその場で【要対応】メール）
+毎朝 7:30（日本時間）見張り番が合図を確かめる
+   そろっている → 「【OK】今朝のまとめ（10/18）」
+   足りない・失敗 → 「【要対応】今朝のブログが動いていません」など（何が・どうなっていそうか＋まとめ）。あとで朝の実行が終われば「【回復】」
+```
+
+| もの | 場所 |
+|---|---|
+| 見張り番 | `workers/guard/`（`python scripts/guard.py deploy` で設置・更新・秘密の設定）。https://maf-guard.asoutobata.workers.dev |
+| 合図・通知・点検・バックアップ（PC 側） | `scripts/guard.py`（beat / check / notify / backup / restore / weekly-check / status / expect） |
+| 最初の1回の設定（人の操作） | `guard-setup.bat`（デスクトップの「ブログ工場の見張り番の設定.bat」）→ 送信元（maf-group.jp）・バックアップの合言葉・Search Console の鍵、続けて Windows Update の設定（UAC） |
+| メールの送信元 | `.secrets/mail.json`（maf-group.jp の SMTP・465）→ Cloudflare の秘密の設定 SMTP_*。見張り番から送れないときは PC から直接 |
+| 合言葉（見張り番の受け口） | `.secrets/guard.json`（GUARD_TOKEN。x-poster にも同じものが入っている） |
+| 送れなかった合図 | `state/guard-pending.json`（次の合図のときに送り直す）・ログ `logs/guard.log` |
+| PC① の営業メール | 受け口と見張りは用意済み・「待つ」はオフ。足す手順は `data/guard-pc1-howto.md`、オンは `python scripts/guard.py expect pc1-mail on` |
+
+- **テスト**: `python scripts/guard.py check --date 2026-10-01 --test`（合図のない日 → 【テスト】【要対応】が届く）・`check --test`（今日のまとめを【テスト】で送る）・`--dry` は送らずに中身を表示
+- **Claude の使用量の上限**: `auto-generate.py` が出力から見つけて `state/claude-limit.json` に残す → 書けた分は公開・見直し/下調べ/記事の直しは見送り・まとめの「要確認」に載る → 次の日は自動化記事の1本だけ
+- **週1回の点検**（月曜の朝・`guard.py weekly-check`）: C ドライブの空き（20GB 未満）・ログの大きさ（合計300MB・1ファイル20MB）・Claude のトークンの期限（60日前）・PC の Cloudflare ログイン・X のクレジット（$5 未満）・バックアップの古さ・Windows Update の設定 → 問題はまとめの「要確認」へ
+- **鍵のバックアップ**（月曜の朝・`guard.py backup`）: `.secrets` の小さいファイル（*.json・鍵。ブラウザのデータと画面写真は除く）を zip → AES-256-GCM → 鍵は RSA 公開鍵で包む → 見張り番の KV（backup:latest と日付ごとに4つ）。合言葉は PC に保存しない（秘密鍵は合言葉で暗号化してバックアップに同梱）。R2 は有効化に支払い登録が要るため KV にした
+  - **復元**（新しい PC）: リポジトリを clone → `npx wrangler login` → `python scripts/guard.py restore` → 合言葉を入れる → `.secrets` に書き戻る
+- **Windows Update**: `scripts/winupdate.ps1`（アクティブ時間 3:00〜21:00・自動調整オフ・ログオン中は自動再起動しない）。更新のインストールは power-guard のシャットダウンのとき。結果は `state/winupdate.json`
+
+## 何が稼いでいるかを測る・収益の強化（2026-10-17〜）
+
+- **毎朝の取り込み**（`python scripts/report.py collect`・boot-run の 6.5）→ `state/report/<日付>.json`（売上は GitHub に上げない）
+  - A8（自動ログイン）: プログラム別サマリ（今月の imp・click・発生件数・発生金額・未確定）・確定（承認）・**パラメータ計測（記事別）**。
+    記事別に分かるように、build.py が記事の中の A8 の広告リンクに `&id1=<記事の目印>`（`affiliate.article_code(slug)`・8文字）を付ける
+  - 閲覧数: Cloudflare Web Analytics（Pages の設定で有効にする・GraphQL を wrangler のログインで読む）の前日分（記事別・参照元）
+  - どこから来たか: リンクの `?utm_source=x`（x-plan）・`?utm_source=note`（note-run）を、ブログの門番 `functions/_middleware.js` が見張り番の KV（Pages のバインド名 STATS）に数える
+  - Search Console: `.secrets/gsc-service-account.json`（サービスアカウント・制限付きユーザー）で記事別の表示・クリック・順位・検索語（2日遅れ）
+- **先週の成績表**（月曜の朝・`report.py weekly`・`--dry` で表示だけ）: 閲覧数トップ5・クリック/発生の多い広告トップ5・X/note から来た人数・伸びているジャンル・Google 検索・タイトル直しの結果 → 「【週報】先週の成績表」
+- **検索で押されない記事の直し**（月曜・`report.py ctr-fix`）: 直近28日で表示50回以上・20位以内・クリック率が順位の目安の6割未満の記事を3本まで → Claude（`scripts/ctr-prompt.md`）がタイトルと説明文だけ書き直し（誇大表現・本文にない約束は禁止をプログラムでも確認）→ 公開。記録 `data/ctr-log.json`、4週間後のクリック率を成績表に
+- **読まれている記事に稼げる広告を寄せる**: 成績表のとき閲覧数トップ5を `data/ad-focus.json` へ → `affiliate.pick` がその記事では「よく合う広告（いちばん合う広告の半分以上の点）」の中で報酬の目安（`reward_yen`）の高い順に出す。合わない広告（点0）は入れない。本文の印や `affiliates:` で広告を決めている記事は見直しの優先（`data/refresh-priority.json`）に入れて Claude が置き直す
+- **新しく承認された広告**: 広告を自動で選ぶ記事はビルドで自動的に入る。印・`affiliates:` で決めている記事（自動化記事など）は、`autopilot.py sync` が合う記事を見直しの優先に入れる
+- **選び方と比較のまとめ記事**（月2本まで・10日以上あけて・同じジャンルは半年に1回）: 提携中の広告が3つ以上あるジャンルから、個別記事が多いジャンルを選び、その日の通常記事と入れ替えて書く（`autopilot.py next` が案内・型 `templates/kata/matome.md`・公式サイトで確かめたことだけ・関連記事へ内部リンク・記録 `data/matome.json`）
