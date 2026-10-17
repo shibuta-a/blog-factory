@@ -4,8 +4,8 @@
 
   ページは build.py のたびに作る（Python 標準ライブラリだけ。Cloudflare のビルドでも動く）:
     /shindan/            … 入口と質問（回答の計算はブラウザの中だけ）
-    /shindan/r/<id>.html … 生き物ごとの結果ページ（?a=回答 があれば、その人の面倒くさがり度・多い面倒を出す）
-    /shindan/zukan.html  … 図鑑（出会った生き物は、その人のブラウザの localStorage にだけ記録して色付きで出す）
+    /shindan/r/<id> … 生き物ごとの結果ページ（?a=回答 があれば、その人の面倒くさがり度・多い面倒を出す）
+    /shindan/zukan  … 図鑑（出会った生き物は、その人のブラウザの localStorage にだけ記録して色付きで出す）
 
   PC で使うもの:
     python scripts/shindan.py merge     … state/shindan-parts/*.json（型ごとの生き物）と写真の記録 → data/shindan-species.json
@@ -279,14 +279,14 @@ def head(title, desc, url, image, extra=""):
 <body>
 <header class="sd-header">
   <a class="sd-blog" href="/">MAF ブログ</a>
-  <nav><a href="/shindan/">診断</a><a href="/shindan/zukan.html">図鑑</a></nav>
+  <nav><a href="/shindan/">診断</a><a href="/shindan/zukan">図鑑</a></nav>
 </header>
 """
 
 
 FOOT = """<footer class="sd-footer">
   <p>楽しむための診断です。生き物の特徴は百科事典で確かめたものだけを書いています。</p>
-  <p><a href="/shindan/">自動化いきもの診断</a> ・ <a href="/shindan/zukan.html">図鑑</a> ・ <a href="/">MAF ブログ</a></p>
+  <p><a href="/shindan/">自動化いきもの診断</a> ・ <a href="/shindan/zukan">図鑑</a> ・ <a href="/">MAF ブログ</a></p>
 </footer>
 <script src="/shindan/data.js"></script>
 <script src="/shindan/app.js"></script>
@@ -326,7 +326,7 @@ def index_page(sp, base):
       <li>名前やメールアドレスは聞きません。回答はこのブラウザの中だけで計算します</li>
     </ul>
     <p class="sd-small">楽しむための診断です。心理検査ではありません。</p>
-    <p><a class="sd-btn is-sub" href="/shindan/zukan.html">生き物図鑑を見る</a></p>
+    <p><a class="sd-btn is-sub" href="/shindan/zukan">生き物図鑑を見る</a></p>
   </section>
   <section id="sd-quiz" class="sd-card" hidden></section>
 </main>
@@ -336,7 +336,7 @@ def index_page(sp, base):
 def result_page(s, sp_by_id, base, ledger, rk, sim, links):
     t = TYPES[s["type"]]
     scene = "work" if s.get("rare") else (s.get("cell") or {}).get("scene", "life")
-    url = f"{base}/shindan/r/{s['id']}.html"
+    url = f"{base}/shindan/r/{s['id']}"
     title = f"{s['name']}（{t['name']}）｜{TITLE}"
     desc = f"自動化いきもの診断で「{s['name']}」が出ました。{t['name']}：{s.get('catch', '')}"
     ph = s["photo"]
@@ -430,7 +430,7 @@ def result_page(s, sp_by_id, base, ledger, rk, sim, links):
     <h2>結果をシェアする</h2>
     <a class="sd-btn sd-xbtn" id="sd-x" href="{esc(xurl)}" target="_blank" rel="noopener">X でシェアする</a>
     <a class="sd-btn is-sub" href="/shindan/">もう一度診断する</a>
-    <a class="sd-btn is-sub" href="/shindan/zukan.html">生き物図鑑を見る</a>
+    <a class="sd-btn is-sub" href="/shindan/zukan">生き物図鑑を見る</a>
   </section>
 
   <section class="sd-card">
@@ -466,13 +466,13 @@ def zukan_page(sp, base):
         if not mine:
             continue
         cards = "".join(
-            f'<li data-id="{esc(s["id"])}"{RARE_CLS if s.get("rare") else ""}><a href="/shindan/r/{esc(s["id"])}.html">'
+            f'<li data-id="{esc(s["id"])}"{RARE_CLS if s.get("rare") else ""}><a href="/shindan/r/{esc(s["id"])}">'
             f'<img src="/shindan/img/{esc(s["id"])}-s.jpg" width="320" height="320" alt="{esc(s["name"])}" loading="lazy" '
             f'style="object-position:{esc(s.get("pos") or "50% 50%")}"><span>{esc(s["name"])}</span></a></li>' for s in mine)
         blocks.append(f'<div class="sd-zhead"><h2>{esc(TYPES[code]["name"])}</h2><small>{len(mine)}種</small></div>'
                       f'<ul class="sd-grid">{cards}</ul>')
     desc = f"自動化いきもの診断に出てくる{len(sp)}種の生き物の図鑑。出会った生き物は色付きで表示されます（記録はこのブラウザの中だけ）。"
-    return head(f"生き物図鑑｜{TITLE}", desc, f"{base}/shindan/zukan.html", f"{base}/shindan/share/index.jpg") + f"""<main class="sd-wrap">
+    return head(f"生き物図鑑｜{TITLE}", desc, f"{base}/shindan/zukan", f"{base}/shindan/share/index.jpg") + f"""<main class="sd-wrap">
   <section class="sd-card" id="sd-zukan">
     <h1 style="margin:0;font-size:1.4rem">生き物図鑑</h1>
     <p class="sd-small">出会った生き物：<b id="sd-metcount">0</b> / {len(sp)}種（★はレア枠）。出会った記録は、このブラウザの中にだけ残します（サーバーには送りません）。</p>
@@ -521,7 +521,7 @@ def build(public, programs=None, base=""):  # programs は build.py と形をそ
         (out / "r" / f"{s['id']}.html").write_text(result_page(s, by_id, base, ledger, rk, sim, links), encoding="utf-8")
     day = (jload(SPECIES, {}) or {}).get("updated", "")
     print(f"診断: {len(sp)} 種のページ -> {out}")
-    return [("shindan/", day), ("shindan/zukan.html", day)] + [(f"shindan/r/{s['id']}.html", day) for s in sp]
+    return [("shindan/", day), ("shindan/zukan", day)] + [(f"shindan/r/{s['id']}", day) for s in sp]
 
 
 # ---------------------------------------------------------------------------

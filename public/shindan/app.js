@@ -94,7 +94,7 @@
       if (!r || !r.id) return;
       var s = store("sessionStorage");
       try { s && s.setItem(NEW_KEY, r.id); } catch (e) { /* 数えられなくても結果は出す */ }
-      location.href = "r/" + r.id + ".html?a=" + ans.join("");
+      location.href = "r/" + r.id + "?a=" + ans.join("");
     }
     if (start) {
       start.addEventListener("click", function () {

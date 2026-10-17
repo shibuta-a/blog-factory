@@ -447,8 +447,8 @@ https://blog-factory-cf7.pages.dev/shindan/ 。12問に答えると、その人�
 | 楽天の商品 | `data/shindan-rakuten.json`（「楽天で可」の自動化ごとに1つ） |
 
 - 型: 自分でやる/任せる × 計画/その場 × 慎重/新しもの好き。型の中は 面倒くさがり度（3段）× 仕事/暮らし × ひとり/みんな の12マスに1種。面倒くさがり度がとても高い人には、4つの型でレア枠の種
-- 結果ページ `/shindan/r/<id>.html?a=<回答>`: 回答の計算はブラウザの中だけ。面倒くさがり度・多い面倒（自動化ランキングの順位）は回答から出す。レア度は実際の結果が 300 人に届くまでは、ランダム1万回の割合
-- 図鑑 `/shindan/zukan.html`: 出会った生き物は、そのブラウザの localStorage にだけ記録
+- 結果ページ `/shindan/r/<id>?a=<回答>`: 回答の計算はブラウザの中だけ。面倒くさがり度・多い面倒（自動化ランキングの順位）は回答から出す。レア度は実際の結果が 300 人に届くまでは、ランダム1万回の割合
+- 図鑑 `/shindan/zukan`: 出会った生き物は、そのブラウザの localStorage にだけ記録
 - 広告は「提携済み」（A8・id1 は shindan）と「楽天で可」だけ・PR表記つき。note の有料記事は公開されたら自動で案内に入る
 - 入口: ブログのヘッダー・自動化記事（genre: jidouka）の最後
 - 作り直し: `python scripts/shindan_tools.py check`（引用が出典の本文にあるか・ライセンス）→ `python scripts/shindan.py sim`・`share`・`deploy`・`licenses`
