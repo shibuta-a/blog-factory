@@ -694,5 +694,37 @@
    "landing_url": "https://stocksnap.io/photo/meeting-room-NEB7S4QC8G",
    "openverse_id": "67d4d50e-858c-4243-9af9-f8335ebe4f4d"
   }
+ },
+ "takuhai-kaitori-erabikata-hikaku": {
+  "eyecatch": {
+   "file": "img/takuhai-kaitori-erabikata-hikaku/eyecatch.jpg",
+   "query": "cardboard box",
+   "title": "Cardboard Box",
+   "creator": "Matt Bango",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/cardboard-box-USP4WCYPBW",
+   "openverse_id": "429e6962-efd2-4986-b4c0-e9ca8b6fc30d"
+  },
+  "body-1": {
+   "file": "img/takuhai-kaitori-erabikata-hikaku/body-1.jpg",
+   "query": "workspace",
+   "title": "Man Workspace",
+   "creator": "Burst",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/man-workspace-V0AKCFV9QX",
+   "openverse_id": "fc1a084c-fcfb-4b8c-866c-8f59e8d583e2"
+  },
+  "body-2": {
+   "file": "img/takuhai-kaitori-erabikata-hikaku/body-2.jpg",
+   "query": "books",
+   "title": "School Books",
+   "creator": "Krzysztof%20Puszczy%u0144ski",
+   "license": "CC0",
+   "source": "stocksnap",
+   "landing_url": "https://stocksnap.io/photo/school-books-S059QDGBOG",
+   "openverse_id": "0fda2134-4308-4a47-9c4e-1fe444829255"
+  }
  }
 }
