@@ -86,8 +86,30 @@ def score(program, title, text):
     return s
 
 
+ASSUMED_ORDER_YEN = 5000   # 「申込み金額の○％」の報酬を円に直すときの仮の注文額
+
+
+def reward_yen(p):
+    """報酬の目安（円）。A8 の成果報酬の文（例「新規登録400円」「申込み金額9.6％」）から、いちばん大きい金額を取る。
+    ％は仮の注文額で円に直す。分からなければ 0。並べ替えに使うだけ（記事には出さない）。"""
+    t = (p.get("reward") or "").replace(",", "").replace("，", "")
+    yen = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*円", t)]
+    pct = [float(x) for x in re.findall(r"(\d+(?:\.\d+)?)\s*[％%]", t)]
+    return max(yen + [x / 100 * ASSUMED_ORDER_YEN for x in pct] + [0])
+
+
+def focus_slugs():
+    """閲覧数の多い記事（scripts/report.py が毎週 data/ad-focus.json に書く）。この記事では、テーマに合う広告のうち報酬の高いものを先に出す。"""
+    try:
+        return set(json.loads((Path(__file__).resolve().parent.parent / "data" / "ad-focus.json").read_text(encoding="utf-8")).get("slugs", []))
+    except Exception:
+        return set()
+
+
 def pick(programs, meta, title, plain_text):
-    """記事に合う案件を最大3件、合う順に返す。"""
+    """記事に合う案件を最大3件、合う順に返す。
+    閲覧数の多い記事（data/ad-focus.json）では、よく合う案件（いちばん合う案件の半分以上の点）の中で報酬の高い順にする。
+    合わない案件（点が0）は、報酬が高くても入れない。"""
     want = (meta.get("affiliates") or "").strip()
     if want.lower() in ("none", "no", "false", "off", "なし"):
         return []
@@ -98,6 +120,12 @@ def pick(programs, meta, title, plain_text):
     scored = [(score(p, title, plain_text), -p.get("priority", 0), p["name"], p) for p in programs]
     scored = [x for x in scored if x[0] > 0]
     scored.sort(key=lambda x: (-x[0], x[1], x[2]))
+    slug = meta.get("slug") or ""
+    if scored and slug and slug in focus_slugs():
+        best = scored[0][0]
+        strong = [x for x in scored if x[0] * 2 >= best]
+        strong.sort(key=lambda x: (-reward_yen(x[3]), -x[0], x[1], x[2]))
+        scored = strong + [x for x in scored if x[0] * 2 < best]
     return [x[3] for x in scored[:MAX_PICK]]
 
 
@@ -124,6 +152,27 @@ def _pixel(p):
     if not src.startswith("http"):
         return ""
     return f'<img class="aff-px" src="{html.escape(src, quote=True)}" width="1" height="1" alt="" loading="lazy">'
+
+
+def article_code(slug):
+    """A8 のパラメータ計測に付ける記事の目印（id1）。slug から決まる英数字8文字（A8 の文字数の上限が不明なので短くする）。
+    どの記事かは scripts/report.py が slug から同じ計算で引き戻す。"""
+    import zlib
+    n, s = zlib.crc32(slug.encode("utf-8")), ""
+    while n:
+        n, r = divmod(n, 36)
+        s = "0123456789abcdefghijklmnopqrstuvwxyz"[r] + s
+    return "b" + s.rjust(7, "0")
+
+
+A8_LINK_RE = re.compile(r'(https://px\.a8\.net/svt/ejp\?a8mat=[0-9A-Za-z+]+)(?!&amp;id1=|&id1=)')
+
+
+def tag_links(html_text, slug):
+    """記事の中の A8 の広告リンクに &id1=<記事の目印> を付ける（A8 のパラメータ計測レポートで記事別のクリック・発生が見える）。"""
+    if not html_text or not slug:
+        return html_text
+    return A8_LINK_RE.sub(lambda m: f"{m.group(1)}&amp;id1={article_code(slug)}", html_text)
 
 
 def _name(p):

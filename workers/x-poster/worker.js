@@ -6,6 +6,7 @@
 //   4. 二重投稿を防ぐため、X に送る前に KV（POSTED）に「送信中」の印を付ける。印がある投稿は二度と送らない
 //      GitHub の data/x.json（GitHub Actions 時代の記録・朝に写した記録）に載っている投稿も「投稿済み」として扱う
 //   5. 画像があれば /2/media/upload（JSON・base64。10/16 に実績のある形）→ /2/tweets → 結果を KV に記録
+//   6. 結果（成功・失敗）を見張り番 maf-guard に送る（サービス連携 GUARD_SVC・合言葉 GUARD_TOKEN）。失敗は見張り番がすぐ Gmail に知らせる
 //
 // キーは Cloudflare の秘密の設定（X_API_KEY / X_API_SECRET / X_ACCESS_TOKEN / X_ACCESS_SECRET / ADMIN_TOKEN）。GitHub には置かない。
 //   GET  /status                        … 最後の実行・今月の件数と概算費用・クレジット切れ・最近の記録（だれでも見られる。キーは出ない）
@@ -135,6 +136,17 @@ function uploadBody(img) {
   return JSON.stringify({ media: toBase64(img), media_category: "tweet_image" });
 }
 
+// 投稿の結果を見張り番（maf-guard）へ（サービス連携）。失敗は見張り番がその場で Gmail に知らせる。届かなくても投稿は続ける
+async function report(env, p) {
+  if (!env.GUARD_SVC || !env.GUARD_TOKEN) return;
+  try {
+    await env.GUARD_SVC.fetch("https://maf-guard/beat", { method: "POST", body: JSON.stringify({ name: "xpost", ...p }),
+      headers: { Authorization: `Bearer ${env.GUARD_TOKEN}`, "Content-Type": "application/json" } });
+  } catch (e) {
+    await addLog(env, `見張り番に結果を送れませんでした: ${String(e).slice(0, 120)}`);
+  }
+}
+
 async function run(env, nowOverride) {
   if (!env.X_API_KEY || !env.X_ACCESS_TOKEN) return "X のキーが未設定です";
   const now = nowOverride || jst();
@@ -155,6 +167,8 @@ async function run(env, nowOverride) {
     await env.POSTED.put("items", JSON.stringify(states));
     if (isCreditError(r.code, r.data)) await env.POSTED.put("credit", JSON.stringify({ depleted: true, at: now }));
     await addLog(env, `失敗 ${it.id}（${where}）: ${r.code} ${JSON.stringify(r.data).slice(0, 200)}`);
+    await report(env, { id: it.id, ok: false, state: states[it.id].state, at: now, planned: it.at.slice(11), kind: it.kind, where,
+                        code: r.code, error: JSON.stringify(r.data).slice(0, 300), credit: isCreditError(r.code, r.data), text: it.text });
     return `失敗: ${it.id} ${where} ${r.code}`;
   };
 
@@ -180,6 +194,8 @@ async function run(env, nowOverride) {
   await env.POSTED.put("posts", JSON.stringify(posts.slice(-400)));
   if ((await kvJson(env, "credit", {})).depleted) await env.POSTED.put("credit", JSON.stringify({ depleted: false, recovered_at: now }));
   await addLog(env, `投稿 ${it.id} → https://x.com/i/web/status/${tid}`);
+  await report(env, { id: it.id, ok: true, state: "posted", at: now, planned: it.at.slice(11), kind: it.kind,
+                      url: `https://x.com/maf_media_jp/status/${tid}` });
   return `投稿しました: ${it.id}`;
 }
 

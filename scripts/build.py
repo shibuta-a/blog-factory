@@ -569,6 +569,8 @@ def main():
             body, rk_used = affiliate.apply_rakuten(body, rk_items, gconf.get("images") != "none")
             if rk_used and not pr_notice:
                 pr_notice = affiliate.PR_NOTICE
+            # A8 の広告リンクに記事の目印（id1）を付ける → パラメータ計測レポートで記事別のクリック・発生（scripts/report.py）
+            body, cta_top, aff_tail = (affiliate.tag_links(x, slug) for x in (body, cta_top, aff_tail))
             body = insert_middle_ad(body, slots["slot_ad_middle"])
             body = wrap_sections(body)
             imgs = images.get(slug, {})

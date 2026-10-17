@@ -1,0 +1,13 @@
+# 見張り番（scripts/guard.py deploy が設定・デプロイする）
+name = "maf-guard"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[triggers]
+# 毎朝 7:30（日本時間）= 22:30 UTC
+crons = ["30 22 * * *"]
+
+[[kv_namespaces]]
+binding = "GUARD"
+id = "28588d83071e4289bd90c959ce65c2aa"

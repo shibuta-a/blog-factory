@@ -10,3 +10,8 @@ crons = ["*/5 * * * *"]
 [[kv_namespaces]]
 binding = "POSTED"
 id = "28ba2e9e3f91417ca57003c7a262647c"
+
+# 投稿の結果を見張り番（workers/guard）へ
+[[services]]
+binding = "GUARD_SVC"
+service = "maf-guard"

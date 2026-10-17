@@ -167,7 +167,7 @@ def closing_lines(slug, meta, done):
 def write_version(slug, md, meta, base_url, feedback="", done=None, out=None):
     out = out or NOTE_DIR / f"{slug}.md"
     NOTE_DIR.mkdir(parents=True, exist_ok=True)
-    blog_url = f"{base_url}/{slug}"
+    blog_url = f"{base_url}/{slug}?utm_source=note"   # どこから来たかを数える（scripts/report.py の成績表）
     own = meta.get("genre") == "orishan"
     jidouka = meta.get("genre") == "jidouka"
     link_line = (f"ほかの困りごとの自動化のやり方も、ブログ記事「{meta.get('title', '')}」にまとめています。\n{blog_url}" if jidouka else

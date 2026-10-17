@@ -20,6 +20,9 @@ scripts/daily-prompt.md の手順（承認の取り込み → ネタ選び → �
 """
 import argparse
 import datetime
+import json
+import os
+import re
 import shutil
 import subprocess
 import sys
@@ -44,6 +47,23 @@ ALLOWED_TOOLS = [
     "Bash(python scripts/publish.py:*)",
     "Bash(python scripts/images.py:*)",
 ]
+
+
+LIMIT_STATE = ROOT / "state" / "claude-limit.json"
+LIMIT_RE = re.compile(r"usage limit|hit your limit|limit reached|limit will reset|resets? (at )?\d{1,2}(:\d\d)?\s*(am|pm)", re.I)
+
+
+def limit_hit(output, code, mode):
+    """Claude の使用量の上限に当たったかを出力から見て、当たっていれば state/claude-limit.json に残す（boot-run と見張り番の合図が読む）。
+    記事の本文にも「上限」は出てくるので、終了コードが 0 でないか、出力が短い（＝すぐ止まった）ときだけ判定する。"""
+    tail = output.strip()[-600:]
+    if not LIMIT_RE.search(tail) or (code == 0 and len(output.strip()) > 600):
+        return False
+    LIMIT_STATE.parent.mkdir(exist_ok=True)
+    LIMIT_STATE.write_text(json.dumps({"date": os.environ.get("BLOG_TODAY") or datetime.date.today().isoformat(),
+                                       "at": datetime.datetime.now().strftime("%H:%M"), "stage": mode,
+                                       "message": tail[-200:]}, ensure_ascii=False), encoding="utf-8")
+    return True
 
 
 def find_claude():
@@ -86,6 +106,7 @@ def main():
             if r.stderr.strip():
                 log.write("\n[stderr]\n" + r.stderr[-3000:])
             code = r.returncode
+            limit_hit(r.stdout + "\n" + r.stderr, code, mode)
         except subprocess.TimeoutExpired:
             log.write(f"{TIMEOUT_MIN[mode]}分で終わらなかったため中断しました。\n")
             code = 1

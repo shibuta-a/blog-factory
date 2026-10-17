@@ -16,10 +16,12 @@
 1. `python scripts/autopilot.py next` を実行し、ネタ・ジャンル・型・公開済み記事の一覧を読む
    - 「毎日1本の自動化記事です」と出たら、その日の1本目は自動化記事（ジャンル jidouka）。表示された第N回の3つの困りごとを、
      型 `templates/kata/jidouka.md` と表示された広告の指示どおりに1記事で書く（下の記事のルールの「自動化記事」の項も守る）
+   - 「選び方と比較のまとめ記事」と出たら（月2本まで）、ネタ帳ではなく表示されたジャンルのまとめ記事を型 `templates/kata/matome.md` で書く。
+     料金・特徴は公式サイトで確かめたことだけ書き、表示された「関連する記事」へ `[タイトル](/slug)` でリンクする
 2. 「広告が足りません」と出たら、`python scripts/autopilot.py ads <genre>` を実行する（A8 で検索→提携申請→即時提携分を台帳へ。数分かかる）
 3. 表示された「型」のファイルを読み、その見出し構成に沿って記事を書く。「このジャンルのルール」が表示されたら、下の記事のルールより優先して必ず守る
 4. `content/ja/<slug>.md` に保存する（slug は内容に合う英小文字とハイフンの短い名前。既存と重ならないこと）
-5. `python scripts/autopilot.py done "<ネタ>" <slug>` でネタに使用済みの印を付ける（自動化記事は代わりに `python scripts/autopilot.py jidouka-done <回> <slug>`）
+5. `python scripts/autopilot.py done "<ネタ>" <slug>` でネタに使用済みの印を付ける（自動化記事は代わりに `python scripts/autopilot.py jidouka-done <回> <slug>`、まとめ記事は `python scripts/autopilot.py matome-done <ジャンル> <slug>`）
 
 ### 記事のルール（必ず守る）
 

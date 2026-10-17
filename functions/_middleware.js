@@ -29,6 +29,18 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   const path = url.pathname;
 
+  // どこから来たか（?utm_source=x / note）を数える。KV（見張り番と同じ maf-guard の KV・バインド名 STATS）の
+  // utm:<日付>:<来た所>:<パス> に足す。ロボットは数えない。scripts/report.py が見張り番の /utm から読んで成績表に載せる
+  const src = (url.searchParams.get("utm_source") || "").replace(/[^\w-]/g, "").slice(0, 20);
+  const ua = context.request.headers.get("user-agent") || "";
+  if (src && context.env.STATS && context.request.method === "GET" && !/bot|crawl|spider|preview|fetch|curl|python/i.test(ua)) {
+    const key = `utm:${nowJst().slice(0, 10)}:${src}:${path.replace(/\.html$/, "").slice(0, 80)}`;
+    context.waitUntil((async () => {
+      const n = Number((await context.env.STATS.get(key)) || 0);
+      await context.env.STATS.put(key, String(n + 1), { expirationTtl: 60 * 60 * 24 * 120 });
+    })().catch(() => {}));
+  }
+
   // 予約の一覧そのものは見せない
   if (path === "/_schedule.json" || path === "/_x_queue.json") return notFound();
 

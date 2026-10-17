@@ -9,6 +9,8 @@
   python scripts/autopilot.py sync             … 審査待ちが承認されていたら広告リンクを台帳に取り込む
   python scripts/autopilot.py a8-check         … A8 にログインした Chrome が使えるか確認（なければ起動を試す）
   python scripts/autopilot.py topics-check     … 残りネタが少ないジャンルを表示（自動運転の Claude が補充する）
+  python scripts/autopilot.py matome-due       … 今日が「選び方と比較のまとめ記事」（月2本まで・通常記事と入れ替え）の日なら 0（next が自動で出す）
+  python scripts/autopilot.py matome-done <ジャンル> <slug>  … まとめ記事を書いた記録（data/matome.json）
   python scripts/autopilot.py weekly-due       … 週1本のジャンル（genres.json の weekly_day。オリシャン記事）を今日書く日なら 0、違えば 1
   python scripts/autopilot.py jidouka-done <回> <slug>  … 自動化記事（毎日1本）のその回を書いた印を data/jidouka-progress.json に付ける
   python scripts/autopilot.py jidouka-add <file.json>   … 自動化ランキングに困りごとを追加する（残りが10個を切ったとき。形は next が表示）
@@ -390,6 +392,79 @@ def weekly_due(topics=None):
     return None
 
 
+# ---------------------------------------------------------------------------
+# 選び方と比較のまとめ記事（月2本まで・その日の通常記事と入れ替える）
+# 同じジャンルで提携中の広告が3つ以上あるテーマについて書く。記録は data/matome.json
+# ---------------------------------------------------------------------------
+MATOME = DATA / "matome.json"
+MATOME_PER_MONTH = 2
+MATOME_MIN_ADS = 3
+MATOME_GAP_DAYS = 10       # まとめ記事どうしの間隔（月の前半と後半に1本ずつになる）
+MATOME_REDO_DAYS = 180     # 同じジャンルのまとめは半年に1回まで
+
+
+def matome_due():
+    """今日まとめ記事を書くなら (ジャンル, 広告の一覧, 同じジャンルの公開済み記事)。書かないなら None。"""
+    done = load_json(MATOME, [])
+    d = datetime.date.fromisoformat(today())
+    if sum(1 for m in done if m["date"][:7] == today()[:7]) >= MATOME_PER_MONTH:
+        return None
+    if done and (d - datetime.date.fromisoformat(max(m["date"] for m in done))).days < MATOME_GAP_DAYS:
+        return None
+    if any(a.get("matome") == "true" and (a.get("created") or a.get("date")) == today() for a in articles()):
+        return None
+    recent = {m["genre"] for m in done if (d - datetime.date.fromisoformat(m["date"])).days < MATOME_REDO_DAYS}
+    ledger = load_json(LEDGER, {})
+    arts = [a for a in published_articles() if a.get("matome") != "true"]
+    best = None
+    for g, conf in GENRES.items():
+        if g in recent or conf.get("daily") or conf.get("ads") in ("none", "own") or isinstance(conf.get("weekly_day"), int):
+            continue
+        ads = [(k, v) for k, v in ledger.items() if isinstance(v, dict) and v.get("url") and v.get("enabled") is not False
+               and v.get("genre") in ad_genres(g)]
+        if len(ads) < MATOME_MIN_ADS:
+            continue
+        rel = [a for a in arts if a["_genre"] == g]
+        score = len(ads) + 3 * len(rel)          # 個別記事が多いジャンルほど内部リンクが張れる
+        if not best or score > best[0]:
+            best = (score, g, ads, rel)
+    return best[1:] if best else None
+
+
+def show_matome(g, ads, rel, done_today):
+    import affiliate
+    conf = GENRES[g]
+    log(f"■ 本日の自動記事: {len(done_today)}/{MAX_PER_DAY} 本")
+    log(f"■ 今日の通常記事は「選び方と比較のまとめ記事」に入れ替えます（月{MATOME_PER_MONTH}本まで・ネタ帳 topics.txt は使わない）")
+    log(f"■ ジャンル: {g}（{conf['label']}）")
+    log("■ 型: templates/kata/matome.md（フロントマターに matome: true と genre を必ず書く）")
+    if conf.get("note"):
+        log(f"■ このジャンルのルール（必ず守る）: {conf['note']}")
+    log("■ 料金・特徴は、書く前に WebSearch / WebFetch で各サービスの公式サイトを確かめる。確かめられなかったことは書かない")
+    log(f"■ 比べる候補（提携中の広告 {len(ads)} 件・報酬の目安が高い順。読者に合う3〜5件を選ぶ。合わないものは入れない）:")
+    for k, v in sorted(ads, key=lambda kv: -affiliate.reward_yen(kv[1])):
+        log(f"  - 案件名「{k}」: {v.get('label', '')} {v.get('catch', '')}")
+    log("■ 関連する記事（「関連する記事」の節で [タイトル](/slug) でリンクする。本文の中でも合う所から自然にリンクしてよい）:")
+    for a in rel:
+        log(f"  - {a.get('title', a['_slug'])}  → /{a['_slug']}")
+    log(f"■ 書いて保存したら、topics の done の代わりに `python scripts/autopilot.py matome-done {g} <slug>` を実行し、publish.py で公開する")
+    log("■ 公開済みの記事（タイトルが重ならないようにする）:")
+    for a in articles():
+        log(f"  - [{a['_genre']}] {a.get('title', a['_slug'])}  ({a['_slug']})")
+    return 0
+
+
+def cmd_matome_done(genre, slug):
+    done = load_json(MATOME, [])
+    done.append({"date": today(), "genre": genre, "slug": slug})
+    save_json(MATOME, done)
+    state = load_json(STATE, {})
+    state["last_genre"] = genre      # 通常のジャンルの順番も1つ進める
+    save_json(STATE, state)
+    log(f"まとめ記事を記録しました: {genre} → {slug}（今月 {sum(1 for m in done if m['date'][:7] == today()[:7])} 本）")
+    return 0
+
+
 def cmd_weekly_due():
     g = weekly_due()
     if g:
@@ -409,6 +484,10 @@ def cmd_next():
         return show_jidouka(daily, done_today)
     topics = [t for t in read_topics() if not t[2] and t[1] not in daily_genres()]
     due = weekly_due(topics)
+    if not due:   # 週1本の日でなければ、月2本までの「選び方と比較のまとめ記事」の日かを見る（通常記事と入れ替え）
+        m = matome_due()
+        if m:
+            return show_matome(*m, done_today)
     # 週1本のジャンルは、書く日だけ最優先。それ以外の日は通常の順番に入れない
     if not due:
         topics = [t for t in topics if t[1] not in weekly_genres()]
@@ -652,6 +731,10 @@ def cmd_sync():
     after = {k for k, v in load_json(LEDGER, {}).items() if isinstance(v, dict) and v.get("url")}
     new = sorted(after - before)
     log(f"新しく使えるようになった広告: {len(new)} 件 {' / '.join(new)}")
+    if new:
+        k = new_ads_to_articles(new)
+        if k:
+            log(f"新しい広告が合う既存記事 {k} 件を、優先の見直しに入れました（data/refresh-priority.json）")
     n = jidouka_sync()
     if n:
         log(f"自動化ランキング: 広告の状況を「提携済み」にした困りごと {n} 件")
@@ -845,6 +928,53 @@ def cmd_status():
 # ---------------------------------------------------------------------------
 REFRESH_CFG = DATA / "refresh.json"
 REFRESH_LOG = DATA / "refresh-log.json"
+# 優先して見直す記事（30日たっていなくても先に見直す）: [{slug, reason, added}]
+#   ・scripts/report.py（毎週）: 閲覧数の多い記事 → 合う広告のうち報酬の高いものを優先して置く
+#   ・cmd_sync: 新しく承認された広告に合う既存記事（広告を本文の印や affiliates: で指定している記事）→ その広告を足す
+REFRESH_PRIORITY = DATA / "refresh-priority.json"
+
+
+def refresh_priority_add(slug, reason):
+    items = load_json(REFRESH_PRIORITY, [])
+    for it in items:
+        if it["slug"] == slug:
+            if reason not in it["reason"]:
+                it["reason"] += " ／ " + reason
+            break
+    else:
+        items.append({"slug": slug, "reason": reason, "added": today()})
+    save_json(REFRESH_PRIORITY, items)
+
+
+def refresh_priority_done(slug):
+    items = load_json(REFRESH_PRIORITY, [])
+    if any(it["slug"] == slug for it in items):
+        save_json(REFRESH_PRIORITY, [it for it in items if it["slug"] != slug])
+
+
+def new_ads_to_articles(new_names):
+    """新しく承認された広告に合う既存記事を、優先の見直しに入れる。
+    広告を自動で選ぶ記事は、ビルドのたびに合う広告が入るので対象外。本文の印（<!-- AFFILIATE: -->）か affiliates: で
+    広告を決めている記事（自動化記事など）だけ、その広告を足すかを見直しで判断させる。"""
+    import affiliate
+    progs = {p["name"]: p for p in affiliate.load_ledger()}
+    n = 0
+    for a in published_articles():
+        path = article_path(a["_slug"])
+        if not path:
+            continue
+        meta, body = front_matter(path)
+        if not ("<!-- AFFILIATE:" in body or (meta.get("affiliates") or "").strip()):
+            continue
+        if (meta.get("affiliates") or "").strip().lower() in ("none", "なし", "no", "off", "false"):
+            continue
+        for name in new_names:
+            p = progs.get(name)
+            if p and affiliate.score(p, meta.get("title", ""), body) >= 3 and name not in body and name not in meta.get("affiliates", ""):
+                refresh_priority_add(a["_slug"], f"新しく承認された広告「{name}」（{p.get('label') or name}）がこの記事に合う。"
+                                                 "読者に合う節があれば、そこに自然に足す（合わなければ足さない）")
+                n += 1
+    return n
 
 
 def refresh_cfg():
@@ -884,6 +1014,11 @@ def refresh_quota_left():
 
 def cmd_refresh_next():
     ok, why = refresh_active()
+    pri = [it for it in load_json(REFRESH_PRIORITY, []) if article_path(it["slug"])]
+    pub = {a["_slug"]: a for a in published_articles()}
+    pri = [it for it in pri if it["slug"] in pub]
+    if pri and refresh_cfg()["mode"] != "off" and refresh_quota_left() > 0:
+        return show_refresh_target(pub[pri[0]["slug"]], pri[0]["reason"])
     if not ok:
         log(why)
         return 2
@@ -904,6 +1039,15 @@ def cmd_refresh_next():
         log(f"見直す記事がありません（どの記事も {cfg['min_age_days']} 日以内に公開・見直し済み）。")
         return 2
     last, a = sorted(cands, key=lambda x: x[0])[0]
+    return show_refresh_target(a, "")
+
+
+def show_refresh_target(a, reason):
+    import affiliate
+    cfg = refresh_cfg()
+    checked = {}
+    for e in load_json(REFRESH_LOG, []):
+        checked[e["slug"]] = max(checked.get(e["slug"], ""), e["date"])
     path = article_path(a["_slug"])
     ledger = {k: v for k, v in load_json(LEDGER, {}).items() if isinstance(v, dict) and v.get("url")}
     genre = a["_genre"]
@@ -912,9 +1056,11 @@ def cmd_refresh_next():
     log(f"  slug: {a['_slug']} / ファイル: {path.relative_to(ROOT).as_posix()} / ジャンル: {genre}")
     log(f"  公開日: {a.get('date', '-')} / 最終更新: {a.get('updated', '-')} / 最後の見直し: {checked.get(a['_slug'], '-')}")
     log(f"  記事で指定している広告: {a.get('affiliates', '（指定なし＝内容に合わせて自動）')}")
-    log(f"  このジャンルの提携中の広告（{len(progs)}件）:")
-    for k, v in progs:
-        log(f"    - {k}: {v.get('label', '')} {v.get('catch', '')}")
+    if reason:
+        log(f"  ★ 優先の見直し（目的）: {reason}")
+    log(f"  このジャンルの提携中の広告（{len(progs)}件・報酬の目安が高い順）:")
+    for k, v in sorted(progs, key=lambda kv: -affiliate.reward_yen(kv[1])):
+        log(f"    - {k}: {v.get('label', '')} {v.get('catch', '')}（報酬 {v.get('reward') or '不明'}）")
     log(f"今週あと {refresh_quota_left()} 本見直せます。")
     return 0
 
@@ -960,6 +1106,7 @@ def refresh_record(slug, result, note):
 
 
 def cmd_refresh_done(slug, note):
+    refresh_priority_done(slug)
     path = article_path(slug)
     if not path:
         log(f"記事 {slug} が見つかりません")
@@ -987,6 +1134,7 @@ def cmd_refresh_done(slug, note):
 
 
 def cmd_refresh_skip(slug, note):
+    refresh_priority_done(slug)
     path = article_path(slug)
     if path:
         old = git_head_text(path)
@@ -1014,6 +1162,12 @@ def main():
         return cmd_sync()
     if cmd == "a8-check":
         return cmd_a8_check()
+    if cmd == "matome-done" and len(rest) == 2:
+        return cmd_matome_done(*rest)
+    if cmd == "matome-due":
+        m = matome_due()
+        log(f"今日はまとめ記事の日です: {m[0]}（広告 {len(m[1])} 件・関連記事 {len(m[2])} 本）" if m else "今日はまとめ記事の日ではありません")
+        return 0 if m else 1
     if cmd == "weekly-due":
         return cmd_weekly_due()
     if cmd == "jidouka-done" and len(rest) == 2:
