@@ -9,6 +9,7 @@
   python scripts/note-run.py list       … note に投稿済みの記事
   python scripts/note-run.py header     … 投稿済みで見出し画像のない記事に、あとから見出し画像を付ける
   python scripts/note-run.py due        … 今日投稿する記事があるか（あれば終了コード 0）
+  python scripts/note-run.py profile    … note の顔（アイコン・ヘッダー・名前・自己紹介。scripts/note_design.py の絵柄）を設定する
 
 流れ:
   1. 公開済み（公開予定時刻を過ぎた）のブログ記事のうち、note にまだ出していないものを選ぶ。
@@ -16,8 +17,10 @@
      ほかの記事は、公開済みの自動化記事・オリシャン記事が1本もないときだけ（自動化記事を始めた最初の日など）
   2. Claude Code（claude -p・scripts/note-prompt.md）が note 用の別バージョンを書く → data/note/<slug>.md
   3. 重複チェック: ブログと同じ10文字の並びが 12% 以上、または 40 字以上の一致があれば書き直し（3回書いてだめなら見送り）
-  4. note 用の Chrome（ログイン済みプロファイル）で記事を入力して公開 → URL を data/note.json に記録
-  5. publish.py でブログ側の記事末尾に note への案内を足す（note に出した記事だけ）
+  4. 見出し画像＝記事サムネイル（scripts/note_design.py。シリーズ名と note での連番・原稿の thumb_* の文字・絵。
+     はみ出したら文字を小さく→それでもだめなら thumb_* を言い換えさせる。作れなければブログの写真）→ state/note-img/<slug>.png
+  5. note 用の Chrome（ログイン済みプロファイル）で記事を入力して公開 → URL を data/note.json に記録（series・series_no も）
+  6. publish.py でブログ側の記事末尾に note への案内を足す（note に出した記事だけ）
 ログインが切れていたら .secrets/note.json で自動でログインし直す。通らなければ note だけ見送り、STATUS.md の「要対応」に理由を出す。
 通し確認（boot-run.py --rehearsal・環境変数 BLOG_REHEARSAL=1）のときは、note の公開設定の画面（ハッシュタグ入力）まで進めて止める。
 公開はせず（note には下書きが1件残る）、data/note.json にも記録しない。日付は BLOG_TODAY（明日）として数える。
@@ -32,9 +35,11 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import note_design  # noqa: E402
 import social  # noqa: E402
 from claude_env import claude_env  # noqa: E402
 from note_browser import CDP_URL, SHOTS, auto_login, close_chrome, current_user, published_notes, save_status, start_chrome  # noqa: E402
@@ -262,6 +267,55 @@ def header_image(slug, title):
     return out
 
 
+def genre_of(slug):
+    md = ROOT / "content" / "ja" / f"{slug}.md"
+    return read_md(md)[0].get("genre", "") if md.exists() else ""
+
+
+def rewrite_thumb(ver, why):
+    """note 用原稿のサムネイルの文字（thumb_*）だけを Claude Code に書き直させる。"""
+    claude = find_claude()
+    if not claude:
+        return False
+    rel = ver.relative_to(ROOT).as_posix()
+    prompt = (f"{rel} のフロントマターの thumb_topic・thumb_title・thumb_sub・thumb_motif の4行だけを書き直して保存してください"
+              f"（なければ title と tags の行のあとに足す）。ほかの行・本文は1文字も変えない。\n"
+              f"書き方は scripts/note-prompt.md の「サムネイルの文字」の節に従う。\n理由: {why}\n"
+              f"保存したら「保存しました」とだけ報告して終わる。")
+    subprocess.run([claude, "-p", prompt, "--permission-mode", "acceptEdits", "--allowedTools", "Read", "Edit"],
+                   cwd=ROOT, text=True, encoding="utf-8", errors="replace", capture_output=True, timeout=10 * 60, env=claude_env())
+    return True
+
+
+def thumbnail(slug, ver, meta, done):
+    """記事サムネイル（シリーズ名・番号・大きな文字・下の一行・絵）を作る。(画像のパス, シリーズ名, 番号)。
+    文字がはみ出すときは note_design が小さくし、それでもだめなら thumb_* を言い換えさせて作り直す（2回まで）。
+    作れなければ、これまでの見出し画像（ブログの写真）にする。"""
+    series = note_design.series_name(meta.get("genre"))
+    no = 1 + sum(1 for s, v in done.items() if v.get("series", note_design.series_name(genre_of(s))) == series)
+    out = ROOT / "state" / "note-img" / f"{slug}.png"
+    why = ""
+    for attempt in range(3):
+        if why:
+            log(f"{slug}: サムネイルの文字を言い換えます（{why}）")
+            rewrite_thumb(ver, why)
+        spec = note_design.thumb_spec(note_design.read_front(ver), meta.get("genre"), no)
+        if not spec:
+            why = "thumb_title・thumb_sub がありません"
+            continue
+        try:
+            size = note_design.make_thumb(spec, out, palette_index=len(done))
+            log(f"{slug}: サムネイルを作りました（{spec['badge']}・大きな文字 {size}px）")
+            return out, series, no
+        except note_design.FitError as e:
+            why = f"文字が枠からはみ出します: {e}。もっと短く言い換える"
+        except Exception as e:
+            log(f"{slug}: サムネイルを作れませんでした（{type(e).__name__}: {str(e)[:200]}）")
+            break
+    log(f"{slug}: サムネイルを作れなかったため、ブログの写真を見出し画像にします")
+    return header_image(slug, read_md(ver)[0].get("title", "")), None, None
+
+
 def wait_js(page, js, timeout=60):
     """js（真偽を返す関数）が真になるまで1秒ごとに確かめる。
     note の画面は CSP で Playwright の wait_for_function（文字列の評価）が使えないため、evaluate で見る。"""
@@ -321,6 +375,50 @@ def add_header_to_posted(page, url, image):
     page.get_by_role("button", name=re.compile("^更新する")).click()
     wait_js(page, "() => !location.pathname.includes('/publish') || document.body.innerText.includes('シェアしてみましょう')", 60)
     page.wait_for_timeout(2000)
+
+
+PROFILE_NAME = "maf｜面倒を減らす暮らしのメモ"
+PROFILE_BIO = ("家事・お金・仕事の「毎回やっている面倒」を、道具と仕組みで少しずつ減らす方法を書いています。"
+               "献立、洗濯、家計簿、請求書。今日から1つ試せる話だけを。")
+
+
+def use_image_dialog(page, name):
+    """画像の切り抜きダイアログが出たら確定する。"""
+    page.wait_for_timeout(2500)
+    shot(page, f"profile-{name}")
+    for label in ("この画像を使う", "設定", "保存"):
+        btn = page.locator('[role="dialog"]').get_by_role("button", name=label, exact=True)
+        if btn.count() and btn.last.is_enabled():
+            btn.last.click()
+            page.wait_for_timeout(2500)
+            return
+    raise RuntimeError(f"{name} の画像の確定ボタンが見つかりません")
+
+
+def set_profile(page, user):
+    """プロフィール設定画面で、ヘッダー・アイコン・名前・自己紹介を設定して保存する。"""
+    icon, header = note_design.make_profile()
+    page.goto("https://note.com/settings/profile", wait_until="domcontentloaded")
+    page.locator('input[name="editNickname"]').wait_for(timeout=30000)
+    page.wait_for_timeout(2000)
+    page.set_input_files("#headerImage", str(header))
+    use_image_dialog(page, "header")
+    page.locator('xpath=//input[@name="editNickname"]/preceding::button[1]').click()   # アイコン
+    page.locator('[role="dialog"] input[type="file"]').wait_for(state="attached", timeout=15000)
+    page.locator('[role="dialog"] input[type="file"]').set_input_files(str(icon))
+    use_image_dialog(page, "icon")
+    if page.locator('[role="dialog"]').count() and page.locator('[role="dialog"]').first.is_visible():
+        use_image_dialog(page, "icon2")   # 切り抜きのあとに「設定」の画面に戻る場合
+    page.locator('input[name="editNickname"]').fill(PROFILE_NAME)
+    page.locator('textarea[name="editBiography"]').fill(PROFILE_BIO)
+    shot(page, "profile-before-save")
+    page.get_by_role("button", name="保存", exact=True).last.click()
+    page.wait_for_timeout(4000)
+    shot(page, "profile-saved")
+    with urllib.request.urlopen(urllib.request.Request(f"https://note.com/api/v2/creators/{user}",
+                                headers={"User-Agent": "Mozilla/5.0 blog-factory"}), timeout=20) as r:
+        d = json.loads(r.read().decode("utf-8"))["data"]
+    return d.get("nickname"), d.get("profile"), d.get("profileImageUrl") or d.get("userProfileImagePath"), d.get("headerImageUrl")
 
 
 PASTE_JS = """(html) => {
@@ -418,7 +516,7 @@ def find_same_title(user, title):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header", "due"])
+    ap.add_argument("cmd", nargs="?", default="run", choices=["run", "check", "list", "header", "due", "profile"])
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--slug")
     args = ap.parse_args()
@@ -461,6 +559,7 @@ def main():
         return 1
     posted = []
     with sync_playwright() as p:
+        note_design.use_playwright(p)   # サムネイル・プロフィール画像の撮影も同じ Playwright で
         browser = p.chromium.connect_over_cdp(CDP_URL)
         ctx = browser.contexts[0]
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
@@ -479,6 +578,15 @@ def main():
         save_status(True, f"OK（{user}）")
         if args.cmd == "check":
             print(f"note: ログイン中（{user}）")
+            close_chrome(browser)
+            return 0
+        if args.cmd == "profile":  # note の顔（アイコン・ヘッダー・名前・自己紹介）
+            try:
+                print(json.dumps(set_profile(page, user), ensure_ascii=False))
+                log("note: プロフィールを設定しました")
+            except Exception as e:
+                shot(page, "error-profile")
+                log(f"note: プロフィールの設定に失敗（{type(e).__name__}: {str(e)[:300]}）")
             close_chrome(browser)
             return 0
         if args.cmd == "header":  # 投稿済みで見出し画像のない記事に、あとから付ける
@@ -511,8 +619,9 @@ def main():
                     posted.append(slug)
                     log(f"note: {slug} は同じタイトルの記事がすでに note にあるため投稿しません（記録だけ補いました → {same}）")
                     continue
+                image, series, no = thumbnail(slug, ver, meta, done)
                 url, has_header = post_to_note(page, user, n_meta["title"], to_html(n_body), tags,
-                                   image=header_image(slug, n_meta["title"]), publish=not REHEARSAL)
+                                               image=image, publish=not REHEARSAL)
                 if REHEARSAL:
                     log(f"note:（通し確認）{slug} を公開設定の画面まで入力して止めました（公開していません・下書き {url}）")
                     continue
@@ -525,6 +634,8 @@ def main():
                 continue
             done[slug] = {"url": url, "title": n_meta["title"], "header": has_header,
                           "posted_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")}
+            if series:
+                done[slug].update(series=series, series_no=no)
             save_log(done)
             posted.append(slug)
             log(f"note: 投稿しました {slug} → {url}")
