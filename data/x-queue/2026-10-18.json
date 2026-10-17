@@ -1,0 +1,47 @@
+{
+ "date": "2026-10-18",
+ "day_number": 2,
+ "created_at": "2026-10-18T04:15",
+ "cost_note": "今月の概算 $3.24（使った分 $0.23＋残り 14 日分）",
+ "items": [
+  {
+   "kind": "link",
+   "at": "2026-10-18T07:33",
+   "text": "食後のシンクにたまったお皿、見るだけで気が重くなります。\n食後の作業を「食洗機に入れてボタンを押す」までにする考え方と、置き場所や工事の有無の確かめ方を書きました。\n\nhttps://blog-factory-cf7.pages.dev/jidouka-02-ryouri-soujiki-saraarai?utm_source=x",
+   "url": "https://blog-factory-cf7.pages.dev/jidouka-02-ryouri-soujiki-saraarai?utm_source=x",
+   "check_url": "https://blog-factory-cf7.pages.dev/jidouka-02-ryouri-soujiki-saraarai",
+   "slug": "jidouka-02-ryouri-soujiki-saraarai",
+   "image": "data/x-queue/img/2026-10-18-link.png",
+   "card": {
+    "before_title": "前：手洗い",
+    "before": [
+     "毎食後スポンジで洗う",
+     "水切りかごで乾かす"
+    ],
+    "after_title": "今：食洗機",
+    "after": [
+     "入れる位置を決めておく",
+     "入れてボタンを押すだけ"
+    ]
+   },
+   "est_cost": 0.2,
+   "id": "2026-10-18-1"
+  },
+  {
+   "kind": "taiken",
+   "at": "2026-10-18T12:54",
+   "text": "飲食店をやっていた頃、忙しい時間ほど電話が鳴りました。\n\n予約の電話は、料理の手を止めて出るしかありません。受付で大事なのは、すぐ出ることより、あとで確かめられる記録が残ることかもしれないと思っています。",
+   "est_cost": 0.015,
+   "image": "data/x-queue/img/2026-10-18-t1.png",
+   "card": {
+    "label": "飲食店をやっていた頃",
+    "quote": [
+     "受付は、すぐ出ることより",
+     "あとで確かめられる記録が",
+     "残ることが大事だと思う"
+    ]
+   },
+   "id": "2026-10-18-2"
+  }
+ ]
+}

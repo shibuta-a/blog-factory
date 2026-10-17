@@ -22,13 +22,24 @@
    "url": null,
    "text": "支払いや入金の通知メールが届くたび、内容を探して表計算ソフトに写していませんか。\nメールソフトの振り分けで専用フォルダに集めておくだけでも、月末に探す手間は減らせます。まずは件名で1つ、ルールを作ってみてください。",
    "cost": 0.015
+  },
+  {
+   "id": "2026-10-17-2",
+   "date": "2026-10-17",
+   "kind": "link",
+   "at": "2026-10-17T20:04",
+   "posted_at": "2026-10-17T20:05",
+   "tweet_id": "2111413315016515968",
+   "url": "https://blog-factory-cf7.pages.dev/jidouka-01-choubo-seikyusho-kondate?utm_source=x",
+   "text": "月末になると、ひな形をコピーして日付と金額を書きかえる請求書づくり。\n請求書ソフトに取引先と品目を一度登録し、定期請求を設定すると、毎月の作成を任せられます。選び方も記事にまとめました。\n\nhttps://blog-factory-cf7.pages.dev/jidouka-01-choubo-seikyusho-kondate?utm_source=x",
+   "cost": 0.2
   }
  ],
  "months": {
   "2026-10": {
-   "posts": 2,
-   "link_posts": 0,
-   "cost": 0.03
+   "posts": 3,
+   "link_posts": 1,
+   "cost": 0.23
   }
  },
  "credit": {},
@@ -36,6 +47,6 @@
  "replies": {
   "items": [],
   "user_id": "2109492125918470144",
-  "checked_at": "2026-10-17T18:15"
+  "checked_at": "2026-10-18T04:15"
  }
 }
